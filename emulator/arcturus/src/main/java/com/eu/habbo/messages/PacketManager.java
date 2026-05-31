@@ -446,6 +446,7 @@ public class PacketManager {
         this.registerHandler(Incoming.JukeBoxRequestPlayListEvent, JukeBoxRequestPlayListEvent.class);
         this.registerHandler(Incoming.JukeBoxEventOne, JukeBoxEventOne.class);
         this.registerHandler(Incoming.JukeBoxEventTwo, JukeBoxEventTwo.class);
+        this.registerHandler(Incoming.JukeBoxEventThree, SoundMachineSaveSongEvent.class);
         this.registerHandler(Incoming.SavePostItStickyPoleEvent, SavePostItStickyPoleEvent.class);
         this.registerHandler(Incoming.RequestPromotionRoomsEvent, RequestPromotionRoomsEvent.class);
         this.registerHandler(Incoming.BuyRoomPromotionEvent, BuyRoomPromotionEvent.class);
