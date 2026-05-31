@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block body %}
+<header class="page-header flex-container flex-vertical-center">
+    <div class="page-header-content">
+        <h1>{{locale.header_title}}</h1>
+        {{locale.header_desc}}
+    </div>
+</header>
+
+<div class="page-content">
+    <div class="left-side">
+
+        {% if news is not empty %}
+        <article class="default-section community-topstory">
+            {% set featured = news[0] %}
+            <a href="/article/{{featured.id}}-{{featured.slug}}" class="community-topstory-link">
+                {% if featured.header %}
+                <div class="community-topstory-image" style="background-image: url({{featured.header}});"></div>
+                {% endif %}
+                <div class="community-topstory-body">
+                    <div class="community-topstory-category">{{featured.category}}</div>
+                    <div class="community-topstory-title">{{featured.title}}</div>
+                    <div class="community-topstory-desc">{{featured.short_story}}</div>
+                    <span class="community-read-more">{{locale.read_more}} &rsaquo;</span>
+                </div>
+            </a>
+        </article>
+
+        <article class="default-section">
+            <div class="aside-title-content">{{locale.latest_news}}</div>
+            <div class="aside-content">
+                <div class="community-news-list">
+                    {% for item in news %}
+                    {% if loop.index > 1 %}
+                    <a href="/article/{{item.id}}-{{item.slug}}" class="community-news-item">
+                        {% if item.header %}
+                        <div class="community-news-thumb" style="background-image: url({{item.header}});"></div>
+                        {% endif %}
+                        <div class="community-news-info">
+                            <div class="community-news-category">{{item.category}}</div>
+                            <div class="community-news-title">{{item.title}}</div>
+                            <div class="community-news-date">{{item.timestamp|date("d M Y")}}</div>
+                        </div>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+        {% endif %}
+
+    </div>
+
+    <div class="right-side">
+
+        <aside class="default-section">
+            <div class="aside-title-content">{{locale.community_links}}</div>
+            <div class="aside-content">
+                <ul class="community-links-list">
+                    <li><a href="/articles">{{locale.link_articles}}</a></li>
+                    <li><a href="/community/photos">{{locale.link_photos}}</a></li>
+                    <li><a href="/community/staff">{{locale.link_staff}}</a></li>
+                    <li><a href="/community/fansites">{{locale.link_fansites}}</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        {% if habbos is not empty %}
+        <aside class="default-section">
+            <div class="aside-title-content">{{locale.random_habbos}}</div>
+            <div class="aside-content">
+                <div class="community-habbos-grid">
+                    {% for habbo in habbos %}
+                    <a href="/profile/{{habbo.username}}" class="community-habbo-item" title="{{habbo.username}}">
+                        <img src="{{site.fpath}}/avatarimage?figure={{habbo.look}}&direction=2&head_direction=3&gesture=sml&size=s&headonly=1" alt="{{habbo.username}}" class="pixelated">
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+        {% endif %}
+
+        {% if rooms is not empty %}
+        <aside class="default-section">
+            <div class="aside-title-content">{{locale.popular_rooms}}</div>
+            <div class="aside-content">
+                <ul class="community-rooms-list">
+                    {% for room in rooms %}
+                    <li class="community-room-item">
+                        <img src="/assets/havana/web-gallery/v2/images/rooms/room_icon_{% if room.users >= 10 %}5{% elseif room.users >= 7 %}4{% elseif room.users >= 4 %}3{% elseif room.users >= 1 %}2{% else %}1{% endif %}.gif" alt="" class="room-icon">
+                        <div class="community-room-details">
+                            <div class="community-room-name">{{room.name}}</div>
+                            <div class="community-room-users">{{room.users}} {{locale.users_online}}</div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </aside>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

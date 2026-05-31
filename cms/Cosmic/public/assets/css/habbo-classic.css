@@ -1284,3 +1284,215 @@ body.habbo-classic .page-container .page-content {
     image-rendering: pixelated;
     image-rendering: -webkit-optimize-contrast;
 }
+
+/* =============================================
+   COMMUNITY PAGE
+   ============================================= */
+
+/* Featured top story */
+.community-topstory {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.community-topstory-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.community-topstory-image {
+    width: 100%;
+    height: 160px;
+    background-size: cover;
+    background-position: center top;
+    background-color: #c0c8d0;
+}
+
+.community-topstory-body {
+    padding: 10px 12px 12px;
+}
+
+.community-topstory-category {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+}
+
+.community-topstory-title {
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.community-topstory-desc {
+    font-size: 11px;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.community-read-more {
+    font-size: 11px;
+    color: #c36a05;
+    font-weight: bold;
+}
+
+.community-topstory-link:hover .community-topstory-title {
+    text-decoration: underline;
+}
+
+/* News list below the top story */
+.community-news-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.community-news-item {
+    display: flex;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    align-items: flex-start;
+}
+
+.community-news-thumb {
+    width: 64px;
+    height: 40px;
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    background-color: #c0c8d0;
+    border-radius: 3px;
+}
+
+.community-news-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.community-news-category {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+.community-news-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.3;
+    margin: 2px 0;
+}
+
+.community-news-date {
+    font-size: 10px;
+    color: #999;
+}
+
+.community-news-item:hover .community-news-title {
+    text-decoration: underline;
+    color: #c36a05;
+}
+
+/* Community links */
+.community-links-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.community-links-list li {
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.community-links-list li:last-child {
+    border-bottom: none;
+}
+
+.community-links-list li a {
+    display: block;
+    padding: 5px 4px;
+    font-size: 11px;
+    color: #c36a05;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.community-links-list li a:hover {
+    text-decoration: underline;
+    color: #333;
+}
+
+/* Random Habbos grid */
+.community-habbos-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.community-habbo-item {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: #e8f0f8;
+    align-items: center;
+    justify-content: center;
+}
+
+.community-habbo-item img {
+    display: block;
+}
+
+.community-habbo-item:hover {
+    background: #d0dce8;
+}
+
+/* Popular rooms list */
+.community-rooms-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.community-room-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.community-room-item:last-child {
+    border-bottom: none;
+}
+
+.community-room-item .room-icon {
+    flex-shrink: 0;
+    image-rendering: pixelated;
+}
+
+.community-room-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.community-room-name {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.community-room-users {
+    font-size: 10px;
+    color: #888;
+}
