@@ -1,8 +1,8 @@
 {
     "image.library.notifications.url": "${image.library.url}notifications/%image%.png",
     "achievements.images.url": "${image.library.url}Quests/%image%.png",
-    "camera.url": "https://camera.url",
-    "thumbnails.url": "https://camera.url/thumbnail/%thumbnail%.png",
+    "camera.url": "http://localhost:8082/camera",
+    "thumbnails.url": "http://localhost:8082/camera/thumbnail/%thumbnail%.png",
     "url.prefix": "https://website.com",
     "cms.url": "http://localhost:8082",
     "habbopages.url": "${url.prefix}/",

@@ -18,6 +18,7 @@ services:
       - ./emulator/:/app/
       - volume-arcturus-target:/app/arcturus/target
       - volume-arcturus-maven-repo:/root/.m2
+      - ./cms/Cosmic/public/camera:/var/www/html/public/camera
     ports:
       - 3000:3000
       - 3001:3001
