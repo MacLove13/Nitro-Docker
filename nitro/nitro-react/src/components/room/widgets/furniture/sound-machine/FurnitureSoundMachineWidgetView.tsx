@@ -109,6 +109,7 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
 {
     const {
         objectId,
+        isOpen,
         diskInventory,
         selectedDiskIds,
         timeline,
@@ -129,7 +130,7 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
 
     const stopSampleRef = useRef<(() => void) | null>(null);
 
-    if (objectId === -1) return null;
+    if (!isOpen || objectId === -1) return null;
 
     const diskIds: number[] = diskInventory?.getKeys() ?? [];
 

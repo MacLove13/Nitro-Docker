@@ -235,21 +235,28 @@
                     <div class="kt-section">
                         <div class="kt-section__title">Rotation Images (PNG / GIF)</div>
                         <p class="text-muted kt-margin-b-10">
-                            Upload images for each rotation direction.
-                            Use GIFs to include frame-by-frame animations.
-                            Directions: 0 = North, 2 = East, 4 = South, 6 = West (and diagonals 1/3/5/7).
+                            Faça upload apenas das rotações que o objeto terá — as demais são ignoradas automaticamente.<br>
+                            <strong>Rotações principais:</strong> 0 = Norte, 2 = Leste, 4 = Sul, 6 = Oeste.<br>
+                            <strong>Rotações diagonais (opcional):</strong> 1, 3, 5, 7.<br>
+                            Uma cadeira simples normalmente usa apenas <strong>0, 2, 4 e 6</strong>.
+                            Se quiser somente 2 direções, suba só as rotações desejadas (ex: apenas 2 e 6).
+                            Use GIF para animar frames.
                         </p>
                         <div class="kt-section__body">
                             <div class="row" id="rotationUploads">
-                                {% for rot in [0,1,2,3,4,5,6,7] %}
+                                {# Isometric camera comes from the SE. Arrows show where the object's FRONT faces on screen. #}
+                                {% set rot_labels = {0: 'frente-direita', 2: 'frente', 4: 'frente-esquerda', 6: 'costas', 1: 'direita', 3: 'baixo', 5: 'esquerda', 7: 'cima'} %}
+                                {% set rot_arrows = {0: '↗', 2: '↘', 4: '↙', 6: '↖', 1: '➡', 3: '⬇', 5: '⬅', 7: '⬆'} %}
+                                {% for rot in [0,2,4,6,1,3,5,7] %}
                                 <div class="col-md-3 kt-margin-b-20">
                                     <div class="kt-portlet kt-portlet--bordered">
                                         <div class="kt-portlet__head kt-portlet__head--sm">
                                             <div class="kt-portlet__head-label">
-                                                <span class="kt-portlet__head-title">Rotation {{ rot }}</span>
+                                                <span class="kt-portlet__head-title">{{ rot_arrows[rot] }} Rot {{ rot }} &ndash; {{ rot_labels[rot] }}</span>
                                             </div>
                                         </div>
                                         <div class="kt-portlet__body">
+                                            <small class="text-muted d-block kt-margin-b-5">opcional</small>
                                             <input type="file" name="rotation_{{ rot }}" accept="image/png,image/gif"
                                                    class="rotation-upload" data-rotation="{{ rot }}">
                                             <img src="#" class="rotation-preview img-fluid kt-margin-t-10"

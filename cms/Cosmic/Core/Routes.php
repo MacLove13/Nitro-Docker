@@ -97,6 +97,7 @@ class Routes extends Router
             Router::get('/profile/{username}', 'Home\Profile@profile', ['defaultParameterRegex' => '[a-zA-Z0-9\d\-_=\?!@:\.,]+']);
           
             Router::post('/profile/search', 'Home\Profile@search');
+            Router::post('/profile/feeds', 'Home\Profile@feeds');
 
             Router::get('/assets/js/web/web.locale.js', function () {
                 header('Content-Type: application/javascript');

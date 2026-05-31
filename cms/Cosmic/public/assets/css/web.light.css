@@ -2130,7 +2130,7 @@ input:-webkit-autofill {
     background-repeat: no-repeat;
     border-top: 1px solid rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    height: 160px;
+    height: 100px;
     color: #fff;
     padding-left: 395px;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
@@ -2200,6 +2200,10 @@ input:-webkit-autofill {
     width: 692px;
     float: left;
     clear: left;
+}
+
+.page-container[data-page="profile"] .page-content {
+    min-height: 768px;
 }
 
 .page-container[data-page="profile"] .page-content .right-side {
@@ -2340,20 +2344,31 @@ input:-webkit-autofill {
 
 .page-container[data-page="profile"] .page-header-content .button, 
 .page-container[data-page="profile"] .page-content .button {
-    color: #222;
+    color: #fff;
     outline: none;
-    padding: 5px;
-    margin: 0;
+    padding: 6px 14px;
+    margin: 0 5px;
     border-radius: 4px;
-    border: 1px solid #000000;
+    border: 2px solid #2a7700;
     min-width: 50px;
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: bold;
+    font-size: 13px;
     text-decoration: none;
     cursor: pointer;
     box-sizing: border-box;
-    background: linear-gradient(to bottom, #F3F3F3 50%, #d9d9d9 50%);
-    box-shadow: inset 0 0 0 2px #d9d9d9;
+    background: linear-gradient(to bottom, #5bcc00 50%, #3a9900 50%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+    
+.page-container[data-page="profile"] .page-header-content .button:hover, 
+.page-container[data-page="profile"] .page-content .button:hover {
+    background: linear-gradient(to bottom, #6fd600 50%, #4ab100 50%);
+}
+    
+.page-container[data-page="profile"] .page-header-content .button:active, 
+.page-container[data-page="profile"] .page-content .button:active {
+    background: linear-gradient(to bottom, #4d9a00 50%, #2d6d00 50%);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -4542,6 +4557,25 @@ input:-webkit-autofill {
 .page-container[data-page="profile"] .page-header {
     background-image: url(../images/web/pages/profile/banner.png);
     background-color: #27282f;
+}
+
+.page-container[data-page="profile"] .profile-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.page-container[data-page="profile"] .profile-header-content h1 {
+    margin: 0;
+    flex: 1;
+}
+
+.page-container[data-page="profile"] .profile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .page-container[data-page="profile"] .page-header h1 {

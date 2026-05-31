@@ -2210,6 +2210,10 @@ input:-webkit-autofill {
     clear: left;
 }
 
+.page-container[data-page="profile"] .page-content {
+    min-height: 768px;
+}
+
 .page-container .page-content .right-side {
     width: 330px;
     float: right;

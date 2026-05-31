@@ -301,7 +301,7 @@ class Admin
         return QueryBuilder::table('users')->select('username')->select('id')->setFetchMode(PDO::FETCH_CLASS, get_called_class())->where('username', 'LIKE', $string . '%')->limit($limit)->get();
     }
 
-    public static function changePlayerSettings($email, $motto, $pin_code, $user_id, $extra_rank)
+    public static function changePlayerSettings($email, $motto, $pin_code, $user_id, $extra_rank, $rank = null)
     {
         $data = array(
             'mail'        => $email,
@@ -309,6 +309,10 @@ class Admin
             'pincode'     => $pin_code,
             'extra_rank'  => $extra_rank
         );
+
+        if ($rank !== null) {
+            $data['rank'] = $rank;
+        }
 
         return QueryBuilder::table('users')->setFetchMode(PDO::FETCH_CLASS, get_called_class())->where('id', $user_id)->update($data);
     }

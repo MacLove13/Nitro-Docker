@@ -151,9 +151,13 @@ class NitroGenerator:
         """Build the sprite asset name following Habbo naming conventions.
 
         Expected format: {item_name}_{size}_{rotation}_{frame}
-        e.g.  custom_furni_1_64_2_0
+        e.g.  custom_chair_64_2_0
+
+        rotation_key comes from the form field name ("rotation_2") or
+        state field ("state_0") – we extract just the numeric part.
         """
-        return f"{self.item_name}_64_{rotation_key}_{frame_index}"
+        rot_num = rotation_key.replace("rotation_", "").replace("state_", "")
+        return f"{self.item_name}_64_{rot_num}_{frame_index}"
 
     # ------------------------------------------------------------------
     # Manifest building

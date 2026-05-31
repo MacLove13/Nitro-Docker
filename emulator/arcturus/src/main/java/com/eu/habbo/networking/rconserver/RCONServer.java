@@ -45,6 +45,7 @@ public class RCONServer extends Server {
         this.addRCONMessage("setrank", SetRank.class);
         this.addRCONMessage("updatewordfilter", UpdateWordfilter.class);
         this.addRCONMessage("updatecatalog", UpdateCatalog.class);
+        this.addRCONMessage("updateitems", UpdateItems.class);
         this.addRCONMessage("executecommand", ExecuteCommand.class);
         this.addRCONMessage("progressachievement", ProgressAchievement.class);
         this.addRCONMessage("updateuser", UpdateUser.class);

@@ -611,69 +611,458 @@ function WebPageProfileInterface(main_page) {
             }
         });
 
+        // ── Inventory modal HTML ─────────────────────────────────────────────
+        var inventoryModalHtml =
+            '<div class="profile-modal-overlay" id="inventoryModal">' +
+            '  <div class="profile-modal">' +
+            '    <div class="profile-modal-header">' +
+            '      <span class="profile-modal-title">Inventário</span>' +
+            '      <button class="profile-modal-close" data-modal="inventoryModal">×</button>' +
+            '    </div>' +
+            '    <div class="profile-modal-body">' +
+            '      <div class="profile-modal-sidebar">' +
+            '        <a href="#" class="inv-tab active" data-section="inv-stickers">Stickers</a>' +
+            '        <a href="#" class="inv-tab" data-section="inv-widgets">Widgets</a>' +
+            '        <a href="#" class="inv-tab" data-section="inv-backgrounds">Backgrounds</a>' +
+            '      </div>' +
+            '      <div class="profile-modal-content">' +
+            '        <div class="inv-section" id="inv-stickers">' +
+            '          <div class="inv-filter-bar"></div>' +
+            '          <div class="inv-grid-wrap"><div class="inv-sticker-grid"></div></div>' +
+            '        </div>' +
+            '        <div class="inv-section" id="inv-widgets" style="display:none">' +
+            '          <div class="inv-widget-list"></div>' +
+            '        </div>' +
+            '        <div class="inv-section" id="inv-backgrounds" style="display:none">' +
+            '          <div class="inv-bg-grid"></div>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>';
 
-        var stickers = [
-            '<div class="dialog-popup sticker-shop-dialog" style="width: 780px; max-width: 850px;">' +
-            '<div class="sticker-shop-tabs">' +
-            '<button class="tab-btn active" data-tab="inventory">Inventory</button>' +
-            '<button class="tab-btn" data-tab="webstore">Web Store</button>' +
-            '</div>' +
-            '<div class="sticker-shop-body">' +
-            '<div class="tab-panel" id="tab-inventory">' +
-            '<div class="shop-sidenav"></div>' +
-            '<div class="shop-main inventory-main"></div>' +
-            '</div>' +
-            '<div class="tab-panel" id="tab-webstore" style="display:none">' +
-            '<div class="shop-sidenav webstore-sidenav"></div>' +
-            '<div class="shop-main webstore-main"></div>' +
-            '<div class="shop-preview">' +
-            '<div class="preview-img-wrap"><img class="preview-img" src="" alt=""></div>' +
-            '<div class="preview-name"></div>' +
-            '<div class="preview-price"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle;"> Price: <span class="price-val">0</span> credits</div>' +
-            '<div class="preview-balance"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle;"> You have: <span class="balance-val">0</span> credits</div>' +
-            '<button class="purchaseBtn btn btn-primary" disabled>Purchase</button>' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
-            '</div>'
-        ].join("");
+        // ── Shop modal HTML ──────────────────────────────────────────────────
+        var shopModalHtml =
+            '<div class="profile-modal-overlay" id="shopModal">' +
+            '  <div class="profile-modal">' +
+            '    <div class="profile-modal-header">' +
+            '      <span class="profile-modal-title">Loja</span>' +
+            '      <button class="profile-modal-close" data-modal="shopModal">×</button>' +
+            '    </div>' +
+            '    <div class="profile-modal-body">' +
+            '      <div class="profile-modal-sidebar">' +
+            '        <a href="#" class="shop-tab active" data-section="shop-stickers">Stickers</a>' +
+            '        <a href="#" class="shop-tab" data-section="shop-backgrounds">Backgrounds</a>' +
+            '      </div>' +
+            '      <div class="profile-modal-content">' +
+            '        <div class="shop-section" id="shop-stickers">' +
+            '          <div class="shop-cat-sidebar" id="shop-sticker-cats"></div>' +
+            '          <div class="shop-items-wrap">' +
+            '            <div class="shop-item-grid" id="shop-sticker-grid"></div>' +
+            '            <div class="shop-preview-panel">' +
+            '              <div class="shop-preview-img-wrap"><img class="shop-preview-img" src="" alt=""></div>' +
+            '              <div class="shop-preview-name"></div>' +
+            '              <div class="shop-preview-price"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle"> Preço: <span class="shop-price-val">0</span> créditos</div>' +
+            '              <div class="shop-preview-balance"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle"> Seu saldo: <span class="shop-balance-val">0</span> créditos</div>' +
+            '              <button class="shop-buy-btn btn btn-primary" disabled>Comprar</button>' +
+            '            </div>' +
+            '          </div>' +
+            '        </div>' +
+            '        <div class="shop-section" id="shop-backgrounds" style="display:none">' +
+            '          <div class="shop-cat-sidebar" id="shop-bg-cats"></div>' +
+            '          <div class="shop-items-wrap">' +
+            '            <div class="shop-item-grid" id="shop-bg-grid"></div>' +
+            '            <div class="shop-preview-panel">' +
+            '              <div class="shop-preview-img-wrap"><img class="shop-preview-img" src="" alt=""></div>' +
+            '              <div class="shop-preview-name"></div>' +
+            '              <div class="shop-preview-price"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle"> Preço: <span class="shop-price-val">0</span> créditos</div>' +
+            '              <div class="shop-preview-balance"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle"> Seu saldo: <span class="shop-balance-val">0</span> créditos</div>' +
+            '              <button class="shop-buy-btn btn btn-primary" disabled>Comprar</button>' +
+            '            </div>' +
+            '          </div>' +
+            '        </div>' +
+            '      </div>' +
+            '    </div>' +
+            '  </div>' +
+            '</div>';
 
-        var widgets = [
-            '<div class="dialog-popup" style="width: 275px;">\n' +
-            '</div>'
-        ].join("");
+        // ── Helper: build flat sticker grid with filter bar ──────────────────
+        function buildStickerInventoryGrid(filterBarSel, gridSel, categorys, items) {
+            var $bar  = $(filterBarSel).empty();
+            var $grid = $(gridSel).empty();
 
-        var template = [
-            '<div class="dialog-popup" style="width: 744px; max-width: 850px;">\n' +
-            '    <div class="notification-content" style="overflow-y:scroll; height: 400px"></div>\n' +
-            '</div>'
-        ].join("");
+            // Build category map
+            var catMap = {};
+            if (categorys) {
+                $.each(categorys, function(i, c) { catMap[c.id] = c.name; });
+            }
 
-        this.backgrounds_template = [
-            '<img src="/assets/images/profile_backgrounds/{{image.url}}" class="bgImage" data-id="{{id}}" height="75" width="75">\n'
-        ].join("");
+            // "Todos" filter button + per-category buttons
+            $bar.append('<a href="#" class="inv-filter active" data-cat="all">Todos</a>');
+            if (categorys && categorys.length > 0) {
+                $.each(categorys, function(i, cat) {
+                    // Only show filter if we have items in this cat
+                    var hasCat = items && items.some(function(it) { return String(it.category) === String(cat.id); });
+                    if (hasCat) {
+                        $bar.append('<a href="#" class="inv-filter" data-cat="' + cat.id + '">' + cat.name + '</a>');
+                    }
+                });
+            }
 
-        // Change background
+            // Render all items as a flat grid, each with data-cat attribute
+            if (items && items.length > 0) {
+                $.each(items, function(i, item) {
+                    var imgSrc = '/assets/images/homestickers/' + item.data + '.gif';
+                    var $wrap  = $('<div class="inv-item-wrap">').attr('data-cat', item.category);
+                    var $img   = $('<img>').attr('src', imgSrc)
+                        .addClass('inv-item-img')
+                        .attr('data-id', item.id)
+                        .attr('data-data', item.data)
+                        .attr('data-name', item.name)
+                        .attr('data-type', item.type)
+                        .attr('title', item.name)
+                        .attr('height', 40).attr('width', 40);
+
+                    $wrap.append($img);
+                    if (item.quantity > 1) {
+                        $wrap.append('<span class="inv-qty-badge">x' + item.quantity + '</span>');
+                    }
+                    $grid.append($wrap);
+
+                    $img.click(function() {
+                        var catalogueId = $(this).data('id');
+                        var stickerData = $(this).data('data');
+                        var imgPath     = '/assets/images/homestickers/' + stickerData + '.gif';
+
+                        // Call server to decrement inventory
+                        Web.ajax_manager.post("/home/profile/useSticker", {
+                            catalogue_id: catalogueId,
+                            csrftoken: csrftoken
+                        }, function(result) {
+                            if (result.status !== 'success') {
+                                Web.notifications_manager.create('error', 'Erro', result.message || 'Erro ao usar sticker.');
+                                return;
+                            }
+
+                            // Place sticker on page with edit overlay
+                            var uid = Date.now();
+                            var $widget = $(
+                                '<div class="widget sticker-widget" ' +
+                                '     data-id="' + stickerData + '.gif" ' +
+                                '     data-ids="new-' + uid + '" ' +
+                                '     data-type="s" data-skin="default_skin" ' +
+                                '     data-top="0" data-left="0" ' +
+                                '     style="position:relative;left:0px;top:0px;width:0px;">' +
+                                '  <img id="new-' + uid + '-edit" data-id="new-' + uid + '" ' +
+                                '       class="icon-edit editActive" ' +
+                                '       src="/assets/images/homestickers/icon_edit.gif" ' +
+                                '       style="display:none;position:absolute;top:-10px;right:-10px;z-index:10;cursor:pointer;">' +
+                                '  <div class="edit-menu" id="new-' + uid + '-menu" ' +
+                                '       style="position:absolute;z-index:20;display:none;">' +
+                                '    <button class="deleteElement" data-type="s" data-id="new-' + uid + '" ' +
+                                '            data-catalogue="' + catalogueId + '">Remover</button>' +
+                                '  </div>' +
+                                '  <img src="' + imgPath + '">' +
+                                '</div>'
+                            );
+
+                            $('.page-content').append($widget);
+                            $widget.draggable({
+                                containment: $('.page-container'),
+                                stop: function() {
+                                    $(this).attr('data-top',  $(this).css('top').replace('px',''));
+                                    $(this).attr('data-left', $(this).css('left').replace('px',''));
+                                }
+                            });
+
+                            // Wire edit icon
+                            $widget.find('.icon-edit').click(function(e) {
+                                e.stopPropagation();
+                                $widget.find('.edit-menu').toggle();
+                            });
+
+                            // Wire remove button — returns sticker to inventory
+                            $widget.find('.deleteElement').click(function() {
+                                var $btn = $(this);
+                                var catId = $btn.data('catalogue');
+                                Web.ajax_manager.post("/home/profile/remove", {
+                                    id: $btn.data('id'),
+                                    type: 's',
+                                    catalogue_id: catId,
+                                    csrftoken: csrftoken
+                                }, function(res) {
+                                    if (res.status === 'success') {
+                                        $widget.remove();
+                                        // Update quantity badge in inventory if modal still open
+                                        var $invWrap = $('#inventoryModal .inv-item-img[data-id="' + catId + '"]').closest('.inv-item-wrap');
+                                        if ($invWrap.length) {
+                                            var $badge = $invWrap.find('.inv-qty-badge');
+                                            var cur = $badge.length ? parseInt($badge.text().replace('x','')) : 0;
+                                            var nxt = cur + 1;
+                                            if ($badge.length) $badge.text('x' + nxt);
+                                            else $invWrap.append('<span class="inv-qty-badge">x' + nxt + '</span>');
+                                        }
+                                    }
+                                });
+                            });
+
+                            // Update qty badge in modal
+                            var newQty = result.quantity;
+                            if (newQty <= 0) {
+                                $wrap.remove();
+                                // Remove filter button if no items left in that cat
+                                var catId2 = item.category;
+                                var remaining = $grid.find('.inv-item-wrap[data-cat="' + catId2 + '"]').length;
+                                if (remaining === 0) {
+                                    $bar.find('.inv-filter[data-cat="' + catId2 + '"]').remove();
+                                }
+                            } else {
+                                $wrap.find('.inv-qty-badge').remove();
+                                if (newQty > 1) $wrap.append('<span class="inv-qty-badge">x' + newQty + '</span>');
+                            }
+                        });
+
+                        $('#inventoryModal').hide();
+                    });
+                });
+            } else {
+                $grid.append('<p class="inv-empty">Nenhum sticker no inventário.</p>');
+            }
+
+            // Filter click handler
+            $bar.find('.inv-filter').click(function(e) {
+                e.preventDefault();
+                $bar.find('.inv-filter').removeClass('active');
+                $(this).addClass('active');
+                var cat = $(this).data('cat');
+                if (cat === 'all') {
+                    $grid.find('.inv-item-wrap').show();
+                } else {
+                    $grid.find('.inv-item-wrap').hide();
+                    $grid.find('.inv-item-wrap[data-cat="' + cat + '"]').show();
+                }
+            });
+        }
+
+        // ── Helper: build bg grid ────────────────────────────────────────────
+        function buildBgGrid(gridSel, items) {
+            var $grid = $(gridSel).empty();
+            if (items && items.length > 0) {
+                $.each(items, function(i, item) {
+                    var imgSrc = '/assets/images/profile_backgrounds/' + item.data;
+                    var $wrap  = $('<div class="inv-item-wrap">');
+                    var $img   = $('<img>').attr('src', imgSrc)
+                        .addClass('inv-item-img')
+                        .attr('title', item.name)
+                        .attr('height', 60).attr('width', 100);
+                    $wrap.append($img);
+                    $grid.append($wrap);
+                    $img.click(function() {
+                        page_container.css('background', 'url(' + imgSrc + ')');
+                        page_container.find('.page-content').attr('data-background', item.data);
+                        $('#inventoryModal').hide();
+                    });
+                });
+            } else {
+                $grid.append('<p class="inv-empty">Nenhum background no inventário.</p>');
+            }
+        }
+
+        // ── Open Inventory modal ─────────────────────────────────────────────
+        page_container.find(".openInventory").click(function() {
+            if ($('#inventoryModal').length) $('#inventoryModal').remove();
+            $('body').append(inventoryModalHtml);
+            var $modal = $('#inventoryModal');
+
+            Web.ajax_manager.post("/home/profile/inventory", { csrftoken: csrftoken }, function(data) {
+
+                // Sidebar tab switching
+                $modal.find('.inv-tab').click(function(e) {
+                    e.preventDefault();
+                    $modal.find('.inv-tab').removeClass('active');
+                    $(this).addClass('active');
+                    $modal.find('.inv-section').hide();
+                    $('#' + $(this).data('section')).show();
+                });
+
+                // ── Stickers tab — flat grid + filter ────────────────────────
+                buildStickerInventoryGrid(
+                    '#inventoryModal .inv-filter-bar',
+                    '#inventoryModal .inv-sticker-grid',
+                    data.sticker_categorys,
+                    data.sticker_inventory
+                );
+
+                // ── Widgets tab ──────────────────────────────────────────────
+                var $wlist = $modal.find('.inv-widget-list').empty();
+                if (data.widgets && data.widgets.length > 0) {
+                    $.each(data.widgets, function(i, w) {
+                        var $btn = $('<button class="inv-widget-btn">' + w + '</button>');
+                        $wlist.append($btn);
+                        $btn.click(function() {
+                            Web.ajax_manager.post("/home/profile/add", {
+                                data: 'w', type: 'p', add: w, csrftoken: csrftoken
+                            }, function(result) {
+                                if (result.status === 'success') {
+                                    window.location.reload();
+                                }
+                            });
+                            $modal.hide();
+                        });
+                    });
+                } else {
+                    $wlist.append('<p class="inv-empty">Todos os widgets já estão no seu perfil.</p>');
+                }
+
+                // ── Backgrounds tab ──────────────────────────────────────────
+                buildBgGrid('#inventoryModal .inv-bg-grid', data.bg_inventory);
+            });
+
+            // Close button / overlay click
+            $modal.find('.profile-modal-close').click(function() { $modal.remove(); });
+            $modal.click(function(e) { if ($(e.target).is('.profile-modal-overlay')) $modal.remove(); });
+        });
+
+        // ── Open Shop modal ──────────────────────────────────────────────────
+        page_container.find(".openShop").click(function() {
+            if ($('#shopModal').length) $('#shopModal').remove();
+            $('body').append(shopModalHtml);
+            var $modal = $('#shopModal');
+            var shopCredits = 0;
+            var selectedItem = null;
+
+            Web.ajax_manager.post("/home/profile/shop", { csrftoken: csrftoken }, function(data) {
+                shopCredits = data.credits;
+
+                // Sidebar tab switching
+                $modal.find('.shop-tab').click(function(e) {
+                    e.preventDefault();
+                    $modal.find('.shop-tab').removeClass('active');
+                    $(this).addClass('active');
+                    $modal.find('.shop-section').hide();
+                    var sec = $(this).data('section');
+                    $('#' + sec).show();
+                    // Reset selection
+                    selectedItem = null;
+                    $modal.find('.shop-buy-btn').prop('disabled', true);
+                    $modal.find('.shop-preview-img').attr('src', '');
+                    $modal.find('.shop-preview-name').text('');
+                });
+
+                function setupShopSection(catSel, gridSel, categorys, items, typeSuffix) {
+                    var $catBar = $(catSel).empty();
+                    var $grid   = $(gridSel).empty();
+                    var $section = $grid.closest('.shop-section');
+
+                    $section.find('.shop-balance-val').text(shopCredits);
+
+                    if (categorys && categorys.length > 0) {
+                        $.each(categorys, function(i, cat) {
+                            $catBar.append('<a href="#" data-cat="' + cat.id + '">' + cat.name + '</a>');
+                            $grid.append('<div class="inv-cat-grid cat-' + cat.id + '" style="display:none"></div>');
+                        });
+                        $catBar.find('a').first().addClass('active');
+                        $grid.find('.inv-cat-grid').first().show();
+                        $catBar.find('a').click(function(e) {
+                            e.preventDefault();
+                            $catBar.find('a').removeClass('active');
+                            $(this).addClass('active');
+                            $grid.find('.inv-cat-grid').hide();
+                            $grid.find('.cat-' + $(this).data('cat')).show();
+                        });
+                    } else {
+                        $grid.append('<div class="inv-cat-grid cat-0"></div>');
+                    }
+
+                    if (items && items.length > 0) {
+                        $.each(items, function(i, item) {
+                            var catClass = categorys && categorys.length > 0 ? 'cat-' + item.category : 'cat-0';
+                            var imgSrc = typeSuffix === 's'
+                                ? '/assets/images/homestickers/' + item.data + '.gif'
+                                : '/assets/images/profile_backgrounds/' + item.data;
+
+                            var $wrap = $('<div class="inv-item-wrap shop-item-wrap' + (item.owned ? ' item-owned' : '') + '">');
+                            var $img = $('<img>').attr('src', imgSrc)
+                                .addClass('inv-item-img shop-item-img')
+                                .attr('data-id', item.id)
+                                .attr('data-name', item.data)
+                                .attr('data-type', typeSuffix)
+                                .attr('data-price', item.price)
+                                .attr('title', item.name)
+                                .attr('height', typeSuffix === 'b' ? 60 : 40)
+                                .attr('width',  typeSuffix === 'b' ? 100 : 40);
+
+                            $wrap.append($img);
+                            if (item.owned) $wrap.append('<span class="item-owned-badge">✓ Possuído</span>');
+                            $grid.find('.' + catClass).append($wrap);
+
+                            if (!item.owned || typeSuffix === 's') {
+                                $img.click(function() {
+                                    selectedItem = { id: item.id, name: item.name, src: imgSrc, price: item.price, type: typeSuffix };
+                                    $section.find('.shop-preview-img').attr('src', imgSrc);
+                                    $section.find('.shop-preview-name').text(item.name);
+                                    $section.find('.shop-price-val').text(item.price);
+                                    $section.find('.shop-balance-val').text(shopCredits);
+                                    $section.find('.shop-buy-btn').prop('disabled', false);
+                                    $grid.find('.inv-item-wrap').removeClass('selected');
+                                    $wrap.addClass('selected');
+                                });
+                            }
+                        });
+                    }
+
+                    $section.find('.shop-buy-btn').click(function() {
+                        if (!selectedItem) return;
+                        var $btn = $(this);
+                        $btn.prop('disabled', true);
+                        Web.ajax_manager.post("/home/profile/buy", {
+                            catalogue_id: selectedItem.id,
+                            csrftoken: csrftoken
+                        }, function(result) {
+                            if (result.status === 'success') {
+                                shopCredits = result.credits;
+                                $modal.find('.shop-balance-val').text(shopCredits);
+                                Web.notifications_manager.create('success', 'Comprado!', result.message);
+                                // Mark background as owned if type b
+                                if (result.item.type === 'b') {
+                                    $grid.find('.inv-item-wrap[data-id="' + result.item.id + '"]').addClass('item-owned');
+                                }
+                            } else {
+                                Web.notifications_manager.create('error', 'Erro', result.message);
+                                $btn.prop('disabled', false);
+                            }
+                        });
+                    });
+                }
+
+                setupShopSection('#shop-sticker-cats', '#shop-sticker-grid', data.sticker_categorys, data.sticker_items, 's');
+                setupShopSection('#shop-bg-cats',      '#shop-bg-grid',      data.bg_categorys,      data.bg_items,      'b');
+            });
+
+            $modal.find('.profile-modal-close').click(function() { $modal.remove(); });
+            $modal.click(function(e) { if ($(e.target).is('.profile-modal-overlay')) $modal.remove(); });
+        });
+
+
+        // ── Background on page load ──────────────────────────────────────────
         if ($(".page-content").attr('data-background')) {
             page_container.css('background', 'url(/assets/images/profile_backgrounds/' + $(".page-content").attr('data-background') + ')');
         }
 
+        // ── Save profile ─────────────────────────────────────────────────────
         page_container.find(".saveProfile").click(function() {
-
             var arr = [];
-
             page_container.find(".editActive").hide();
             page_container.find(".editProfile").show();
 
             $('.widget').each(function(i, obj) {
-
-                var id = $(this).attr('data-id')
-                var top = $(this).attr('data-top');
-                var left = $(this).attr('data-left');
-                var skin = $(this).attr('data-skin');
-                var type = $(this).attr('data-type'); 
-
-                arr.push([id, top, left, skin, type]);
+                arr.push([
+                    $(this).attr('data-id'),
+                    $(this).attr('data-top'),
+                    $(this).attr('data-left'),
+                    $(this).attr('data-skin'),
+                    $(this).attr('data-type')
+                ]);
             });
 
             Web.ajax_manager.post("/home/profile/save", {
@@ -681,28 +1070,29 @@ function WebPageProfileInterface(main_page) {
                 background: $(".page-content").attr('data-background'),
                 csrftoken: csrftoken
             });
+            
+            // Disable drag and drop after saving
+            $('.widget').draggable('destroy');
         });
 
+        // ── Widget skin/delete edit menu ─────────────────────────────────────
         page_container.find(".icon-edit").click(function(e) {
-
             var id = $(this).attr('data-id');
-
             page_container.find("#" + id + '-menu').show();
 
             page_container.find(".selectSkin[data-id=" + id + "]").unbind("click").click(function(e) {
                 if ($(this).val() !== null) {
-
                     $(".widget[data-ids=" + id + "]").removeClass('widget_' + $(".widget[data-ids=" + id + "]").attr('data-skin'));
                     $(".widget[data-ids=" + id + "]").addClass('widget_' + $(this).val());
                     $(".widget[data-ids=" + id + "]").attr('data-skin', $(this).val());
-
                 }
             });
 
             page_container.find(".deleteElement[data-id=" + id + "]").unbind("click").click(function(e) {
+                var $del = $(this);
                 Web.ajax_manager.post("/home/profile/remove", {
-                    id: $(this).attr('data-id'),
-                    type: $(this).attr('data-type'),
+                    id: $del.data('id'),
+                    type: $del.data('type'),
                     csrftoken: csrftoken
                 }, function(result) {
                     if (result.status == "success") {
@@ -718,244 +1108,21 @@ function WebPageProfileInterface(main_page) {
                     }
                 }
             });
-
         });
 
-        page_container.find(".addWidget").click(function() {
-
-            var dialog = $(widgets);
-
-            $.magnificPopup.open({
-                items: {
-                    src: dialog,
-                    type: 'inline'
-                }
-            });
-            
-            Web.ajax_manager.post("/home/profile/store", {
-                data: 'w',
-                type: null,
-                csrftoken: csrftoken
-            }, function(data) {
-                $.each(data.widgets, function(index, value) {
-                    dialog.append('<a href="#" data-name="' + value + '" class="widgetButton btn form-control" style="margin-top: 5px">' + value + '</a>');
-
-                    dialog.find(".widgetButton[data-name=" + value + "]").click(function() {
-                        Web.ajax_manager.post("/home/profile/store", {
-                            data: 'w',
-                            type: 'p',
-                            add: $(this).attr('data-name'),
-                            csrftoken: csrftoken
-                        }, function(data) {
-                            setTimeout(function() {
-                                page_container.find(".editProfile").click();
-                            }, 500);
-                        });
-                        $.magnificPopup.close();
-                    });
-                });
-            });
-        });
-
+        // ── Edit profile (enable dragging) ───────────────────────────────────
         page_container.find(".editProfile").click(function() {
-
             page_container.find(".editActive").show();
             page_container.find(".editProfile").hide();
 
             $('.widget').draggable({
                 containment: $('.page-container'),
                 stop: function() {
-                    $(this).attr('data-top', $(this).css("top").replace('px', ''))
-                    $(this).attr('data-left', $(this).css("left").replace('px', ''))
+                    $(this).attr('data-top', $(this).css("top").replace('px', ''));
+                    $(this).attr('data-left', $(this).css("left").replace('px', ''));
                 }
             });
-
-            page_container.find(".addSticker").click(function() {
-                Web.ajax_manager.post("/home/profile/store", {
-                    data: 's',
-                    csrftoken: csrftoken
-                }, function(data) {
-
-                    var dialog = $(stickers);
-                    var selectedItem = null;
-                    var userCredits = data.credits !== undefined ? data.credits : 0;
-
-                    $.magnificPopup.open({
-                        items: { src: dialog, type: 'inline' }
-                    });
-
-                    // ── Tab switching ───────────────────────────────────────
-                    dialog.find(".tab-btn").click(function() {
-                        dialog.find(".tab-btn").removeClass("active");
-                        $(this).addClass("active");
-                        dialog.find(".tab-panel").hide();
-                        dialog.find("#tab-" + $(this).data("tab")).show();
-                    });
-
-                    // ── Helper: build category sidebar ──────────────────────
-                    function buildSidebar(sidenavSel, mainSel, items, categorys, clickFn) {
-                        if (categorys && categorys.length > 0) {
-                            for (var i = 0; i < categorys.length; i++) {
-                                var cat = categorys[i];
-                                dialog.find(sidenavSel).append('<a href="#" data-cat="' + cat.id + '">' + cat.name + '</a>');
-                                dialog.find(mainSel).append('<div class="sticker-grid cat-' + cat.id + '" style="display:none"></div>');
-                            }
-                            // Show first category by default
-                            dialog.find(sidenavSel + " a").first().addClass("active");
-                            dialog.find(mainSel + " .sticker-grid").first().show();
-
-                            dialog.find(sidenavSel + " a").click(function() {
-                                dialog.find(sidenavSel + " a").removeClass("active");
-                                $(this).addClass("active");
-                                dialog.find(mainSel + " .sticker-grid").hide();
-                                dialog.find(mainSel + " .cat-" + $(this).data("cat")).show();
-                            });
-                        }
-
-                        if (items && items.length > 0) {
-                            for (var x = 0; x < items.length; x++) {
-                                var item = items[x];
-                                var img = $('<img src="/assets/images/homestickers/' + item.data + '.gif"' +
-                                    ' class="stickerImage" data-name="' + item.data +
-                                    '" data-id="' + item.id +
-                                    '" data-price="' + (item.price || 0) +
-                                    '" height="34" width="34" title="' + item.name + '">');
-                                dialog.find(mainSel + " .cat-" + item.category).append(img);
-                                img.click(function() { clickFn($(this)); });
-                            }
-                        }
-                    }
-
-                    // ── Inventory tab ───────────────────────────────────────
-                    buildSidebar(
-                        "#tab-inventory .shop-sidenav",
-                        "#tab-inventory .inventory-main",
-                        data.inventory,
-                        data.categorys,
-                        function(img) {
-                            $('<img>').attr('src', img.attr("src"))
-                                .addClass('widget')
-                                .attr('data-id', img.attr("data-name") + '.gif')
-                                .attr('data-type', 's')
-                                .css('position', 'relative')
-                                .appendTo('.page-content').draggable({
-                                containment: $('.page-container'),
-                                stop: function() {
-                                    $(this).attr('data-top', $(this).css("top").replace('px', ''));
-                                    $(this).attr('data-left', $(this).css("left").replace('px', ''));
-                                }
-                            });
-                            $.magnificPopup.close();
-                        }
-                    );
-
-                    // ── Web Store tab ───────────────────────────────────────
-                    // Use credits returned in store() response
-                    if (data.credits !== undefined) {
-                        userCredits = data.credits;
-                    }
-                    dialog.find(".balance-val").text(userCredits);
-
-                    buildSidebar(
-                        "#tab-webstore .webstore-sidenav",
-                        "#tab-webstore .webstore-main",
-                        data.items,
-                        data.categorys,
-                        function(img) {
-                            selectedItem = {
-                                id:    img.attr("data-id"),
-                                name:  img.attr("title"),
-                                src:   img.attr("src"),
-                                price: parseInt(img.attr("data-price"), 10) || 0
-                            };
-                            dialog.find(".preview-img").attr("src", selectedItem.src);
-                            dialog.find(".preview-name").text(selectedItem.name);
-                            dialog.find(".price-val").text(selectedItem.price);
-                            dialog.find(".purchaseBtn").prop("disabled", false);
-                        }
-                    );
-
-                    // Purchase button
-                    dialog.find(".purchaseBtn").click(function() {
-                        if (!selectedItem) return;
-                        var btn = $(this);
-                        btn.prop("disabled", true);
-                        Web.ajax_manager.post("/home/profile/buy", {
-                            catalogue_id: selectedItem.id,
-                            csrftoken: csrftoken
-                        }, function(result) {
-                            if (result.status === "success") {
-                                userCredits = result.credits;
-                                dialog.find(".balance-val").text(userCredits);
-                                // Move purchased item to inventory tab
-                                data.inventory = data.inventory || [];
-                                data.inventory.push(result.item);
-                                var newImg = $('<img>').attr('src', selectedItem.src)
-                                    .addClass('stickerImage')
-                                    .attr('data-name', result.item.data)
-                                    .attr('data-id', String(result.item.id))
-                                    .attr('data-price', '0')
-                                    .attr('height', '34')
-                                    .attr('width', '34')
-                                    .attr('title', result.item.name);
-                                dialog.find("#tab-inventory .cat-" + result.item.category).append(newImg);
-                                newImg.click(function() {
-                                    $('<img>').attr('src', $(this).attr("src"))
-                                        .addClass('widget')
-                                        .attr('data-id', $(this).attr("data-name") + '.gif')
-                                        .attr('data-type', 's')
-                                        .css('position', 'relative')
-                                        .appendTo('.page-content').draggable({
-                                        containment: $('.page-container'),
-                                        stop: function() {
-                                            $(this).attr('data-top', $(this).css("top").replace('px', ''));
-                                            $(this).attr('data-left', $(this).css("left").replace('px', ''));
-                                        }
-                                    });
-                                    $.magnificPopup.close();
-                                });
-                                Web.notifications_manager.create("success", "Purchased!", "Sticker added to your inventory.");
-                            } else {
-                                Web.notifications_manager.create("error", "Error", result.message);
-                                btn.prop("disabled", false);
-                            }
-                        });
-                    });
-
-                });
-            });
-
-            page_container.find(".changeBg").click(function() {
-                Web.ajax_manager.post("/home/profile/store", {
-                    data: 'b',
-                    csrftoken: csrftoken
-                }, function(data) {
-
-                    var dialog = $(template);
-
-                    $.magnificPopup.open({
-                        items: {
-                            src: dialog,
-                            type: 'inline'
-                        }
-                    });
-
-                    if (data.items.length > 0) {
-                        for (var i = 0; i < data.items.length; i++) {
-
-                            var background = data.items[i];
-                            var backgroundInsert = $(self.backgrounds_template.replace(/{{image.url}}/g, background.data).replace(/{{id}}/g, background.id));
-                            dialog.find(".notification-content").append(backgroundInsert);
-
-                            dialog.find(".bgImage[data-id=" + background.id + "]").click(function() {
-                                page_container.css('background', 'url(' + $(this).attr("src") + ')');
-                                page_container.find('.page-content').attr('data-background', $(this).attr("src").replace('/assets/images/profile_backgrounds/', ''));
-                            });
-                        }
-                    }
-                });
-            });
-        })
+        });
     }
 }
 

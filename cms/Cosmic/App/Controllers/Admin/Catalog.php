@@ -18,6 +18,14 @@ class Catalog
         $this->data = new \stdClass();
     }
   
+    private function reloadEmulator(): void
+    {
+        if (Config::apiEnabled) {
+            HotelApi::execute('updatecatalog');
+            HotelApi::execute('updateitems');
+        }
+    }
+
     public function request()
     {
         $validate = request()->validator->validate([
@@ -48,9 +56,7 @@ class Catalog
         $query = Admin::updateCatalogPages($catid, $caption, $page_teaser, $page_headline, $parent_id, $page_layout, $visible, $enabled);
       
         if($query) {
-            if(Config::apiEnabled) {
-                HotelApi::execute('updatecatalog');
-            }
+            $this->reloadEmulator();
         }
       
         echo '{"status":"success","message":"Item is successfully editted!"}';
@@ -128,7 +134,7 @@ class Catalog
             )
         ), $furni_id));
 
-        HotelApi::execute('updatecatalog');
+        $this->reloadEmulator();
 
         echo '{"status":"success","message":"Item is successfully editted!"}';
         exit;
@@ -193,7 +199,7 @@ class Catalog
             exit;
         }
 
-        HotelApi::execute('updatecatalog');
+        $this->reloadEmulator();
         HotelApi::execute('hotelalert', ['message' => 'O catalogo foi atualizado', 'url' => '']);
 
         echo json_encode(['status' => 'success', 'message' => 'Catalog reloaded and players notified.']);

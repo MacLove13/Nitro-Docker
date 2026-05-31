@@ -1,5 +1,5 @@
 import { GetNitroInstance, GetConfiguration, GetConnection } from '../../../../api';
-import { MusicPriorities, RoomObjectSoundMachineEvent, SongDataEntry, SongDiskInventoryReceivedEvent, IAdvancedMap, AdvancedMap } from '@nitrots/nitro-renderer';
+import { MusicPriorities, RoomEngineTriggerWidgetEvent, RoomObjectSoundMachineEvent, SongDataEntry, SongDiskInventoryReceivedEvent, IAdvancedMap, AdvancedMap } from '@nitrots/nitro-renderer';
 import { useCallback, useRef, useState } from 'react';
 import { useRoomEngineEvent, useSoundEvent } from '../../../events';
 
@@ -57,6 +57,7 @@ const useFurnitureSoundMachineWidgetState = () =>
 {
     const [ objectId, setObjectId ] = useState(-1);
     const [ category, setCategory ] = useState(-1);
+    const [ isOpen, setIsOpen ] = useState(false);
     const [ diskInventory, setDiskInventory ] = useState<IAdvancedMap<number, number>>(new AdvancedMap());
     const [ selectedDiskIds, setSelectedDiskIds ] = useState<number[]>([]);
     const [ timeline, setTimeline ] = useState<TraxTimeline>(
@@ -78,6 +79,7 @@ const useFurnitureSoundMachineWidgetState = () =>
         stopPreview();
         setObjectId(-1);
         setCategory(-1);
+        setIsOpen(false);
         setSelectedDiskIds([]);
         setTimeline(Array.from({ length: TRAX_TRACKS }, () => Array<number | null>(TRAX_STEPS).fill(null)));
         setTrackName('');
@@ -88,6 +90,11 @@ const useFurnitureSoundMachineWidgetState = () =>
     {
         setObjectId(event.objectId);
         setCategory(event.category);
+    });
+
+    useRoomEngineEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR, event =>
+    {
+        setIsOpen(true);
         GetNitroInstance().soundManager?.musicController?.requestUserSongDisks();
     });
 
@@ -196,6 +203,7 @@ const useFurnitureSoundMachineWidgetState = () =>
 
     return {
         objectId,
+        isOpen,
         diskInventory,
         selectedDiskIds,
         timeline,

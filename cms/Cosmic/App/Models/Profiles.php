@@ -41,6 +41,14 @@ class Profiles
         return QueryBuilder::table('website_profile_catalogues_cats')->setFetchMode(PDO::FETCH_CLASS, get_called_class())->where('type', 's')->get();
     }
 
+    public static function getCategorysForType($type)
+    {
+        return QueryBuilder::table('website_profile_catalogues_cats')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('type', $type)
+            ->get();
+    }
+
     public static function saveBackground($user_id, $name)
     {
         return QueryBuilder::table('website_profile_homes')->setFetchMode(PDO::FETCH_CLASS, get_called_class())->where('user_id', $user_id)->where('type', 'b')->update(array('name' => $name));;
@@ -87,12 +95,81 @@ class Profiles
 
     public static function getInventory($user_id)
     {
-        return QueryBuilder::table('website_profile_inventories as i')
-            ->join('website_profile_catalogues as c', 'i.catalogue_id', '=', 'c.id')
-            ->select(['c.id', 'c.type', 'c.data', 'c.name', 'c.category', 'c.price', 'i.quantity'])
+        return QueryBuilder::table('website_profile_inventories')
+            ->join('website_profile_catalogues', 'website_profile_inventories.catalogue_id', '=', 'website_profile_catalogues.id')
+            ->select([
+                'website_profile_catalogues.id',
+                'website_profile_catalogues.type',
+                'website_profile_catalogues.data',
+                'website_profile_catalogues.name',
+                'website_profile_catalogues.category',
+                'website_profile_catalogues.price',
+                'website_profile_inventories.quantity',
+            ])
             ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
-            ->where('i.user_id', $user_id)
+            ->where('website_profile_inventories.user_id', $user_id)
+            ->where('website_profile_catalogues.type', 's')
             ->get();
+    }
+
+    public static function getBackgroundInventory($user_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->join('website_profile_catalogues', 'website_profile_inventories.catalogue_id', '=', 'website_profile_catalogues.id')
+            ->select([
+                'website_profile_catalogues.id',
+                'website_profile_catalogues.type',
+                'website_profile_catalogues.data',
+                'website_profile_catalogues.name',
+                'website_profile_catalogues.category',
+                'website_profile_catalogues.price',
+                'website_profile_inventories.quantity',
+            ])
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('website_profile_inventories.user_id', $user_id)
+            ->where('website_profile_catalogues.type', 'b')
+            ->get();
+    }
+
+    public static function decrementInventoryQuantity($user_id, $catalogue_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->where('user_id', $user_id)
+            ->where('catalogue_id', $catalogue_id)
+            ->decrement('quantity', 1);
+    }
+
+    public static function removeFromInventory($user_id, $catalogue_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->where('user_id', $user_id)
+            ->where('catalogue_id', $catalogue_id)
+            ->delete();
+    }
+
+    public static function getHomeItem($user_id, $item_id)
+    {
+        return QueryBuilder::table('website_profile_homes')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('user_id', $user_id)
+            ->where('id', $item_id)
+            ->first();
+    }
+
+    public static function getCatalogueItemByData($data)
+    {
+        return QueryBuilder::table('website_profile_catalogues')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('data', $data)
+            ->first();
+    }
+
+    public static function incrementInventoryQuantity($user_id, $catalogue_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->where('user_id', $user_id)
+            ->where('catalogue_id', $catalogue_id)
+            ->increment('quantity', 1);
     }
 
     public static function hasInInventory($user_id, $catalogue_id)

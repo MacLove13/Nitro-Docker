@@ -206,7 +206,7 @@
     <div class="habbo-tabnav">
         <div class="habbo-tabnav-inner">
             {% if player %}
-            <a href="/me" class="habbo-tab habbo-tab-user {% if "home" in page or "me" in page %}habbo-tab-active{% endif %}" aria-label="{{player.username}} (rank {{player.rank}})">( <span class="habbo-rank-badge" aria-hidden="true">{{player.rank}}</span> )</a>
+            <a href="/home" class="habbo-tab habbo-tab-user {% if "home" in page or "me" in page %}habbo-tab-active{% endif %}" aria-label="{{player.username}} (rank {{player.rank}})">{{player.username}}</a>
             {% endif %}
             <a href="/community" class="habbo-tab habbo-tab-blue {% if "community" in page or page == "article" %}habbo-tab-active{% endif %}">Community</a>
             <a href="/help" class="habbo-tab habbo-tab-blue {% if "help" in page %}habbo-tab-active{% endif %}">Safety</a>

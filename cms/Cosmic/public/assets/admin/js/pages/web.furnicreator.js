@@ -103,7 +103,7 @@ var furniCreator = function () {
                 var formData = new FormData(this);
 
                 $.ajax({
-                    url: '/housekeeping/api/furnicreator/create',
+                    url: '/housekeeping/api/furniCreator/create',
                     type: 'post',
                     headers: { 'Authorization': 'housekeeping_furni_creator' },
                     data: formData,
@@ -122,7 +122,7 @@ var furniCreator = function () {
                                 }, 500);
                             }
                         } else {
-                            toastr['error'](data.message || 'An error occurred.');
+                            toastr['error'](data.message || data.error || 'An error occurred.');
                         }
                     },
                     error: function () {
@@ -170,7 +170,7 @@ var furniCreator = function () {
             showPanel('furniCreatorList');
 
             $.ajax({
-                url: '/housekeeping/api/furnicreator/getItems',
+                url: '/housekeeping/api/furniCreator/getItems',
                 type: 'post',
                 headers: { 'Authorization': 'housekeeping_furni_creator' },
                 dataType: 'json',
@@ -256,7 +256,7 @@ var furniCreator = function () {
 
         refreshDetail: function (id) {
             $.ajax({
-                url: '/housekeeping/api/furnicreator/getItemById',
+                url: '/housekeeping/api/furniCreator/getItemById',
                 type: 'post',
                 headers: { 'Authorization': 'housekeeping_furni_creator' },
                 data: { id: id },
@@ -346,7 +346,7 @@ var furniCreator = function () {
 
         pollStatus: function (id) {
             $.ajax({
-                url: '/housekeeping/api/furnicreator/getStatus',
+                url: '/housekeeping/api/furniCreator/getStatus',
                 type: 'post',
                 headers: { 'Authorization': 'housekeeping_furni_creator' },
                 data: { id: id },
@@ -373,7 +373,7 @@ var furniCreator = function () {
             $btn.prop('disabled', true).text('Adding…');
 
             $.ajax({
-                url: '/housekeeping/api/furnicreator/addToGame',
+                url: '/housekeeping/api/furniCreator/addToGame',
                 type: 'post',
                 headers: { 'Authorization': 'housekeeping_furni_creator' },
                 data: { id: currentItemId },
@@ -403,7 +403,7 @@ var furniCreator = function () {
             if (!confirm('Delete this furni creation job?')) return;
 
             $.ajax({
-                url: '/housekeeping/api/furnicreator/deleteItem',
+                url: '/housekeeping/api/furniCreator/deleteItem',
                 type: 'post',
                 headers: { 'Authorization': 'housekeeping_furni_creator' },
                 data: { id: currentItemId },

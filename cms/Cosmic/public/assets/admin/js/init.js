@@ -305,7 +305,6 @@ function isEmpty(str) {
 jQuery(document).ready(function() {
     KTDashboard.init();
     LoadingPage.init();
-    blockPageInterface.init();
     select2Interface.init();
 
     $("#showOnlinePlayers").unbind().click(function () {

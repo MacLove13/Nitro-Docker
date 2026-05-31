@@ -40,15 +40,15 @@ class FurniCreator
             'length'                  => 'required|numeric',
             'stack_height'            => 'required',
             'page_id'                 => 'required|numeric',
-            'allow_stack'             => 'required|pattern:^(?:1|0)$',
-            'allow_sit'               => 'required|pattern:^(?:1|0)$',
-            'allow_lay'               => 'required|pattern:^(?:1|0)$',
-            'allow_walk'              => 'required|pattern:^(?:1|0)$',
-            'allow_gift'              => 'required|pattern:^(?:1|0)$',
-            'allow_trade'             => 'required|pattern:^(?:1|0)$',
-            'allow_recycle'           => 'required|pattern:^(?:1|0)$',
-            'allow_marketplace_sell'  => 'required|pattern:^(?:1|0)$',
-            'allow_inventory_stack'   => 'required|pattern:^(?:1|0)$',
+            'allow_stack'             => 'required|in:0,1',
+            'allow_sit'               => 'required|in:0,1',
+            'allow_lay'               => 'required|in:0,1',
+            'allow_walk'              => 'required|in:0,1',
+            'allow_gift'              => 'required|in:0,1',
+            'allow_trade'             => 'required|in:0,1',
+            'allow_recycle'           => 'required|in:0,1',
+            'allow_marketplace_sell'  => 'required|in:0,1',
+            'allow_inventory_stack'   => 'required|in:0,1',
             'type'                    => 'required',
             'interaction_type'        => 'required',
             'interaction_modes_count' => 'required|numeric',
@@ -102,7 +102,7 @@ class FurniCreator
         }
 
         // Handle image uploads
-        $uploadDir = __DIR__ . '/../../../../public/uploads/furni_creator/' . $furniId . '/';
+        $uploadDir = __DIR__ . '/../../../public/uploads/furni_creator/' . $furniId . '/';
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
                 echo json_encode(['status' => 'error', 'message' => 'Failed to create upload directory.']);
@@ -261,6 +261,7 @@ class FurniCreator
 
         if (Config::apiEnabled) {
             HotelApi::execute('updatecatalog');
+            HotelApi::execute('updateitems');
         }
 
         echo json_encode(['status' => 'success', 'message' => 'Furni added to game successfully.']);

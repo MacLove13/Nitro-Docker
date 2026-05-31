@@ -98,10 +98,82 @@ class Profile
         response()->json(["replacepage" => "profile/" . input('search')]);
     }
   
+    public function inventory()
+    {
+        if (!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $player_id = request()->player->id;
+
+        // Available widgets (all configured minus already placed)
+        $allWidgets = explode(";", Core::settings()->available_profile_widgets);
+        $availableWidgets = [];
+        foreach ($allWidgets as $widget) {
+            $widget = trim($widget);
+            if ($widget !== '' && !Profiles::hasWidget($player_id, $widget)) {
+                $availableWidgets[] = $widget;
+            }
+        }
+
+        $stickerCategorys    = Profiles::getCategorysForType('s');
+        $stickerInventory    = Profiles::getInventory($player_id);
+        $bgCategorys         = Profiles::getCategorysForType('b');
+        $bgInventory         = Profiles::getBackgroundInventory($player_id);
+
+        response()->json([
+            "status"            => "success",
+            "widgets"           => $availableWidgets,
+            "sticker_categorys" => $stickerCategorys,
+            "sticker_inventory" => $stickerInventory,
+            "bg_categorys"      => $bgCategorys,
+            "bg_inventory"      => $bgInventory,
+        ]);
+    }
+
+    public function shop()
+    {
+        if (!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $player_id = request()->player->id;
+        $player    = Player::getDataById($player_id, ['id', 'credits']);
+
+        $stickerCategorys = Profiles::getCategorysForType('s');
+        $stickerItems     = Profiles::getItems('s');
+        $bgCategorys      = Profiles::getCategorysForType('b');
+        $bgItems          = Profiles::getItems('b');
+
+        // Mark backgrounds the player already owns
+        $bgInventory = Profiles::getBackgroundInventory($player_id);
+        $ownedBgIds  = array_map(function($b) { return (int) $b->id; }, $bgInventory);
+        foreach ($bgItems as $item) {
+            $item->owned = in_array((int) $item->id, $ownedBgIds);
+        }
+
+        response()->json([
+            "status"           => "success",
+            "credits"          => (int) $player->credits,
+            "sticker_categorys"=> $stickerCategorys,
+            "sticker_items"    => $stickerItems,
+            "bg_categorys"     => $bgCategorys,
+            "bg_items"         => $bgItems,
+        ]);
+    }
+
     public function store()
+    {
+        return $this->add();
+    }
+
+    public function add()
     {
         if(!request()->player->id) {
             response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
         }
         
         if(input('data') == "w") {
@@ -117,6 +189,7 @@ class Profile
             if(input()->post('type')->value == "p") {
                 Profiles::insert(request()->player->id, input()->post('add')->value, '0', '0', 'default_skin', input('data'));
                 response()->json(["status" => "success", "replacepage" => "/profile/" . request()->player->username ]);
+                return;
             }
         }
 
@@ -151,45 +224,110 @@ class Profile
 
         $catalogue_id = (int) input()->post('catalogue_id')->value;
         if(!$catalogue_id) {
-            response()->json(["status" => "error", "message" => "Invalid sticker."]);
+            response()->json(["status" => "error", "message" => "Item inválido."]);
             return;
         }
 
         $item = Profiles::getCatalogueItem($catalogue_id);
         if(!$item) {
-            response()->json(["status" => "error", "message" => "Sticker not found."]);
-            return;
-        }
-
-        if(Profiles::hasInInventory(request()->player->id, $catalogue_id)) {
-            response()->json(["status" => "error", "message" => "You already own this sticker."]);
+            response()->json(["status" => "error", "message" => "Item não encontrado."]);
             return;
         }
 
         $player = Player::getDataById(request()->player->id, ['id', 'credits']);
         if($player->credits < $item->price) {
-            response()->json(["status" => "error", "message" => "Not enough credits."]);
+            response()->json(["status" => "error", "message" => "Créditos insuficientes."]);
             return;
         }
 
-        Player::update(request()->player->id, ['credits' => $player->credits - $item->price]);
-        Profiles::addToInventory(request()->player->id, $catalogue_id);
+        $existing = Profiles::hasInInventory(request()->player->id, $catalogue_id);
+
+        // Backgrounds: one-time purchase only
+        if ($item->type === 'b') {
+            if ($existing) {
+                response()->json(["status" => "error", "message" => "Você já possui este background."]);
+                return;
+            }
+            Player::update(request()->player->id, ['credits' => $player->credits - $item->price]);
+            Profiles::addToInventory(request()->player->id, $catalogue_id);
+        } else {
+            // Stickers: stackable — increment quantity if already owned
+            Player::update(request()->player->id, ['credits' => $player->credits - $item->price]);
+            if ($existing) {
+                Profiles::incrementInventoryQuantity(request()->player->id, $catalogue_id);
+                $item->quantity = $existing->quantity + 1;
+            } else {
+                Profiles::addToInventory(request()->player->id, $catalogue_id);
+                $item->quantity = 1;
+            }
+        }
 
         response()->json([
             "status"  => "success",
-            "message" => "Sticker purchased successfully!",
+            "message" => "Compra realizada com sucesso!",
             "credits" => $player->credits - $item->price,
             "item"    => $item,
         ]);
     }
   
+    public function useSticker()
+    {
+        if(!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $catalogue_id = (int) input()->post('catalogue_id')->value;
+        if(!$catalogue_id) {
+            response()->json(["status" => "error", "message" => "Item inválido."]);
+            return;
+        }
+
+        $inv = Profiles::hasInInventory(request()->player->id, $catalogue_id);
+        if(!$inv || $inv->quantity < 1) {
+            response()->json(["status" => "error", "message" => "Você não possui este sticker no inventário."]);
+            return;
+        }
+
+        // Decrement quantity or remove from inventory if last one
+        if($inv->quantity > 1) {
+            Profiles::decrementInventoryQuantity(request()->player->id, $catalogue_id);
+            $newQty = $inv->quantity - 1;
+        } else {
+            Profiles::removeFromInventory(request()->player->id, $catalogue_id);
+            $newQty = 0;
+        }
+
+        response()->json(["status" => "success", "quantity" => $newQty]);
+    }
+
     public function remove() 
     {
         if(!request()->player->id) {
             response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
         }
-      
-        Profiles::remove(request()->player->id, input('id'), input('type'));
+
+        $item_id = input('id');
+        $type    = input('type');
+
+        // If it's a sticker, return it to inventory
+        if($type === 's') {
+            $home = Profiles::getHomeItem(request()->player->id, $item_id);
+            if($home) {
+                $catalogue = Profiles::getCatalogueItemByData($home->name);
+                if($catalogue) {
+                    $inv = Profiles::hasInInventory(request()->player->id, $catalogue->id);
+                    if($inv) {
+                        Profiles::incrementInventoryQuantity(request()->player->id, $catalogue->id);
+                    } else {
+                        Profiles::addToInventory(request()->player->id, $catalogue->id);
+                    }
+                }
+            }
+        }
+
+        Profiles::remove(request()->player->id, $item_id, $type);
         response()->json(["status" => "success", "message" => "Widget deleted!"]); 
     }
 

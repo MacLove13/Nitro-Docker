@@ -18,6 +18,7 @@ var catalog = function() {
                     blockPageInterface.init();
                 },
                 success: function(data) {
+                    blockPageInterface.stop();
                     catalog.initDatatable(data);
                 }
             });
