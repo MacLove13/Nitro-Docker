@@ -208,7 +208,7 @@
             {% if player %}
             <a href="/me" class="habbo-tab habbo-tab-user {% if "home" in page or "me" in page %}habbo-tab-active{% endif %}" aria-label="{{player.username}} (rank {{player.rank}})">( <span class="habbo-rank-badge" aria-hidden="true">{{player.rank}}</span> )</a>
             {% endif %}
-            <a href="/articles" class="habbo-tab habbo-tab-blue {% if "community" in page %}habbo-tab-active{% endif %}">Community</a>
+            <a href="/community" class="habbo-tab habbo-tab-blue {% if "community" in page or page == "article" %}habbo-tab-active{% endif %}">Community</a>
             <a href="/help" class="habbo-tab habbo-tab-blue {% if "help" in page %}habbo-tab-active{% endif %}">Safety</a>
             <a href="/shop" class="habbo-tab habbo-tab-blue {% if "shop" in page %}habbo-tab-active{% endif %}">Credits</a>
             {% if 'housekeeping' in permissions %}
@@ -221,16 +221,24 @@
     {% if player %}
     <div class="habbo-subnav">
         <div class="habbo-subnav-inner">
+            {% if "community" in page or page == "article" %}
+            <a href="/community" class="{% if page == "community_home" %}active{% endif %}">Community</a>
+            <a href="/articles" class="{% if page == "article" %}active{% endif %}">Articles</a>
+            <a href="/community/photos" class="{% if page == "community_photos" %}active{% endif %}">Photos</a>
+            <a href="/community/staff" class="{% if page == "community_staff" %}active{% endif %}">Staff</a>
+            <a href="/community/fansites" class="{% if page == "community_fansites" %}active{% endif %}">Fansites</a>
+            {% else %}
             <a href="/home" class="{% if "home" in page %}active{% endif %}">Home</a>
             <a href="/profile/{{player.username}}" class="{% if "profile" in page %}active{% endif %}">My Page</a>
             <a href="/settings" class="{% if "settings" in page %}active{% endif %}">Account Settings</a>
+            {% endif %}
         </div>
     </div>
     {% else %}
     <div class="habbo-subnav">
         <div class="habbo-subnav-inner">
             <a href="/home">Home</a>
-            <a href="/articles">Community</a>
+            <a href="/community">Community</a>
             <a href="/help">Help</a>
         </div>
     </div>
