@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { GetConfiguration, LocalizeText, ProductTypeEnum } from '../../../../../api';
-import { Column, Flex, LayoutImage, Text } from '../../../../../common';
+import { Button, Column, Flex, LayoutImage, Text } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
 import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';

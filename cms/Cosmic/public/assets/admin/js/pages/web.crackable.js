@@ -262,11 +262,11 @@ var crackable = function () {
             var html = '';
             $.each(results, function (i, item) {
                 html += '<div class="col-md-3 col-sm-6 kt-margin-b-10">';
-                html += '<div class="kt-portlet kt-portlet--bordered" style="cursor:pointer;" ';
+                html += '<div class="kt-portlet kt-portlet--bordered add-furni-btn" style="cursor:pointer;" ';
                 html += 'data-item-id="' + item.id + '" ';
                 html += 'data-item-name="' + escapeHtml(item.item_name) + '" ';
                 html += 'data-public-name="' + escapeHtml(item.public_name) + '" ';
-                html += 'title="Adicionar à lista" class="add-furni-btn">';
+                html += 'title="Adicionar à lista">';
                 html += '<div class="kt-portlet__body text-center">';
                 html += '<div><small class="kt-font-bold">' + escapeHtml(item.item_name) + '</small></div>';
                 html += '<div><small>' + escapeHtml(item.public_name) + '</small></div>';

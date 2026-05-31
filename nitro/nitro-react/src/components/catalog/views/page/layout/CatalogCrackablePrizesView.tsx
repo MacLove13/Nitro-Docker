@@ -6,6 +6,7 @@ import { LayoutFurniImageView } from '../../../../../common';
 interface CrackablePrize
 {
     item_id: number;
+    sprite_id: number;
     item_name: string;
     item_type: string;
     weight: number;
@@ -55,7 +56,7 @@ export const CatalogCrackablePrizesView: FC<CatalogCrackablePrizesViewProps> = p
                                 <Flex center style={ { width: 64, height: 64, minWidth: 64, overflow: 'hidden', background: 'rgba(0,0,0,0.2)', borderRadius: 4 } }>
                                     <LayoutFurniImageView
                                         productType={ prize.item_type === 'i' ? ProductTypeEnum.WALL : ProductTypeEnum.FLOOR }
-                                        productClassId={ prize.item_id }
+                                        productClassId={ prize.sprite_id }
                                         direction={ 2 }
                                         scale={ 1 }
                                     />

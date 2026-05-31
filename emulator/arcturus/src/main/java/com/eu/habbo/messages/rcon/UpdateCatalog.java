@@ -14,6 +14,7 @@ public class UpdateCatalog extends RCONMessage<UpdateCatalog.JSONUpdateCatalog> 
     @Override
     public void handle(Gson gson, JSONUpdateCatalog json) {
         Emulator.getGameEnvironment().getItemManager().loadItems();
+        Emulator.getGameEnvironment().getItemManager().loadCrackable();
         Emulator.getGameEnvironment().getCatalogManager().initialize();
         Emulator.getGameServer().getGameClientManager().sendBroadcastResponse(new CatalogUpdatedComposer());
         Emulator.getGameServer().getGameClientManager().sendBroadcastResponse(new CatalogModeComposer(0));

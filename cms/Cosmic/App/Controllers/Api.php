@@ -306,7 +306,11 @@ class Api
             exit;
         }
 
-        $crackable = QueryBuilder::table('items_crackable')->where('item_id', $item_id)->first();
+        // $item_id from the client is sprite_id; resolve to items_base.id first
+        $base = QueryBuilder::table('items_base')->where('sprite_id', $item_id)->first();
+        $base_id = $base ? (int) $base->id : $item_id;
+
+        $crackable = QueryBuilder::table('items_crackable')->where('item_id', $base_id)->first();
 
         if (!$crackable || empty($crackable->prizes)) {
             echo json_encode(['prizes' => []]);
@@ -332,7 +336,8 @@ class Api
             $furni = QueryBuilder::table('items_base')->find($p['item_id']);
             $prizes[] = [
                 'item_id'    => $p['item_id'],
-                'item_name'  => $furni ? $furni->item_name : ('item_' . $p['item_id']),
+                'sprite_id'  => $furni ? (int) $furni->sprite_id : 0,
+                'item_name'  => $furni ? $furni->public_name : ('item_' . $p['item_id']),
                 'item_type'  => $furni ? ($furni->type ?? 's') : 's',
                 'weight'     => $p['weight'],
                 'percentage' => $totalWeight > 0 ? round(($p['weight'] / $totalWeight) * 100, 2) : 0,
