@@ -1,0 +1,82 @@
+{% extends "Admin/base.html" %}
+{% block page %}Rank Permissions{% endblock %}
+{% block jsfile %}rankperms{% endblock %}
+
+{% block body %}
+<div class="kt-subheader kt-grid__item" id="kt_subheader">
+    <div class="kt-container kt-container--fluid">
+        <div class="kt-subheader__main">
+            <h3 class="kt-subheader__title">Rank Permissions</h3>
+            <span class="kt-subheader__separator kt-subheader__separator--v"></span>
+            <span class="kt-subheader__desc">Manage emulator permissions per rank</span>
+        </div>
+    </div>
+</div>
+
+<div class="kt-container kt-container--fluid kt-grid__item kt-grid__item--fluid">
+<div id="rankListView" class="row">
+        <div class="col-md-12">
+            <div class="kt-portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title">
+                            <i class="flaticon2-avatar kt-font-brand"></i>&nbsp; Ranks
+                        </h3>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    <div id="rankCards" class="row"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{# Permissions editor }}
+    <div class="row" id="permEditorView" style="display:none">
+        <div class="col-md-12">
+            <div class="kt-portlet">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <h3 class="kt-portlet__head-title" id="editorTitle">Permissions for rank</h3>
+                    </div>
+                    <div class="kt-portlet__head-toolbar">
+                        <button class="btn btn-secondary btn-sm" id="btnBack">
+                            <i class="la la-arrow-left"></i> Back to ranks
+                        </button>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text" id="permSearch" class="form-control" placeholder="Search permission...">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="la la-search"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 text-right">
+                            <span class="kt-badge kt-badge--success kt-badge--inline mr-2">1 = Enabled</span>
+                            <span class="kt-badge kt-badge--warning kt-badge--inline mr-2">2 = Staff Only</span>
+                            <span class="kt-badge kt-badge--danger kt-badge--inline">0 = Disabled</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover kt-table" id="permTable">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width:40%">Permission</th>
+                                    <th style="width:20%">Current Value</th>
+                                    <th style="width:40%">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

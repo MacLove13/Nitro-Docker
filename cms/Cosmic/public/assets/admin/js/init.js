@@ -86,18 +86,15 @@ var blockPageInterfaceSubmit = function() {
 var blockPageInterface = function() {
     return {
         init: function() {
-            $(".ajaxLoad, .preventDoubleRequest").click(function() {
-                KTApp.blockPage({
-                    overlayColor: "#000000",
-                    type: "v2",
-                    state: "primary",
-                    message: "Processing..."
-                }), setTimeout(function() {
-                    KTApp.unblockPage()
-                }, 2e3)
+            KTApp.blockPage({
+                overlayColor: "#000000",
+                type: "v2",
+                state: "primary",
+                message: "Processing..."
             });
-
-
+        },
+        stop: function() {
+            KTApp.unblockPage();
         }
     };
 }();

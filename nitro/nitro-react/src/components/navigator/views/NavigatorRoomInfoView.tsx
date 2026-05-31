@@ -4,7 +4,7 @@ import { FaLink } from 'react-icons/fa';
 import { CreateLinkEvent, DispatchUiEvent, GetGroupInformation, GetSessionDataManager, LocalizeText, ReportType, SendMessageComposer } from '../../../api';
 import { Button, classNames, Column, Flex, LayoutBadgeImageView, LayoutRoomThumbnailView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text, UserProfileIconView } from '../../../common';
 import { RoomWidgetThumbnailEvent } from '../../../events';
-import { useHelp, useNavigator } from '../../../hooks';
+import { useHelp, useNavigator, useUiEvent } from '../../../hooks';
 
 export class NavigatorRoomInfoViewProps
 {
@@ -16,8 +16,11 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
     const { onCloseClick = null } = props;
     const [ isRoomPicked, setIsRoomPicked ] = useState(false);
     const [ isRoomMuted, setIsRoomMuted ] = useState(false);
+    const [ thumbnailVersion, setThumbnailVersion ] = useState(0);
     const { report = null } = useHelp();
     const { navigatorData = null } = useNavigator();
+
+    useUiEvent(RoomWidgetThumbnailEvent.THUMBNAIL_SAVED, () => setThumbnailVersion(v => v + 1));
 
     const hasPermission = (permission: string) =>
     {
@@ -105,7 +108,7 @@ export const NavigatorRoomInfoView: FC<NavigatorRoomInfoViewProps> = props =>
                 { navigatorData.enteredGuestRoom &&
                     <>
                         <Flex gap={ 2 } overflow="hidden">
-                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef }>
+                            <LayoutRoomThumbnailView roomId={ navigatorData.enteredGuestRoom.roomId } customUrl={ navigatorData.enteredGuestRoom.officialRoomPicRef } cacheBuster={ thumbnailVersion }>
                                 { hasPermission('settings') && <i className="icon icon-camera-small position-absolute b-0 r-0 m-1 cursor-pointer top-0" onClick={ () => processAction('open_room_thumbnail_camera') } /> }
                             </LayoutRoomThumbnailView>
                             <Column grow gap={ 1 } overflow="hidden">

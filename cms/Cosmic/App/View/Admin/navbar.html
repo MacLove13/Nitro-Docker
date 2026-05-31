@@ -18,6 +18,12 @@
               <i class="kt-menu__link-icon flaticon2-avatar"></i><span class="kt-menu__link-text">Permissions</span></a>
           </li>
           {% endif %}
+          {% if 'housekeeping_permissions' in permissions or 'housekeeping_tools' in permissions %}
+          <li class="kt-menu__item ajaxLoading" aria-haspopup="true" >
+              <a  href="/housekeeping/rankperms/manage" class="kt-menu__link ">
+              <i class="kt-menu__link-icon flaticon2-settings"></i><span class="kt-menu__link-text">Rank Permissions</span></a>
+          </li>
+          {% endif %}
           {% if 'housekeeping_remote_control' in permissions or 'housekeeping_tools' in permissions %}
           <li class="kt-menu__item ajaxLoading" aria-haspopup="true" >
               <a  href="/housekeeping/remote/control" class="kt-menu__link ">

@@ -1,6 +1,6 @@
 import { NitroRenderTexture } from '@nitrots/nitro-renderer';
 import { FC, useState } from 'react';
-import { GetRoomEngine } from '../../../../api';
+import { DispatchUiEvent, GetRoomEngine } from '../../../../api';
 import { LayoutMiniCameraView } from '../../../../common';
 import { RoomWidgetThumbnailEvent } from '../../../../events';
 import { useRoom, useUiEvent } from '../../../../hooks';
@@ -32,6 +32,7 @@ export const RoomThumbnailWidgetView: FC<{}> = props =>
     const receiveTexture = (texture: NitroRenderTexture) =>
     {
         GetRoomEngine().saveTextureAsScreenshot(texture, true);
+        DispatchUiEvent(new RoomWidgetThumbnailEvent(RoomWidgetThumbnailEvent.THUMBNAIL_SAVED));
 
         setIsVisible(false);
     }

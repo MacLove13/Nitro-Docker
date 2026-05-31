@@ -421,7 +421,7 @@ function WebPageInterface(manager, type, scroll, page_data) {
         navigation_container.find(".navigation-item[data-category='" + category + "']").addClass("selected");
 
         if (this.manager.current_page_url.indexOf("forum") >= 0) {} else {
-            if (this.scroll)
+            if (this.scroll && navigation_container.length && navigation_container.offset())
                 $("html, body").animate({
                     scrollTop: navigation_container.offset().top
                 }, 300);

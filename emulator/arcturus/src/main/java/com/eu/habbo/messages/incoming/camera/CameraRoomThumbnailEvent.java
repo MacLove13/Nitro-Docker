@@ -31,12 +31,17 @@ public class CameraRoomThumbnailEvent extends MessageHandler {
         this.packet.getBuffer().readInt();
         byte[] pngData = ByteBufUtil.getBytes(this.packet.getBuffer());
 
-        int userId = this.client.getHabbo().getHabboInfo().getId();
-        int timestamp = Emulator.getIntUnixTimestamp();
-        String filename = userId + "_" + timestamp + "_thumb.png";
+        int roomId = this.client.getHabbo().getHabboInfo().getCurrentRoom().getId();
+        String filename = roomId + ".png";
 
         String thumbnailDir = Emulator.getConfig().getValue("imager.location.output.thumbnail", "/var/www/html/public/camera/thumbnail/");
         new File(thumbnailDir).mkdirs();
+
+        // Delete existing thumbnail for this room
+        File existingFile = new File(thumbnailDir, filename);
+        if (existingFile.exists()) {
+            existingFile.delete();
+        }
 
         try {
             BufferedImage original = ImageIO.read(new ByteArrayInputStream(pngData));
@@ -47,7 +52,7 @@ public class CameraRoomThumbnailEvent extends MessageHandler {
                 g2d.drawImage(original, 0, 0, 110, 110, null);
                 g2d.dispose();
                 ImageIO.write(thumb, "png", new File(thumbnailDir, filename));
-                LOGGER.info("[Camera] Saved thumbnail: " + filename + " for user " + userId);
+                LOGGER.info("[Camera] Saved room thumbnail: " + filename + " for room " + roomId);
             }
         } catch (Exception e) {
             LOGGER.error("[Camera] Failed to save room thumbnail: " + e.getMessage());
