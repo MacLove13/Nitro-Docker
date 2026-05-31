@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !Cosmic/public/
+
+RewriteRule (.*) /Cosmic/public/$1 [L]

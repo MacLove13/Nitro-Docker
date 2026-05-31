@@ -1,0 +1,28 @@
+{
+    "require": {
+        "php": ">=7.4.6",
+        "twig/twig": "~2.0",
+        "twig/extensions": "^1.5",
+        "usmanhalalit/pixie": "2.*@dev",
+        "rakit/validation": "^1.2",
+        "swiftmailer/swiftmailer": "^6.0",
+        "jenssegers/date": "^3.3.1",
+        "pecee/simple-router": "4.2.0.6",
+        "ext-curl": "*",
+        "ext-pdo": "*",
+        "ext-json": "*",
+        "ext-openssl": "*",
+        "ext-gd": "*",
+        "geoip2/geoip2":"~2.0",
+        "sonata-project/google-authenticator": "^2.2",
+        "symfony/dotenv": "^5.0",
+        "calcinai/php-imagick": "^0.1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Core\\": "Core/",
+            "App\\": "App/",
+            "Library\\": "Library/"
+        }
+    }
+}

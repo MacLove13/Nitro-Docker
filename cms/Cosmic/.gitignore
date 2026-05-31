@@ -1,0 +1,8 @@
+# PHPStorm
+.idea
+vendor/*
+composer.phar
+composer.lock
+.env
+App/Config.php
+tmp/
