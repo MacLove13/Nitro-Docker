@@ -42,9 +42,12 @@ public class SoundMachineSaveSongEvent extends MessageHandler {
         if (habbo == null) return;
 
         String username = habbo.getHabboInfo().getUsername();
-        String code = (username + "_" + songName).toLowerCase().replace(" ", "_").replaceAll("[^a-z0-9_]", "");
+        int userId = habbo.getHabboInfo().getId();
+        // Include user ID and timestamp suffix to avoid code collisions across users or repeated saves
+        String code = (username + "_" + songName + "_" + userId).toLowerCase()
+                .replace(" ", "_").replaceAll("[^a-z0-9_]", "");
 
-        // Compute a rough length from the track data (sum of all channel item lengths for channel 1)
+        // Compute the track length as the maximum total length across all channels
         int length = computeTrackLength(trackData);
 
         // Insert the new soundtrack into the database
@@ -104,11 +107,13 @@ public class SoundMachineSaveSongEvent extends MessageHandler {
     }
 
     private int insertSoundtrack(String code, String name, String author, String track, int length) {
+        // Append a millisecond timestamp to guarantee uniqueness
+        String uniqueCode = code + "_" + System.currentTimeMillis();
         try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(
                      "INSERT INTO soundtracks (code, name, author, track, length) VALUES (?, ?, ?, ?, ?)",
                      Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, code);
+            statement.setString(1, uniqueCode);
             statement.setString(2, name);
             statement.setString(3, author);
             statement.setString(4, track);
@@ -126,7 +131,7 @@ public class SoundMachineSaveSongEvent extends MessageHandler {
     }
 
     private int computeTrackLength(String trackData) {
-        // Parse the first channel and sum item lengths to get a rough total length value
+        // Parse all channels and return the maximum total length across them
         int total = 0;
         try {
             String[] parts = trackData.split(":");

@@ -17,6 +17,9 @@ export const TRAX_MAX_CARTRIDGES = 4;
 
 export type TraxTimeline = (number | null)[][];
 
+/** Step length in track units (each step is 2 units = one eighth note at default tempo) */
+export const TRAX_STEP_LENGTH = 2;
+
 class SaveTraxSongComposer {
     private _data: (string | number)[];
     constructor(songName: string, trackData: string) {
@@ -33,7 +36,7 @@ const buildTrackCode = (timeline: TraxTimeline): string => {
         const blocks: string[] = [];
         for (let step = 0; step < TRAX_STEPS; step++) {
             const sampleId = items[step] ?? 0;
-            blocks.push(`${ sampleId },2`);
+            blocks.push(`${ sampleId },${ TRAX_STEP_LENGTH }`);
         }
         parts.push(`${ ch + 1 }:${ blocks.join(';') }`);
     }
