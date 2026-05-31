@@ -2,25 +2,67 @@ var crackable = function () {
 
     var currentPrizes = [];
 
+    var _escapeDiv = document.createElement('div');
+    function escapeHtml(str) {
+        _escapeDiv.textContent = str || '';
+        return _escapeDiv.innerHTML;
+    }
+
     return {
 
         init: function () {
             crackable.loadList();
 
-            $("#backToList").off("click").on("click", function () {
+            $('#backToList').off('click').on('click', function () {
                 crackable.showList();
             });
 
-            $("#savePrizesBtn").off("click").on("click", function () {
+            $('#savePrizesBtn').off('click').on('click', function () {
                 crackable.savePrizes();
             });
 
-            $("#furniSearchBtn").off("click").on("click", function () {
+            $('#furniSearchBtn').off('click').on('click', function () {
                 crackable.searchFurni();
             });
 
-            $("#furniSearchInput").off("keypress").on("keypress", function (e) {
+            $('#furniSearchInput').off('keypress').on('keypress', function (e) {
                 if (e.which === 13) crackable.searchFurni();
+            });
+
+            // Use delegated event handlers bound once to stable parent containers
+            $('#prizesList').off('change', '.prize-weight-input').on('change', '.prize-weight-input', function () {
+                var idx       = parseInt($(this).data('index'));
+                var newWeight = parseInt($(this).val()) || 1;
+                if (newWeight < 1) newWeight = 1;
+                $(this).val(newWeight);
+                currentPrizes[idx].weight = newWeight;
+                crackable.recalcPercentages();
+            });
+
+            $('#prizesList').off('click', '.remove-prize-btn').on('click', '.remove-prize-btn', function () {
+                var idx = parseInt($(this).data('index'));
+                currentPrizes.splice(idx, 1);
+                crackable.renderPrizes();
+            });
+
+            $('#furniSearchList').off('click', '.add-furni-btn').on('click', '.add-furni-btn', function () {
+                var itemId   = parseInt($(this).data('item-id'));
+                var itemName = $(this).data('item-name');
+                var pubName  = $(this).data('public-name');
+
+                var exists = false;
+                $.each(currentPrizes, function (i, p) {
+                    if (p.item_id === itemId) { exists = true; return false; }
+                });
+
+                if (exists) {
+                    toastr.warning('Este furni já está na lista de prêmios.');
+                    return;
+                }
+
+                currentPrizes.push({ item_id: itemId, item_name: itemName, public_name: pubName, weight: 100 });
+                crackable.renderPrizes();
+                toastr.success('Furni adicionado à lista.');
             });
         },
 
@@ -99,7 +141,7 @@ var crackable = function () {
 
             $('#kt_datatable_crackable').off('click', '.crackableEditBtn').on('click', '.crackableEditBtn', function (e) {
                 e.preventDefault();
-                var row = $(e.target).closest('.kt-datatable__row');
+                var row    = $(e.target).closest('.kt-datatable__row');
                 var itemId = row.find('[data-field="item_id"]').text().trim();
                 crackable.showDetail(itemId);
             });
@@ -155,11 +197,11 @@ var crackable = function () {
 
                 $.each(currentPrizes, function (i, p) {
                     var weight = parseInt(p.weight) || 0;
-                    var pct = totalWeight > 0 ? Math.round((weight / totalWeight) * 10000) / 100 : 0;
+                    var pct    = totalWeight > 0 ? Math.round((weight / totalWeight) * 10000) / 100 : 0;
                     html += '<tr data-index="' + i + '">';
-                    html += '<td>' + p.item_id + '</td>';
-                    html += '<td>' + (p.item_name || '') + '</td>';
-                    html += '<td>' + (p.public_name || '') + '</td>';
+                    html += '<td>' + escapeHtml(String(p.item_id)) + '</td>';
+                    html += '<td>' + escapeHtml(p.item_name) + '</td>';
+                    html += '<td>' + escapeHtml(p.public_name) + '</td>';
                     html += '<td><input type="number" class="form-control form-control-sm prize-weight-input" data-index="' + i + '" value="' + weight + '" min="1" style="width:80px;"></td>';
                     html += '<td class="pct-cell">' + pct + '%</td>';
                     html += '<td><a class="btn btn-sm btn-danger remove-prize-btn" data-index="' + i + '" title="Remover"><i class="la la-trash"></i></a></td>';
@@ -170,23 +212,6 @@ var crackable = function () {
             }
 
             $('#prizesList').html(html);
-
-            // Weight change handler
-            $(document).off('change', '.prize-weight-input').on('change', '.prize-weight-input', function () {
-                var idx = parseInt($(this).data('index'));
-                var newWeight = parseInt($(this).val()) || 1;
-                if (newWeight < 1) newWeight = 1;
-                $(this).val(newWeight);
-                currentPrizes[idx].weight = newWeight;
-                crackable.recalcPercentages();
-            });
-
-            // Remove prize handler
-            $(document).off('click', '.remove-prize-btn').on('click', '.remove-prize-btn', function () {
-                var idx = parseInt($(this).data('index'));
-                currentPrizes.splice(idx, 1);
-                crackable.renderPrizes();
-            });
         },
 
         recalcPercentages: function () {
@@ -196,9 +221,9 @@ var crackable = function () {
             });
 
             $('.prize-weight-input').each(function () {
-                var idx = parseInt($(this).data('index'));
+                var idx    = parseInt($(this).data('index'));
                 var weight = parseInt($(this).val()) || 0;
-                var pct = totalWeight > 0 ? Math.round((weight / totalWeight) * 10000) / 100 : 0;
+                var pct    = totalWeight > 0 ? Math.round((weight / totalWeight) * 10000) / 100 : 0;
                 $(this).closest('tr').find('.pct-cell').text(pct + '%');
             });
         },
@@ -238,43 +263,25 @@ var crackable = function () {
             $.each(results, function (i, item) {
                 html += '<div class="col-md-3 col-sm-6 kt-margin-b-10">';
                 html += '<div class="kt-portlet kt-portlet--bordered" style="cursor:pointer;" ';
-                html += 'data-item-id="' + item.id + '" data-item-name="' + $('<div>').text(item.item_name).html() + '" data-public-name="' + $('<div>').text(item.public_name).html() + '" ';
+                html += 'data-item-id="' + item.id + '" ';
+                html += 'data-item-name="' + escapeHtml(item.item_name) + '" ';
+                html += 'data-public-name="' + escapeHtml(item.public_name) + '" ';
                 html += 'title="Adicionar à lista" class="add-furni-btn">';
                 html += '<div class="kt-portlet__body text-center">';
-                html += '<div><small class="kt-font-bold">' + $('<div>').text(item.item_name).html() + '</small></div>';
-                html += '<div><small>' + $('<div>').text(item.public_name).html() + '</small></div>';
+                html += '<div><small class="kt-font-bold">' + escapeHtml(item.item_name) + '</small></div>';
+                html += '<div><small>' + escapeHtml(item.public_name) + '</small></div>';
                 html += '<div class="kt-margin-t-5"><span class="btn btn-xs btn-primary"><i class="la la-plus"></i> Adicionar</span></div>';
                 html += '</div></div></div>';
             });
 
             $('#furniSearchList').html(html);
             $('#furniSearchResults').show();
-
-            $(document).off('click', '.add-furni-btn').on('click', '.add-furni-btn', function () {
-                var itemId   = parseInt($(this).data('item-id'));
-                var itemName = $(this).data('item-name');
-                var pubName  = $(this).data('public-name');
-
-                var exists = false;
-                $.each(currentPrizes, function (i, p) {
-                    if (p.item_id === itemId) { exists = true; return false; }
-                });
-
-                if (exists) {
-                    toastr.warning('Este furni já está na lista de prêmios.');
-                    return;
-                }
-
-                currentPrizes.push({ item_id: itemId, item_name: itemName, public_name: pubName, weight: 100 });
-                crackable.renderPrizes();
-                toastr.success('Furni adicionado à lista.');
-            });
         },
 
         savePrizes: function () {
             var itemId = $('#currentCrackableId').val();
+            var parts  = [];
 
-            var parts = [];
             $.each(currentPrizes, function (i, p) {
                 var weight = parseInt(p.weight) || 1;
                 parts.push(p.item_id + ':' + weight);

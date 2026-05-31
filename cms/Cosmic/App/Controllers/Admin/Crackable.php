@@ -65,23 +65,12 @@ class Crackable
             exit;
         }
 
-        $entries = array_filter(explode(';', $crackable->prizes));
-        $totalWeight = 0;
-        $parsed = [];
-
-        foreach ($entries as $entry) {
-            $parts = explode(':', $entry);
-            if (count($parts) !== 2) continue;
-            $prizeItemId = (int) $parts[0];
-            $weight      = (int) $parts[1];
-            if ($prizeItemId <= 0) continue;
-            $totalWeight += $weight;
-            $parsed[] = ['item_id' => $prizeItemId, 'weight' => $weight];
-        }
+        $parsed      = $this->parsePrizes($crackable->prizes);
+        $totalWeight = array_sum(array_column($parsed, 'weight'));
 
         $prizes = [];
         foreach ($parsed as $p) {
-            $furni = Admin::getFurnitureById($p['item_id']);
+            $furni    = Admin::getFurnitureById($p['item_id']);
             $prizes[] = [
                 'item_id'     => $p['item_id'],
                 'item_name'   => $furni ? $furni->item_name : ('item_' . $p['item_id']),
@@ -91,6 +80,7 @@ class Crackable
             ];
         }
 
+        // Sort by percentage descending for the initial detail view display.
         usort($prizes, fn($a, $b) => $b['percentage'] <=> $a['percentage']);
 
         echo json_encode([
@@ -107,7 +97,7 @@ class Crackable
 
     public function savePrizes()
     {
-        $item_id = (int) (input()->post('item_id')->value ?? 0);
+        $item_id    = (int) (input()->post('item_id')->value ?? 0);
         $prizes_raw = input()->post('prizes')->value ?? '';
 
         if ($item_id <= 0) {
@@ -122,20 +112,14 @@ class Crackable
             exit;
         }
 
-        // Validate and sanitize the prizes string (format: item_id:weight;item_id:weight)
-        $entries = array_filter(explode(';', trim($prizes_raw)));
-        $valid = [];
+        $parsed        = $this->parsePrizes($prizes_raw);
+        $valid_entries = [];
 
-        foreach ($entries as $entry) {
-            $parts = explode(':', trim($entry));
-            if (count($parts) !== 2) continue;
-            $prizeItemId = (int) $parts[0];
-            $weight      = (int) $parts[1];
-            if ($prizeItemId <= 0 || $weight <= 0) continue;
-            $valid[] = $prizeItemId . ':' . $weight;
+        foreach ($parsed as $p) {
+            $valid_entries[] = $p['item_id'] . ':' . $p['weight'];
         }
 
-        $prizes_string = implode(';', $valid);
+        $prizes_string = implode(';', $valid_entries);
 
         Admin::updateCrackablePrizes($item_id, $prizes_string);
 
@@ -156,7 +140,7 @@ class Crackable
             exit;
         }
 
-        $items = Admin::getItems($query, 20);
+        $items  = Admin::getItems($query, 20);
         $result = [];
 
         foreach ($items as $item) {
@@ -170,5 +154,26 @@ class Crackable
 
         echo json_encode($result);
         exit;
+    }
+
+    /**
+     * Parses a prizes string in the format "item_id:weight;item_id:weight"
+     * and returns an array of ['item_id' => int, 'weight' => int] entries.
+     */
+    private function parsePrizes(string $prizes_raw): array
+    {
+        $entries = array_filter(explode(';', trim($prizes_raw)));
+        $parsed  = [];
+
+        foreach ($entries as $entry) {
+            $parts = explode(':', trim($entry));
+            if (count($parts) !== 2) continue;
+            $prizeItemId = (int) $parts[0];
+            $weight      = (int) $parts[1];
+            if ($prizeItemId <= 0 || $weight <= 0) continue;
+            $parsed[] = ['item_id' => $prizeItemId, 'weight' => $weight];
+        }
+
+        return $parsed;
     }
 }
