@@ -167,6 +167,8 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("youtube", InteractionYoutubeTV.class));
         this.interactionsList.add(new ItemInteraction("jukebox", InteractionJukeBox.class));
         this.interactionsList.add(new ItemInteraction("soundmachine", InteractionJukeBox.class));
+        this.interactionsList.add(new ItemInteraction("traxmachine", InteractionJukeBox.class));
+        this.interactionsList.add(new ItemInteraction("trax_machine", InteractionJukeBox.class));
         this.interactionsList.add(new ItemInteraction("switch", InteractionSwitch.class));
         this.interactionsList.add(new ItemInteraction("fx_box", InteractionFXBox.class));
         this.interactionsList.add(new ItemInteraction("blackhole", InteractionBlackHole.class));

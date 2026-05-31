@@ -216,7 +216,7 @@ def _scrape_effects():
             with conn.cursor() as cur:
                 for item in items:
                     if first_id is None:
-                        first_id = item["effect_name"]
+                        first_id = item["effect_id"]
                     cur.execute(
                         "INSERT IGNORE INTO auto_update_effects "
                         "(effect_name, revision, download_url, status, created_at, updated_at) "

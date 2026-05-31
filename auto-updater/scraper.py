@@ -133,87 +133,149 @@ def fetch_swf_packs() -> List[dict]:
 # Furniture
 # ---------------------------------------------------------------------------
 
+_FURNI_ID_RE = re.compile(r"/furniture/(\d+)")
+_FURNI_CLASSNAME_RE = re.compile(r"^(.*?)\s+(?:name|desc)$", re.IGNORECASE)
+
+
+def _parse_furniture_listing(soup: BeautifulSoup) -> List[dict]:
+    """
+    Extract furniture items from a listing page soup.
+    Returns list of {furniture_id, class_name, icon_url}.
+    """
+    items = []
+    for link in soup.find_all("a", attrs={"x-on:click.prevent": True}):
+        onclick = link.get("x-on:click.prevent", "")
+        m = _FURNI_ID_RE.search(onclick)
+        if not m:
+            continue
+        furni_id = m.group(1)
+
+        # class_name from img alt, e.g. "nft_h26_haf_junglesantini name" → strip suffix
+        img = link.find("img")
+        class_name = furni_id
+        if img:
+            alt = img.get("alt", "")
+            cm = _FURNI_CLASSNAME_RE.match(alt)
+            if cm:
+                class_name = cm.group(1)
+            elif alt:
+                class_name = alt
+
+        # Skip sandbox items
+        if SANDBOX_PATTERN.search(class_name):
+            logger.debug("Skipping sandbox furniture: %s", class_name)
+            continue
+
+        items.append({"furniture_id": furni_id, "class_name": class_name})
+
+    return items
+
+
+def _fetch_furniture_detail(furni_id: str) -> dict:
+    """
+    Fetch the detail page for a single furniture item and extract
+    SQL, XML, revision and download_url.
+    Returns a dict with those fields (may be None if not found).
+    """
+    url = f"{BASE_URL}/furniture/{furni_id}"
+    soup = _get(url)
+    if soup is None:
+        return {}
+
+    # Download SWF link
+    download_url = None
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        txt = a.get_text(strip=True).lower()
+        if "download" in txt or "swf" in txt or href.endswith(".swf") or href.endswith(".zip"):
+            download_url = href if href.startswith("http") else urljoin(BASE_URL, href)
+            break
+
+    # SQL INSERT
+    sql_insert = None
+    for code in soup.find_all("code", class_="language-sql"):
+        sql_insert = code.get_text(strip=True)
+        break
+
+    # XML
+    xml_data = None
+    revision = 0
+    for code in soup.find_all("code", class_="language-xml"):
+        xml_data = code.get_text(strip=True)
+        # Extract revision from XML
+        rev_m = re.search(r"<revision>(\d+)</revision>", xml_data)
+        if rev_m:
+            revision = int(rev_m.group(1))
+        break
+
+    return {
+        "download_url": download_url,
+        "sql_insert": sql_insert,
+        "xml_data": xml_data,
+        "revision": revision,
+    }
+
+
 def fetch_furniture(stop_at_id: Optional[str] = None) -> List[dict]:
     """
-    Scrape the furniture listing page.
+    Scrape all furniture listing pages, paginating until stop_at_id is found
+    or there are no more pages.
 
     If stop_at_id is set, iteration stops as soon as an item with that
-    furniture_id is encountered (the item itself is not included), since all
-    items after it are already known.
+    furniture_id is encountered (the item itself is not included).
+
+    For each new item, also fetches the detail page for SQL/XML/revision/download_url.
 
     Returns a list of dicts:
       { furniture_id, class_name, revision, download_url, sql_insert, xml_data }
     """
-    soup = _get(FURNITURE_URL)
-    if soup is None:
-        return []
-
     results: List[dict] = []
     stop_reached = False
+    page = 1
 
-    # Each furniture item is typically in a <div> or <tr> with data attributes
-    # or in a structured table. Try several selectors.
-    items = (
-        soup.select("[data-furniture-id]")
-        or soup.select("table tbody tr")
-        or soup.select(".furniture-item")
-        or soup.select(".item-row")
-    )
-
-    for item in items:
-        furni_id = (
-            item.get("data-furniture-id")
-            or item.get("data-id")
-            or _extract_id_from_row(item)
-        )
-
-        if not furni_id:
-            continue
-
-        if stop_at_id and str(furni_id) == str(stop_at_id):
-            stop_reached = True
+    while True:
+        url = f"{FURNITURE_URL}?page={page}"
+        soup = _get(url)
+        if soup is None:
+            logger.warning("fetch_furniture: failed to load page %d, stopping", page)
             break
 
-        class_name = (
-            item.get("data-class-name")
-            or item.get("data-classname")
-            or _text_of(item, ".class-name")
-            or str(furni_id)
-        )
+        page_items = _parse_furniture_listing(soup)
 
-        revision_str = item.get("data-revision") or _text_of(item, ".revision") or "0"
-        try:
-            revision = int(revision_str)
-        except ValueError:
-            revision = 0
+        if not page_items:
+            logger.info("fetch_furniture: no items on page %d, stopping", page)
+            break
 
-        download_url = _find_download_url(item, BASE_URL)
-        sql_insert = _find_sql_insert(item)
-        xml_data = _find_xml_data(item)
+        for item in page_items:
+            if stop_at_id and str(item["furniture_id"]) == str(stop_at_id):
+                stop_reached = True
+                break
 
-        # Skip sandbox items
-        if SANDBOX_PATTERN.search(class_name):
-            continue
+            detail = _fetch_furniture_detail(item["furniture_id"])
+            item.update(detail)
+            results.append(item)
 
-        results.append(
-            {
-                "furniture_id": str(furni_id),
-                "class_name": class_name,
-                "revision": revision,
-                "download_url": download_url,
-                "sql_insert": sql_insert,
-                "xml_data": xml_data,
-            }
-        )
+        if stop_reached:
+            break
+
+        # Check if there is a next page button
+        next_btn = soup.find(attrs={"wire:click": lambda v: v and "nextPage" in v})
+        has_next = next_btn is not None and not next_btn.get("disabled")
+        if not has_next:
+            break
+
+        page += 1
+        # Be polite
+        import time as _time
+        _time.sleep(0.5)
 
     if stop_reached:
         logger.info(
-            "fetch_furniture: stopped at cursor %s, returning %d new items",
-            stop_at_id,
-            len(results),
+            "fetch_furniture: stopped at cursor %s after %d pages, returning %d new items",
+            stop_at_id, page, len(results),
         )
     else:
-        logger.info("fetch_furniture: found %d items", len(results))
+        logger.info("fetch_furniture: scraped %d pages, found %d items total", page, len(results))
 
     return results
 
@@ -222,12 +284,24 @@ def fetch_furniture(stop_at_id: Optional[str] = None) -> List[dict]:
 # Effects
 # ---------------------------------------------------------------------------
 
+_EFFECT_ID_RE = re.compile(r"/swfs/effects/(\d+)")
+_PACK_REVISION_RE = re.compile(r"PRODUCTION-(\d+)-")
+
+
 def fetch_effects(stop_at_id: Optional[str] = None) -> List[dict]:
     """
     Scrape the effects listing page.
 
+    The page renders a plain HTML table (no pagination needed — all effects
+    are on a single page).  Each row contains:
+      col 0 – effect filename  (e.g. "DuckGod.swf")
+      col 1 – pack/revision   (e.g. "flash-assets-PRODUCTION-202604231443-…")
+      col 2 – download link   (e.g. https://habboassets.com/swfs/effects/5767)
+
+    If stop_at_id is set, stops when an effect_id matching it is found.
+
     Returns a list of dicts:
-      { effect_name, revision, download_url }
+      { effect_id, effect_name, revision, download_url }
     """
     soup = _get(EFFECTS_URL)
     if soup is None:
@@ -236,35 +310,42 @@ def fetch_effects(stop_at_id: Optional[str] = None) -> List[dict]:
     results: List[dict] = []
     stop_reached = False
 
-    rows = soup.select("table tbody tr") or soup.select("ul li")
+    rows = soup.select("table tbody tr")
 
     for row in rows:
-        effect_name = (
-            row.get("data-effect-name")
-            or row.get("data-name")
-            or _text_of(row, ".effect-name")
-        )
-        if not effect_name:
-            link = row.find("a")
-            effect_name = link.get_text(strip=True) if link else row.get_text(strip=True).split()[0]
+        tds = row.find_all("td")
+        if len(tds) < 3:
+            continue
 
+        # Effect name from first TD (strip ".swf" suffix)
+        raw_name = tds[0].get_text(strip=True)
+        effect_name = re.sub(r"\.swf$", "", raw_name, flags=re.IGNORECASE)
         if not effect_name:
             continue
 
-        if stop_at_id and str(effect_name) == str(stop_at_id):
+        # Download link & effect_id from third TD
+        link = tds[2].find("a", href=True)
+        if not link:
+            continue
+        href = link["href"]
+        id_m = _EFFECT_ID_RE.search(href)
+        if not id_m:
+            continue
+        effect_id = id_m.group(1)
+        download_url = href if href.startswith("http") else urljoin(BASE_URL, href)
+
+        if stop_at_id and str(effect_id) == str(stop_at_id):
             stop_reached = True
             break
 
-        revision_str = row.get("data-revision") or _text_of(row, ".revision") or "0"
-        try:
-            revision = int(revision_str)
-        except ValueError:
-            revision = 0
-
-        download_url = _find_download_url(row, BASE_URL)
+        # Revision from second TD pack string
+        pack_str = tds[1].get_text(strip=True)
+        rev_m = _PACK_REVISION_RE.search(pack_str)
+        revision = int(rev_m.group(1)) if rev_m else 0
 
         results.append(
             {
+                "effect_id": effect_id,
                 "effect_name": effect_name,
                 "revision": revision,
                 "download_url": download_url,
@@ -274,8 +355,7 @@ def fetch_effects(stop_at_id: Optional[str] = None) -> List[dict]:
     if stop_reached:
         logger.info(
             "fetch_effects: stopped at cursor %s, returning %d new items",
-            stop_at_id,
-            len(results),
+            stop_at_id, len(results),
         )
     else:
         logger.info("fetch_effects: found %d effects", len(results))

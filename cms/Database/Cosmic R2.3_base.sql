@@ -374,6 +374,7 @@ INSERT INTO `website_permissions` VALUES (26, 'housekeeping_config', 'Player can
 INSERT INTO `website_permissions` VALUES (27, 'website_invisible_staff', 'Hide rank from staff page at website');
 INSERT INTO `website_permissions` VALUES (28, 'website_extra_rank', '');
 INSERT INTO `website_permissions` VALUES (29, 'housekeeping_website_badgerequest', 'Player is able to accept new badge requests');
+INSERT INTO `website_permissions` VALUES (30, 'housekeeping_auto_update', 'Player is able to use the auto-update tool in the housekeeping panel.');
 
 
 -- ----------------------------
@@ -421,6 +422,7 @@ INSERT INTO `website_permissions_ranks` VALUES (26, 26, 7);
 INSERT INTO `website_permissions_ranks` VALUES (27, 27, 1);
 INSERT INTO `website_permissions_ranks` VALUES (28, 27, 2);
 INSERT INTO `website_permissions_ranks` VALUES (29, 29, 7);
+INSERT INTO `website_permissions_ranks` VALUES (30, 30, 7);
 
 
 -- ----------------------------

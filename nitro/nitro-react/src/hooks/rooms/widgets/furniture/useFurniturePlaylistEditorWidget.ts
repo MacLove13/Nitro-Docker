@@ -34,6 +34,9 @@ const useFurniturePlaylistEditorWidgetState = () =>
 
         if(!roomObject) return;
 
+        // sound_machine* items are handled by the Trax Machine widget
+        if(roomObject.type.startsWith('sound_machine')) return;
+
         if(IsOwnerOfFurniture(roomObject))
         {
             // show the editor

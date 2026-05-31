@@ -1,4 +1,4 @@
-import { GetNitroInstance, GetConfiguration, GetConnection } from '../../../../api';
+import { GetNitroInstance, GetConfiguration, GetConnection, GetRoomEngine } from '../../../../api';
 import { MusicPriorities, RoomEngineTriggerWidgetEvent, RoomObjectSoundMachineEvent, SongDataEntry, SongDiskInventoryReceivedEvent, IAdvancedMap, AdvancedMap } from '@nitrots/nitro-renderer';
 import { useCallback, useRef, useState } from 'react';
 import { useRoomEngineEvent, useSoundEvent } from '../../../events';
@@ -58,6 +58,7 @@ const useFurnitureSoundMachineWidgetState = () =>
     const [ objectId, setObjectId ] = useState(-1);
     const [ category, setCategory ] = useState(-1);
     const [ isOpen, setIsOpen ] = useState(false);
+    const objectIdRef = useRef(-1);
     const [ diskInventory, setDiskInventory ] = useState<IAdvancedMap<number, number>>(new AdvancedMap());
     const [ selectedDiskIds, setSelectedDiskIds ] = useState<number[]>([]);
     const [ timeline, setTimeline ] = useState<TraxTimeline>(
@@ -77,6 +78,7 @@ const useFurnitureSoundMachineWidgetState = () =>
 
     const onClose = useCallback(() => {
         stopPreview();
+        objectIdRef.current = -1;
         setObjectId(-1);
         setCategory(-1);
         setIsOpen(false);
@@ -86,19 +88,27 @@ const useFurnitureSoundMachineWidgetState = () =>
         setIsPlaying(false);
     }, [stopPreview]);
 
-    useRoomEngineEvent<RoomObjectSoundMachineEvent>(RoomObjectSoundMachineEvent.SOUND_MACHINE_INIT, event =>
+    useRoomEngineEvent<RoomObjectSoundMachineEvent>(RoomObjectSoundMachineEvent.JUKEBOX_INIT, event =>
     {
+        const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
+        if(!roomObject || !roomObject.type.startsWith('sound_machine')) return;
+        objectIdRef.current = event.objectId;
         setObjectId(event.objectId);
         setCategory(event.category);
     });
 
     useRoomEngineEvent<RoomEngineTriggerWidgetEvent>(RoomEngineTriggerWidgetEvent.REQUEST_PLAYLIST_EDITOR, event =>
     {
+        const roomObject = GetRoomEngine().getRoomObject(event.roomId, event.objectId, event.category);
+        if(!roomObject || !roomObject.type.startsWith('sound_machine')) return;
+        objectIdRef.current = event.objectId;
+        setObjectId(event.objectId);
+        setCategory(event.category);
         setIsOpen(true);
         GetNitroInstance().soundManager?.musicController?.requestUserSongDisks();
     });
 
-    useRoomEngineEvent<RoomObjectSoundMachineEvent>(RoomObjectSoundMachineEvent.SOUND_MACHINE_DISPOSE, _event =>
+    useRoomEngineEvent<RoomObjectSoundMachineEvent>(RoomObjectSoundMachineEvent.JUKEBOX_DISPOSE, _event =>
     {
         onClose();
     });

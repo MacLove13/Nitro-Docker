@@ -48,6 +48,30 @@ $count = (int) $pdo->query("
       AND table_name = 'website_settings'
 ")->fetchColumn();
 
+// Run pending SQL migrations
+$migrationsDir = '/database/migrations';
+if ($count > 0 && is_dir($migrationsDir)) {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS cms_migrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        filename VARCHAR(255) NOT NULL UNIQUE,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+
+    $applied = $pdo->query("SELECT filename FROM cms_migrations")->fetchAll(PDO::FETCH_COLUMN);
+    $files = glob($migrationsDir . '/*.sql');
+    sort($files);
+
+    foreach ($files as $file) {
+        $filename = basename($file);
+        if (!in_array($filename, $applied)) {
+            echo "Applying migration: {$filename}\n";
+            $pdo->exec(file_get_contents($file));
+            $stmt = $pdo->prepare("INSERT INTO cms_migrations (filename) VALUES (?)");
+            $stmt->execute([$filename]);
+        }
+    }
+}
+
 if ($count > 0) {
     $pdo->exec("
         ALTER TABLE users ADD COLUMN IF NOT EXISTS secret_key VARCHAR(40) NULL DEFAULT NULL;
