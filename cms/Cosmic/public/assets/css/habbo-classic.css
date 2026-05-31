@@ -54,7 +54,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-topbar-inner {
-    max-width: 990px;
+    max-width: 780px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -114,7 +114,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-header-inner {
-    max-width: 990px;
+    max-width: 780px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -152,7 +152,7 @@ body.habbo-classic .page-container .page-content {
     font-weight: bold;
     font-size: 13px;
     text-decoration: none !important;
-    padding: 6px 14px;
+    padding: 8px 18px;
     border-radius: 4px;
     border: 1px solid #2a7700;
     box-shadow: 0 1px 2px rgba(0,0,0,0.3);
@@ -192,7 +192,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-tabnav-inner {
-    max-width: 990px;
+    max-width: 780px;
     margin: 0 auto;
     display: flex;
     align-items: flex-end;
@@ -262,7 +262,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-subnav-inner {
-    max-width: 990px;
+    max-width: 780px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -292,7 +292,7 @@ body.habbo-classic .page-container .page-content {
    MAIN CONTENT AREA
    ============================================= */
 .habbo-page {
-    max-width: 990px;
+    max-width: 780px;
     margin: 10px auto;
     padding: 0 5px;
     display: flex;
@@ -306,24 +306,34 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-right-col {
-    width: 310px;
-    flex-shrink: 0;
-}
-
-.habbo-far-right-col {
-    width: 110px;
+    width: 295px;
     flex-shrink: 0;
 }
 
 /* =============================================
-   PLAYER HOME PANEL (left side)
+   RANK BADGE (tab nav)
    ============================================= */
-.habbo-home-panel {
+.habbo-rank-badge {
+    display: inline-block;
+    background: #1a73c5;
+    color: #fff;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: bold;
+    vertical-align: middle;
+    margin: 0 1px;
+}
+
+/* =============================================
+   HOTEL IMAGE PANEL (#new-personal-info)
+   ============================================= */
+#new-personal-info {
     border: 1px solid #a8b8c0;
-    background: #e8f0f8;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 8px;
+    border-bottom: none;
 }
 
 .habbo-hotel-image {
@@ -331,44 +341,36 @@ body.habbo-classic .page-container .page-content {
     height: 220px;
     background-image: url('../images/web/pages/home/header.gif');
     background-size: cover;
-    background-position: center;
+    background-position: center top;
+    overflow: hidden;
 }
 
-.habbo-hotel-image-overlay {
+/* Enter Hotel button wrapper - centered in hotel image */
+.enter-hotel-btn-wrap {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 3;
 }
 
-.habbo-username-watermark {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    color: rgba(255,255,255,0.7);
-    font-size: 14px;
-    font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    pointer-events: none;
-}
-
+/* "Enter Hotel" button centered inside the hotel scene */
 .habbo-enter-hotel-center {
     background: linear-gradient(to bottom, #5bcc00, #3a9900);
-    color: #fff;
+    color: #fff !important;
     font-weight: bold;
     font-size: 14px;
+    text-decoration: none !important;
     padding: 8px 20px;
     border-radius: 4px;
     border: 1px solid #2a7700;
-    text-decoration: none !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
     display: inline-block;
     text-shadow: 0 1px 0 rgba(0,0,0,0.3);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     cursor: pointer;
 }
 
@@ -377,26 +379,201 @@ body.habbo-classic .page-container .page-content {
     text-decoration: none !important;
 }
 
-.habbo-enter-hotel-center::after {
-    content: " ▶▶";
-}
-
-.habbo-player-figure {
+/* Avatar plate - bottom-left of hotel image */
+#habbo-plate {
     position: absolute;
     bottom: 0;
     left: 10px;
+    z-index: 5;
 }
 
-.habbo-player-figure img {
+#habbo-plate img {
     image-rendering: pixelated;
     image-rendering: -webkit-optimize-contrast;
+    display: block;
 }
 
-/* Motto bar BELOW the hotel image */
-.habbo-motto-bar-below {
-    background: #f0f0f0;
+/* Motto bar below the hotel image */
+#habbo-info {
+    background: #fff;
     border-top: 1px solid #d0d8df;
-    padding: 5px 10px;
+    padding: 5px 8px;
+    margin-bottom: 0;
+}
+
+#habbo-info #motto-container {
+    display: flex;
+    align-items: center;
+}
+
+#habbo-info #motto-display {
+    width: 100%;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    color: #888;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    cursor: pointer;
+    display: block;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#habbo-info #motto-display:hover {
+    border-color: #7ab0d0;
+}
+
+#habbo-info #mottoInput {
+    width: 100%;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    color: #333;
+    background: #fff;
+    border: 1px solid #7ab0d0;
+    border-radius: 2px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* =============================================
+   FEED ITEMS (info rows)
+   ============================================= */
+#habbo-feed {
+    border: 1px solid #c0c8d0;
+    border-top: none;
+    background: #fff;
+    margin-bottom: 8px;
+}
+
+#feed-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#feed-items li {
+    padding: 6px 8px 6px 34px;
+    border-bottom: 1px solid #e8eaed;
+    font-size: 11px;
+    line-height: 1.4;
+    position: relative;
+    min-height: 28px;
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+#feed-items li:last-child {
+    border-bottom: none;
+}
+
+#feed-items li:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+#feed-items li:nth-child(even) {
+    background: #fff;
+}
+
+#feed-items li a {
+    color: #c36a05;
+}
+
+#feed-items li span {
+    display: block;
+    width: 100%;
+    color: #555;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+#feed-items li span a {
+    color: #c36a05;
+}
+
+/* Feed item icons using Font Awesome */
+.feed-icon {
+    position: absolute;
+    left: 8px;
+    top: 7px;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    font-size: 10px;
+    color: #fff;
+    font-style: normal;
+}
+
+.feed-icon::before {
+    font-family: FontAwesome;
+    font-style: normal;
+}
+
+.feed-icon-feedback {
+    background: #f0a800;
+}
+
+.feed-icon-feedback::before {
+    content: "\f06a"; /* fa-exclamation-circle */
+    color: #fff;
+}
+
+.feed-icon-friends {
+    background: #4a9ad4;
+}
+
+.feed-icon-friends::before {
+    content: "\f0c0"; /* fa-users */
+    color: #fff;
+    font-size: 9px;
+}
+
+.feed-icon-groups {
+    background: #c03040;
+}
+
+.feed-icon-groups::before {
+    content: "\f0e5"; /* fa-comment */
+    color: #fff;
+    font-size: 9px;
+}
+
+.feed-icon-trading-on {
+    background: #4aaa20;
+}
+
+.feed-icon-trading-on::before {
+    content: "\f0ec"; /* fa-exchange */
+    color: #fff;
+    font-size: 9px;
+}
+
+.feed-icon-trading-off {
+    background: #999;
+}
+
+.feed-icon-trading-off::before {
+    content: "\f0ec"; /* fa-exchange */
+    color: #fff;
+    font-size: 9px;
+}
+
+.feed-icon-lastlogin {
+    background: #c03040;
+}
+
+.feed-icon-lastlogin::before {
+    content: "\f017"; /* fa-clock-o */
+    color: #fff;
+    font-size: 10px;
 }
 
 .habbo-motto-bar-below .habbo-motto-input {
@@ -526,7 +703,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 /* =============================================
-   INFO PANEL (5 rows on home page)
+   INFO PANEL (legacy styles - kept for compat)
    ============================================= */
 .habbo-info-panel {
     border: 1px solid #c0c8d0;

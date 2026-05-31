@@ -7,69 +7,80 @@
     <!-- MAIN (left) column -->
     <div class="habbo-main-col">
 
-        <!-- Hotel Image + Motto -->
-        <div class="habbo-home-panel">
-            <div class="habbo-hotel-image">
-                <div class="habbo-hotel-image-overlay">
-                    <a href="/hotel" class="habbo-enter-hotel-center hotel-button">Enter {{site.sitename}} Hotel</a>
-                </div>
-                <div class="habbo-player-figure">
-                    <img src="{{site.fpath}}/avatarimage?figure={{player.look}}&action=std&gesture=sml&direction=2&head_direction=2"
-                         alt="{{player.username}}" width="64" height="110">
-                </div>
+        <!-- Hotel Image Panel (matching Havana #new-personal-info) -->
+        <div id="new-personal-info" class="habbo-hotel-image">
+            <div class="enter-hotel-btn-wrap">
+                <a href="/hotel" class="habbo-enter-hotel-center">Enter {{site.sitename}} Hotel</a>
             </div>
-            <!-- Motto bar below the hotel image -->
-            <div class="habbo-motto-bar-below">
-                <input type="text" class="habbo-motto-input"
-                       id="mottoInput"
+            <div id="habbo-plate">
+                <a href="/settings">
+                    <img alt="{{player.username}}"
+                         src="{{site.fpath}}/avatarimage?figure={{player.look}}&size=b&direction=3&head_direction=3&crr=0&gesture=sml&frame=1"
+                         width="64" height="110">
+                </a>
+            </div>
+        </div>
+
+        <!-- Motto bar below the hotel image -->
+        <div id="habbo-info">
+            <div id="motto-container">
+                <span id="motto-display" title="Click to edit" role="button" tabindex="0">{% if player.motto %}{{player.motto}}{% else %}What's on your mind today?{% endif %}</span>
+                <input type="text" id="mottoInput" style="display:none"
                        value="{% if player.motto %}{{player.motto}}{% endif %}"
                        placeholder="What's on your mind today?"
-                       maxlength="190"
-                       autocomplete="off">
+                       maxlength="190" autocomplete="off">
                 <input type="hidden" name="csrftoken" value="{{csrf_token}}" id="csrfMotto">
             </div>
         </div>
 
-        <!-- Info Panel (5 rows matching reference) -->
-        <div class="habbo-info-panel">
+        <!-- Feed / Info Panel -->
+        <div id="habbo-feed">
             {% set trading_on = (player_settings is not empty and player_settings.can_trade == 1) %}
-            <div class="habbo-info-row">
-                <img src="/assets/images/hotel/sprites/feedback.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
-                <span>We'd love to hear from you! Please <a href="/help">visit our feedback site</a> and share your ideas with us.</span>
-            </div>
-            <div class="habbo-info-row">
-                <img src="/assets/images/hotel/sprites/friends_online.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
-                <span>
+            <ul id="feed-items">
+                <li id="feed-notification">
+                    <i class="feed-icon feed-icon-feedback"></i>
+                    We'd love to hear from you! Please <a href="/help">visit our feedback site</a> and share your ideas with us.
+                </li>
+
+                <li id="feed-friends">
+                    <i class="feed-icon feed-icon-friends"></i>
                     {% if random is not empty %}
-                    You have <strong>{{ random|length }}</strong> friends online
-                    {% for f in random %}{% if loop.index <= 5 %}{{ f.username }}{% if not loop.last and loop.index < 5 %}, {% endif %}{% endif %}{% endfor %}
-                    <a href="/community/friends">&raquo; Show all</a>
+                    You have <strong>{{random|length}}</strong> friends online
+                    <span>
+                        {% for f in random %}{% if loop.index <= 5 %}{{f.username}}{% if not loop.last and loop.index < 5 %}, {% endif %}{% endif %}{% endfor %}
+                        {% if random|length > 5 %}<a href="/community/friends">&raquo; Show all</a>{% endif %}
+                    </span>
                     {% else %}
                     You have <strong>0</strong> friends online
                     {% endif %}
-                </span>
-            </div>
-            <div class="habbo-info-row">
-                <img src="/assets/images/hotel/sprites/groups.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
-                <span>
+                </li>
+
+                <li class="small" id="feed-group-discussion">
+                    <i class="feed-icon feed-icon-groups"></i>
                     {% if groups is not empty %}
-                    <strong>{{ groups|length }}</strong> of your groups have new forum messages:
+                    <strong>{{groups|length}}</strong> of your groups have new forum messages:
                     {% else %}
-                    You have no group messages.
+                    You have no new group messages.
                     {% endif %}
-                </span>
-            </div>
-            <div class="habbo-info-row">
-                <img src="/assets/images/hotel/sprites/trading_{{ trading_on ? 'on' : 'off' }}.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
-                <span>
-                    Trading is <strong>{{ trading_on ? 'on' : 'off' }}</strong>.
-                    <a href="#" class="habbo-trading-toggle">Click here to turn it {{ trading_on ? 'off' : 'on' }}</a>
-                </span>
-            </div>
-            <div class="habbo-info-row">
-                <img src="/assets/images/hotel/sprites/last_login.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
-                <span>Last signed in: <strong>{{player.last_login|date("M j, Y g:i:s A")}}</strong></span>
-            </div>
+                </li>
+
+                {% if trading_on %}
+                <li class="small" id="feed-trading-enabled">
+                    <i class="feed-icon feed-icon-trading-on"></i>
+                    Trading is on. <a href="/settings?tab=6">Click here to turn it off</a>
+                </li>
+                {% else %}
+                <li class="small" id="feed-trading-disabled">
+                    <i class="feed-icon feed-icon-trading-off"></i>
+                    Trading is off. <a href="/settings?tab=6">Click here to turn it on</a>
+                </li>
+                {% endif %}
+
+                <li class="small" id="feed-lastlogin">
+                    <i class="feed-icon feed-icon-lastlogin"></i>
+                    Last signed in: {{player.last_login|date("M j, Y g:i:s A")}}
+                </li>
+            </ul>
         </div>
 
         <!-- My characters panel -->
@@ -123,7 +134,7 @@
                 {% endfor %}
                 {% if news is empty %}
                 <div class="habbo-news-item">
-                    <span style="font-size:11px;color:#888;">No news</span>
+                    <span style="font-size:11px;color:#888;">No news available.</span>
                 </div>
                 {% endif %}
             </div>
@@ -142,7 +153,7 @@
                 <div class="habbo-hotelpick-item">
                     <img src="/assets/images/web/pages/community/rooms/room_icon_2.gif" alt="" class="habbo-hotelpick-icon" onerror="this.style.display='none'">
                     <div class="habbo-hotelpick-info">
-                        <a href="/api/room/{{room.id}}" class="habbo-hotelpick-name">{{room.name}}</a>
+                        <a href="/community/rooms/{{room.id}}" class="habbo-hotelpick-name">{{room.name}}</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -159,10 +170,16 @@
                 <p>Browse latest events by their category</p>
                 <select class="habbo-events-select">
                     <option>Parties &amp; Music</option>
+                    <option>Trading</option>
                     <option>Games</option>
-                    <option>Fashion</option>
-                    <option>Trade</option>
-                    <option>Roleplaying</option>
+                    <option>Retro Guides</option>
+                    <option>Debates &amp; Discussion</option>
+                    <option>Grand Openings</option>
+                    <option>Dating</option>
+                    <option>Jobs</option>
+                    <option>Group Events</option>
+                    <option>Performance</option>
+                    <option>Help Desk</option>
                 </select>
             </div>
         </div>
@@ -225,6 +242,14 @@
 $(document).ready(function() {
     var mottoSaved = true;
 
+    // Click on motto display to edit
+    $('#motto-display').on('click keydown', function(e) {
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.type === 'keydown') e.preventDefault();
+        $(this).hide();
+        $('#mottoInput').show().focus().select();
+    });
+
     $('#mottoInput').on('input', function() {
         mottoSaved = false;
     });
@@ -234,11 +259,19 @@ $(document).ready(function() {
             e.preventDefault();
             saveMotto();
         }
+        if (e.key === 'Escape') {
+            $(this).hide();
+            $('#motto-display').show();
+            mottoSaved = true;
+        }
     });
 
     $('#mottoInput').on('blur', function() {
         if (!mottoSaved) {
             saveMotto();
+        } else {
+            $(this).hide();
+            $('#motto-display').show();
         }
     });
 
@@ -253,9 +286,13 @@ $(document).ready(function() {
             },
             success: function(response) {
                 mottoSaved = true;
+                $('#motto-display').text(newMotto || 'What\'s on your mind today?').show();
+                $('#mottoInput').hide();
             },
             error: function() {
                 mottoSaved = true;
+                $('#mottoInput').hide();
+                $('#motto-display').show();
             }
         });
     }
