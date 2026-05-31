@@ -1,7 +1,6 @@
 .idea
 **/*.pid
 emulator/logging
-nitro/nitro-assets/*
 client-tests/node_modules/
 client-tests/test-results/
 client-tests/screenshots/*.png

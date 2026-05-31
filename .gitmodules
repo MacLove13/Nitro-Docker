@@ -10,6 +10,3 @@
 [submodule "nitro/nitro-swf"]
 	path = nitro/nitro-swf
 	url = https://git.krews.org/morningstar/arcturus-morningstar-default-swf-pack.git
-[submodule "nitro/nitro-assets"]
-	path = nitro/nitro-assets
-	url = https://git.krews.org/nitro/default-assets.git
