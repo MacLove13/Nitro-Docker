@@ -1,17 +1,11 @@
 import { HabboSearchComposer, HabboSearchResultData, HabboSearchResultEvent } from '@nitrots/nitro-renderer';
 import { FC, useEffect, useState } from 'react';
 import { LocalizeText, OpenMessengerChat, SendMessageComposer } from '../../../../api';
-import { Base, Column, Flex, NitroCardAccordionItemView, NitroCardAccordionSetView, NitroCardAccordionSetViewProps, Text, UserProfileIconView } from '../../../../common';
+import { Base, Button, Column, Flex, NitroCardAccordionItemView, Text, UserProfileIconView } from '../../../../common';
 import { useFriends, useMessageEvent } from '../../../../hooks';
 
-interface FriendsSearchViewProps extends NitroCardAccordionSetViewProps
+export const FriendsSearchView: FC<{}> = props =>
 {
-
-}
-
-export const FriendsSearchView: FC<FriendsSearchViewProps> = props =>
-{
-    const { ...rest } = props;
     const [ searchValue, setSearchValue ] = useState('');
     const [ friendResults, setFriendResults ] = useState<HabboSearchResultData[]>(null);
     const [ otherResults, setOtherResults ] = useState<HabboSearchResultData[]>(null);
@@ -24,6 +18,13 @@ export const FriendsSearchView: FC<FriendsSearchViewProps> = props =>
         setFriendResults(parser.friends);
         setOtherResults(parser.others);
     });
+
+    const handleSearch = () =>
+    {
+        if(!searchValue || !searchValue.length) return;
+
+        SendMessageComposer(new HabboSearchComposer(searchValue));
+    };
 
     useEffect(() =>
     {
@@ -40,9 +41,8 @@ export const FriendsSearchView: FC<FriendsSearchViewProps> = props =>
     }, [ searchValue ]);
 
     return (
-        <NitroCardAccordionSetView { ...rest }>
-            <input type="text" className="search-input form-control form-control-sm w-100 rounded-0" placeholder={ LocalizeText('generic.search') } value={ searchValue } maxLength={ 50 } onChange={ event => setSearchValue(event.target.value) } />
-            <Column>
+        <Column grow overflow="hidden" style={ { minHeight: 0 } }>
+            <Column grow overflow="auto" style={ { minHeight: 0 } } gap={ 0 }>
                 { friendResults &&
                     <>
                         { (friendResults.length === 0) &&
@@ -98,6 +98,18 @@ export const FriendsSearchView: FC<FriendsSearchViewProps> = props =>
                             </Column> }
                     </> }
             </Column>
-        </NitroCardAccordionSetView>
+            <Flex alignItems="center" gap={ 1 } className="px-2 py-1 nitro-friends-search-input-bar">
+                <input
+                    type="text"
+                    className="search-input form-control form-control-sm flex-grow-1"
+                    placeholder={ LocalizeText('generic.search') }
+                    value={ searchValue }
+                    maxLength={ 50 }
+                    onChange={ event => setSearchValue(event.target.value) }
+                    onKeyDown={ event => event.key === 'Enter' && handleSearch() }
+                />
+                <Button onClick={ handleSearch }>{ LocalizeText('people.search.title') }</Button>
+            </Flex>
+        </Column>
     );
 }

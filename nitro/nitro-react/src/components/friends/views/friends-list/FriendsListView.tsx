@@ -1,7 +1,8 @@
 import { ILinkEventTracker, RemoveFriendComposer, SendRoomInviteComposer } from '@nitrots/nitro-renderer';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FaCaretDown, FaCaretRight, FaSearch, FaTrash } from 'react-icons/fa';
 import { AddEventLinkTracker, LocalizeText, MessengerFriend, RemoveLinkEventTracker, SendMessageComposer } from '../../../../api';
-import { Button, Flex, NitroCardAccordionSetView, NitroCardAccordionView, NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../common';
+import { Base, Flex, NitroCardAccordionSetView, NitroCardAccordionView, NitroCardContentView, NitroCardHeaderView, NitroCardView, Text } from '../../../../common';
 import { useFriends } from '../../../../hooks';
 import { FriendsListGroupView } from './friends-list-group/FriendsListGroupView';
 import { FriendsListRequestView } from './friends-list-request/FriendsListRequestView';
@@ -12,10 +13,11 @@ import { FriendsSearchView } from './FriendsListSearchView';
 export const FriendsListView: FC<{}> = props =>
 {
     const [ isVisible, setIsVisible ] = useState(false);
+    const [ activeTab, setActiveTab ] = useState<'friends' | 'search'>('friends');
     const [ selectedFriendsIds, setSelectedFriendsIds ] = useState<number[]>([]);
     const [ showRoomInvite, setShowRoomInvite ] = useState<boolean>(false);
     const [ showRemoveFriendsConfirmation, setShowRemoveFriendsConfirmation ] = useState<boolean>(false);
-    const { onlineFriends = [], offlineFriends = [], requests = [], requestFriend = null } = useFriends();
+    const { onlineFriends = [], offlineFriends = [], requests = [], requestFriend = null, followFriend = null } = useFriends();
 
     const removeFriendsText = useMemo(() =>
     {
@@ -60,6 +62,11 @@ export const FriendsListView: FC<{}> = props =>
         });
     }, [ setSelectedFriendsIds ]);
 
+    const selectAllFriends = useCallback(() =>
+    {
+        setSelectedFriendsIds(onlineFriends.map(f => f.id));
+    }, [ onlineFriends ]);
+
     const sendRoomInvite = (message: string) =>
     {
         if(!selectedFriendsIds.length || !message || !message.length || (message.length > 255)) return;
@@ -82,6 +89,16 @@ export const FriendsListView: FC<{}> = props =>
 
         setShowRemoveFriendsConfirmation(false);
     }
+
+    const followFirstSelected = useCallback(() =>
+    {
+        if(!selectedFriendsIds.length || !followFriend) return;
+
+        const firstId = selectedFriendsIds[0];
+        const friend = onlineFriends.find(f => f.id === firstId) || offlineFriends.find(f => f.id === firstId);
+
+        if(friend) followFriend(friend);
+    }, [ selectedFriendsIds, onlineFriends, offlineFriends, followFriend ]);
 
     useEffect(() =>
     {
@@ -119,26 +136,65 @@ export const FriendsListView: FC<{}> = props =>
 
     if(!isVisible) return null;
 
+    const hasSelection = selectedFriendsIds.length > 0;
+
+    const selectAllButton = onlineFriends.length > 0 ? (
+        <Text small pointer className="nitro-friends-select-all" onClick={ selectAllFriends }>
+            { LocalizeText('friendlist.select.all') }
+        </Text>
+    ) : null;
+
     return (
         <>
             <NitroCardView className="nitro-friends" uniqueKey="nitro-friends" theme="primary-slim">
                 <NitroCardHeaderView headerText={ LocalizeText('friendlist.friends') } onCloseClick={ event => setIsVisible(false) } />
-                <NitroCardContentView overflow="hidden" gap={ 1 } className="text-black p-0">
-                    <NitroCardAccordionView fullHeight overflow="hidden">
-                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends') + ` (${ onlineFriends.length })` } isExpanded={ true }>
-                            <FriendsListGroupView list={ onlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
-                        </NitroCardAccordionSetView>
-                        <NitroCardAccordionSetView headerText={ LocalizeText('friendlist.friends.offlinecaption') + ` (${ offlineFriends.length })` }>
-                            <FriendsListGroupView list={ offlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
-                        </NitroCardAccordionSetView>
-                        <FriendsListRequestView headerText={ LocalizeText('friendlist.tab.friendrequests') + ` (${ requests.length })` } isExpanded={ true } />
-                        <FriendsSearchView headerText={ LocalizeText('people.search.title') } />
-                    </NitroCardAccordionView>
-                    { selectedFriendsIds && selectedFriendsIds.length > 0 &&
-                        <Flex gap={ 1 } className="p-1">
-                            <Button fullWidth onClick={ () => setShowRoomInvite(true) }>{ LocalizeText('friendlist.tip.invite') }</Button>
-                            <Button fullWidth variant="danger" onClick={ event => setShowRemoveFriendsConfirmation(true) }>{ LocalizeText('generic.delete') }</Button>
-                        </Flex> } 
+                <NitroCardContentView overflow="hidden" gap={ 0 } className="text-black p-0">
+                    { activeTab === 'friends' &&
+                        <>
+                            <Flex pointer justifyContent="between" alignItems="center" className="nitro-card-accordion-set-header px-2 py-1">
+                                <Text>{ LocalizeText('friendlist.friends') }</Text>
+                                <FaCaretDown className="fa-icon" />
+                            </Flex>
+                            <NitroCardAccordionView grow overflow="hidden" style={ { minHeight: 0 } }>
+                                <NitroCardAccordionSetView
+                                    headerText={ `${ LocalizeText('friendlist.friends') } (${ onlineFriends.length })` }
+                                    isExpanded={ true }
+                                    headerRightContent={ selectAllButton }
+                                >
+                                    <FriendsListGroupView list={ onlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
+                                </NitroCardAccordionSetView>
+                                <NitroCardAccordionSetView headerText={ `${ LocalizeText('friendlist.friends.offlinecaption') } (${ offlineFriends.length })` }>
+                                    <FriendsListGroupView list={ offlineFriends } selectedFriendsIds={ selectedFriendsIds } selectFriend={ selectFriend } />
+                                </NitroCardAccordionSetView>
+                                <FriendsListRequestView headerText={ LocalizeText('friendlist.tab.friendrequests') + ` (${ requests.length })` } isExpanded={ true } />
+                            </NitroCardAccordionView>
+                            <Flex justifyContent="between" alignItems="center" className="nitro-friends-toolbar px-2 py-1">
+                                <Flex gap={ 2 } alignItems="center">
+                                    <Base pointer={ hasSelection } className={ `nitro-friends-spritesheet icon-friendbar-chat${ !hasSelection ? ' nitro-friends-toolbar-btn-disabled' : '' }` } onClick={ hasSelection ? () => setShowRoomInvite(true) : null } title={ LocalizeText('friendlist.tip.invite') } />
+                                    <Base pointer={ hasSelection } className={ `nitro-friends-spritesheet icon-follow${ !hasSelection ? ' nitro-friends-toolbar-btn-disabled' : '' }` } onClick={ hasSelection ? followFirstSelected : null } title={ LocalizeText('friendlist.tip.follow') } />
+                                </Flex>
+                                <Flex gap={ 2 } alignItems="center">
+                                    <FaSearch className="cursor-pointer fa-icon" onClick={ () => setActiveTab('search') } title={ LocalizeText('people.search.title') } />
+                                    <FaTrash className={ `fa-icon${ !hasSelection ? ' nitro-friends-toolbar-btn-disabled' : ' cursor-pointer' }` } onClick={ hasSelection ? () => setShowRemoveFriendsConfirmation(true) : null } title={ LocalizeText('generic.delete') } />
+                                </Flex>
+                            </Flex>
+                            <Flex pointer justifyContent="between" alignItems="center" className="nitro-card-accordion-set-header px-2 py-1" onClick={ () => setActiveTab('search') }>
+                                <Text>{ LocalizeText('people.search.title') }</Text>
+                                <FaCaretRight className="fa-icon" />
+                            </Flex>
+                        </> }
+                    { activeTab === 'search' &&
+                        <>
+                            <Flex pointer justifyContent="between" alignItems="center" className="nitro-card-accordion-set-header px-2 py-1" onClick={ () => setActiveTab('friends') }>
+                                <Text>{ LocalizeText('friendlist.friends') }</Text>
+                                <FaCaretRight className="fa-icon" />
+                            </Flex>
+                            <Flex pointer justifyContent="between" alignItems="center" className="nitro-card-accordion-set-header px-2 py-1">
+                                <Text>{ LocalizeText('people.search.title') }</Text>
+                                <FaCaretDown className="fa-icon" />
+                            </Flex>
+                            <FriendsSearchView />
+                        </> }
                 </NitroCardContentView>
             </NitroCardView>
             { showRoomInvite &&
