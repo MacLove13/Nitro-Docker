@@ -82,5 +82,112 @@ class Profiles
     {
         return QueryBuilder::table('website_profile_homes')->where('id', $item_id)->where('user_id', $user_id)->where('type', $type)->delete();
     }
+
+    // ── Sticker inventory (Web Store) ────────────────────────────────────────
+
+    public static function getInventory($user_id)
+    {
+        return QueryBuilder::table('website_profile_inventories as i')
+            ->join('website_profile_catalogues as c', 'i.catalogue_id', '=', 'c.id')
+            ->select(['c.id', 'c.type', 'c.data', 'c.name', 'c.category', 'c.price', 'i.quantity'])
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('i.user_id', $user_id)
+            ->get();
+    }
+
+    public static function hasInInventory($user_id, $catalogue_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('user_id', $user_id)
+            ->where('catalogue_id', $catalogue_id)
+            ->first();
+    }
+
+    public static function addToInventory($user_id, $catalogue_id)
+    {
+        return QueryBuilder::table('website_profile_inventories')->insert([
+            'user_id'      => $user_id,
+            'catalogue_id' => $catalogue_id,
+            'quantity'     => 1,
+            'purchased_at' => time(),
+        ]);
+    }
+
+    public static function getCatalogueItem($id)
+    {
+        return QueryBuilder::table('website_profile_catalogues')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->where('id', $id)
+            ->first();
+    }
+
+    // ── Admin catalogue management ───────────────────────────────────────────
+
+    public static function getAllCategorys()
+    {
+        return QueryBuilder::table('website_profile_catalogues_cats')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->get();
+    }
+
+    public static function createCategory($type, $name)
+    {
+        return QueryBuilder::table('website_profile_catalogues_cats')->insert([
+            'type' => $type,
+            'name' => $name,
+        ]);
+    }
+
+    public static function updateCategory($id, $name)
+    {
+        return QueryBuilder::table('website_profile_catalogues_cats')
+            ->where('id', $id)
+            ->update(['name' => $name]);
+    }
+
+    public static function deleteCategory($id)
+    {
+        return QueryBuilder::table('website_profile_catalogues_cats')
+            ->where('id', $id)
+            ->delete();
+    }
+
+    public static function getAllItems()
+    {
+        return QueryBuilder::table('website_profile_catalogues')
+            ->setFetchMode(PDO::FETCH_CLASS, get_called_class())
+            ->get();
+    }
+
+    public static function createItem($type, $data, $name, $category, $price)
+    {
+        return QueryBuilder::table('website_profile_catalogues')->insert([
+            'type'     => $type,
+            'data'     => $data,
+            'name'     => $name,
+            'category' => $category,
+            'price'    => (int) $price,
+        ]);
+    }
+
+    public static function updateItem($id, $data, $name, $category, $price)
+    {
+        return QueryBuilder::table('website_profile_catalogues')
+            ->where('id', $id)
+            ->update([
+                'data'     => $data,
+                'name'     => $name,
+                'category' => $category,
+                'price'    => (int) $price,
+            ]);
+    }
+
+    public static function deleteItem($id)
+    {
+        return QueryBuilder::table('website_profile_catalogues')
+            ->where('id', $id)
+            ->delete();
+    }
 }
 
