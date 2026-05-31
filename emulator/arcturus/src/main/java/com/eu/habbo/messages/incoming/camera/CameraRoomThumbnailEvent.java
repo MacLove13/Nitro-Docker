@@ -3,11 +3,20 @@ package com.eu.habbo.messages.incoming.camera;
 import com.eu.habbo.Emulator;
 import com.eu.habbo.messages.incoming.MessageHandler;
 import com.eu.habbo.messages.outgoing.camera.CameraRoomThumbnailSavedComposer;
-import com.eu.habbo.networking.camera.CameraClient;
-import com.eu.habbo.networking.camera.messages.outgoing.CameraRenderImageComposer;
-import com.eu.habbo.util.crypto.ZIP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.netty.buffer.ByteBufUtil;
+import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 
 public class CameraRoomThumbnailEvent extends MessageHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CameraRoomThumbnailEvent.class);
+
     @Override
     public void handle() throws Exception {
         if (!this.client.getHabbo().hasPermission("acc_camera")) {
@@ -18,20 +27,32 @@ public class CameraRoomThumbnailEvent extends MessageHandler {
         if (!this.client.getHabbo().getHabboInfo().getCurrentRoom().isOwner(this.client.getHabbo()))
             return;
 
-        if (CameraClient.isLoggedIn) {
-            this.packet.getBuffer().readFloat();
-            byte[] data = this.packet.getBuffer().readBytes(this.packet.getBuffer().readableBytes()).array();
-            String content = new String(ZIP.inflate(data));
+        // Read length prefix then raw PNG bytes sent by Nitro React
+        this.packet.getBuffer().readInt();
+        byte[] pngData = ByteBufUtil.getBytes(this.packet.getBuffer());
 
-            CameraRenderImageComposer composer = new CameraRenderImageComposer(this.client.getHabbo().getHabboInfo().getId(), this.client.getHabbo().getHabboInfo().getCurrentRoom().getBackgroundTonerColor().getRGB(), 110, 110, content);
+        int userId = this.client.getHabbo().getHabboInfo().getId();
+        int timestamp = Emulator.getIntUnixTimestamp();
+        String filename = userId + "_" + timestamp + "_thumb.png";
 
-            this.client.getHabbo().getHabboInfo().setPhotoJSON(Emulator.getConfig().getValue("camera.extradata").replace("%timestamp%", composer.timestamp + ""));
-            this.client.getHabbo().getHabboInfo().setPhotoTimestamp(composer.timestamp);
+        String thumbnailDir = Emulator.getConfig().getValue("imager.location.output.thumbnail", "/var/www/html/public/camera/thumbnail/");
+        new File(thumbnailDir).mkdirs();
 
-            Emulator.getCameraClient().sendMessage(composer);
-        } else {
-            this.client.sendResponse(new CameraRoomThumbnailSavedComposer());
-            this.client.getHabbo().alert(Emulator.getTexts().getValue("camera.disabled"));
+        try {
+            BufferedImage original = ImageIO.read(new ByteArrayInputStream(pngData));
+            if (original != null) {
+                BufferedImage thumb = new BufferedImage(110, 110, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = thumb.createGraphics();
+                g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.drawImage(original, 0, 0, 110, 110, null);
+                g2d.dispose();
+                ImageIO.write(thumb, "png", new File(thumbnailDir, filename));
+                LOGGER.info("[Camera] Saved thumbnail: " + filename + " for user " + userId);
+            }
+        } catch (Exception e) {
+            LOGGER.error("[Camera] Failed to save room thumbnail: " + e.getMessage());
         }
+
+        this.client.sendResponse(new CameraRoomThumbnailSavedComposer());
     }
 }
