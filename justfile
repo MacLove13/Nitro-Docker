@@ -15,10 +15,12 @@ start-all:
 # Close docker containers, remove images and clean volumes
 clean-docker:
   docker-compose down
-  docker image rm nitro-docker_arcturus -f
-  docker image rm nitro-docker_nitro -f
+  docker image rm nitro-docker-arcturus -f
+  docker image rm nitro-docker-nitro -f
+  docker image rm nitro-docker-cms -f
   docker volume rm nitro-docker_volume-arcturus-maven-repo
   docker volume rm nitro-docker_volume-arcturus-target
+  docker volume rm nitro-docker_volume-cms-vendor
   docker volume rm nitro-docker_volume-mysql
   docker volume rm nitro-docker_volume-nitro-converter-node-modules
   docker volume rm nitro-docker_volume-nitro-react-node-modules
@@ -74,6 +76,18 @@ shell-nitro:
 # Watch Nitro dev server's output
 watch-nitro:
   docker exec nitro supervisorctl tail -f nitro-dev-server
+
+# Restart CMS
+restart-cms:
+  docker-compose restart cms
+
+# Enter in the CMS shell
+shell-cms:
+  docker exec -it cms sh
+
+# Watch CMS output
+watch-cms:
+  docker logs -f cms
 
 
 # Extract nitro assets from SWF

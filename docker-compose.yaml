@@ -6,6 +6,7 @@ volumes:
   volume-arcturus-target:
   volume-nitro-converter-node-modules:
   volume-nitro-react-node-modules:
+  volume-cms-vendor:
 
 services:
   arcturus:
@@ -42,8 +43,39 @@ services:
     networks:
       nitro:
 
+  cms:
+    container_name: cms
+    build:
+      context: cms
+    entrypoint: ["/bin/sh","/app/scripts/build.sh"]
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=arcturus
+      - DB_USER=arcturus_user
+      - DB_PASS=arcturus_pw
+      - DB_CHARSET=utf8
+      - DB_COLLATION=utf8_general_ci
+      - CMS_DOMAIN=localhost:8082
+      - CMS_NITRO_PATH=http://localhost:1080
+      - CMS_ASSET_PATH=http://localhost:8080
+      - CMS_SHORTNAME=Nitro
+      - CMS_SITENAME=Nitro
+    volumes:
+      - ./cms/Cosmic:/var/www/html
+      - ./cms/Database:/database
+      - volume-cms-vendor:/var/www/html/vendor
+    ports:
+      - 8082:80
+    depends_on:
+      - mysql
+      - arcturus
+      - nitro
+    networks:
+      nitro:
+
   mysql:
-    container_name: mysql
+    container_name: mysql-nitro
     image: mariadb:10.6
     command: --default-authentication-plugin=mysql_native_password
     environment:
