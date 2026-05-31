@@ -330,268 +330,220 @@ body.habbo-classic .page-container .page-content {
 
 /* =============================================
    HOTEL IMAGE PANEL (#new-personal-info)
+   Based on Havana-Web personal.css
    ============================================= */
 #new-personal-info {
-    border: 1px solid #a8b8c0;
-    border-bottom: none;
-}
-
-.habbo-hotel-image {
     position: relative;
-    height: 220px;
-    background-image: url('../images/web/pages/home/header.gif');
-    background-size: cover;
-    background-position: center top;
-    overflow: hidden;
+    background-image: url('/assets/havana/web-gallery/v2/images/personal_info/hotel_views/htlview_br.png');
+    background-repeat: no-repeat;
+    background-color: transparent;
+    padding-top: 143px;
+    margin: 0 0 7px 0;
+    border: 1px solid #a8b8c0;
+    overflow: visible;
 }
 
-/* Enter Hotel button wrapper - centered in hotel image */
-.enter-hotel-btn-wrap {
+/* Enter Hotel button outer wrapper — top-right of hotel scene */
+.enter-hotel-btn {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    top: 15px;
+    right: 40px;
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/orange_thing.png') no-repeat 50% 0;
+    padding: 28px 0;
     z-index: 3;
 }
 
-/* "Enter Hotel" button centered inside the hotel scene */
-.habbo-enter-hotel-center {
-    background: linear-gradient(to bottom, #5bcc00, #3a9900);
-    color: #fff !important;
-    font-weight: bold;
-    font-size: 14px;
-    text-decoration: none !important;
-    padding: 8px 20px;
-    border-radius: 4px;
-    border: 1px solid #2a7700;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-    display: inline-block;
-    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+/* Enter Hotel button inner: uses enter_button.png 3-state sprite (0/-49/-98px) */
+.enter-btn {
+    display: flex;
+    height: 49px;
     cursor: pointer;
+    text-decoration: none;
 }
 
-.habbo-enter-hotel-center:hover {
-    background: linear-gradient(to bottom, #6ddd00, #4aaa00);
+.enter-btn b {
+    display: block;
+    width: 9px;
+    height: 49px;
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/enter_button.png') no-repeat 0 0;
+    flex-shrink: 0;
+}
+
+.enter-btn a {
+    display: block;
+    height: 49px;
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/enter_button.png') no-repeat -9px 0;
+    padding: 0 26px 0 19px;
+    line-height: 47px;
+    font-size: 14px;
+    color: #fff !important;
     text-decoration: none !important;
+    font-weight: bold;
+    white-space: nowrap;
+    position: relative;
 }
 
-/* Avatar plate - bottom-left of hotel image */
-#habbo-plate {
+.enter-btn a i {
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/flashy_arrow.gif') no-repeat 0 50%;
+    padding: 10px 10px;
     position: absolute;
-    bottom: 0;
-    left: 10px;
+    right: 0;
+    top: 13px;
+    line-height: 1px;
+    height: 1px;
+    font-size: 1px;
+    font-style: normal;
+    display: inline-block;
+}
+
+.enter-btn:hover a {
+    background-position: -9px -49px;
+}
+
+.enter-btn:hover b {
+    background-position: 0 -49px;
+}
+
+/* Avatar plate — left side of hotel scene, overlaps into motto bar */
+#new-personal-info #habbo-plate {
+    position: absolute;
+    top: 48px;
+    left: 15px;
+    background: url('/assets/havana/web-gallery/v2/images/personal_info/info_habbo_plate.png') no-repeat 2px -162px;
+    text-align: center;
+    height: 138px;
+    width: 96px;
     z-index: 5;
 }
 
-#habbo-plate img {
+#new-personal-info #habbo-plate:hover {
+    background-position: 2px 75px;
+}
+
+#new-personal-info #habbo-plate a {
+    display: block;
+}
+
+#new-personal-info #habbo-plate img {
     image-rendering: pixelated;
     image-rendering: -webkit-optimize-contrast;
     display: block;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
 }
 
-/* Motto bar below the hotel image */
-#habbo-info {
-    background: #fff;
-    border-top: 1px solid #d0d8df;
-    padding: 5px 8px;
-    margin-bottom: 0;
+/* Motto bar */
+#new-personal-info #habbo-info {
+    background-color: #7B7B71;
+    padding-top: 10px;
 }
 
-#habbo-info #motto-container {
-    display: flex;
-    align-items: center;
+#new-personal-info #habbo-info #motto-container {
+    margin-left: 120px;
+    width: 323px;
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/motto_field.png') no-repeat;
+    height: 18px;
+    padding: 2px 3px 4px 3px;
+    overflow: hidden;
 }
 
-#habbo-info #motto-display {
-    width: 100%;
-    padding: 4px 8px;
-    font-size: 11px;
-    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    color: #888;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    cursor: pointer;
+#new-personal-info #habbo-info #motto-display {
     display: block;
-    box-sizing: border-box;
+    line-height: 18px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#habbo-info #motto-display:hover {
-    border-color: #7ab0d0;
-}
-
-#habbo-info #mottoInput {
-    width: 100%;
-    padding: 4px 8px;
+    color: #555;
+    cursor: pointer;
     font-size: 11px;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    color: #333;
-    background: #fff;
-    border: 1px solid #7ab0d0;
-    border-radius: 2px;
+}
+
+#new-personal-info #habbo-info #mottoInput {
+    border: 1px solid #fff;
+    padding: 1px 0;
+    height: 14px;
+    margin: 0;
+    background-color: #ddd;
+    width: 100%;
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
     box-sizing: border-box;
-    outline: none;
 }
 
 /* =============================================
-   FEED ITEMS (info rows)
+   FEED ITEMS (#habbo-feed inside #new-personal-info)
+   Based on Havana-Web personal.css
    ============================================= */
-#habbo-feed {
-    border: 1px solid #c0c8d0;
-    border-top: none;
-    background: #fff;
-    margin-bottom: 8px;
+#new-personal-info #habbo-feed {
+    background-color: #A0A097;
 }
 
-#feed-items {
+#new-personal-info #habbo-feed ul#feed-items {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-#feed-items li {
-    padding: 6px 8px 6px 34px;
-    border-bottom: 1px solid #e8eaed;
-    font-size: 11px;
-    line-height: 1.4;
-    position: relative;
+#new-personal-info #habbo-feed ul#feed-items li {
+    padding: 7px 5px 7px 45px;
+    background: transparent url('/assets/havana/web-gallery/v2/images/personal_info/big_icons.png') no-repeat 10px 7px;
+    border-top: 1px dotted #7B7B73;
     min-height: 28px;
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    line-height: 1.4;
+    color: #fff;
 }
 
-#feed-items li:last-child {
-    border-bottom: none;
+#new-personal-info #habbo-feed ul#feed-items li:first-child {
+    border-top: none;
 }
 
-#feed-items li:nth-child(odd) {
-    background: #f9f9f9;
+#new-personal-info #habbo-feed ul#feed-items li a {
+    color: #fff;
+    text-decoration: underline;
 }
 
-#feed-items li:nth-child(even) {
-    background: #fff;
+#new-personal-info #habbo-feed ul#feed-items li a:hover {
+    color: #e0e0e0;
+    text-decoration: none;
 }
 
-#feed-items li a {
-    color: #c36a05;
-}
-
-#feed-items li span {
+#new-personal-info #habbo-feed ul#feed-items li span {
     display: block;
     width: 100%;
-    color: #555;
+    color: #fff;
     font-size: 10px;
     margin-top: 2px;
 }
 
-#feed-items li span a {
-    color: #c36a05;
+#new-personal-info #habbo-feed ul#feed-items li span a {
+    color: #fff;
 }
 
-/* Feed item icons using Font Awesome */
-.feed-icon {
-    position: absolute;
-    left: 8px;
-    top: 7px;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 2px;
+/* Big icon positions (big_icons.png — 3645×30px horizontal sprite) */
+#new-personal-info #habbo-feed ul#feed-items li#feed-notification { background-position: -439px 6px; }
+#new-personal-info #habbo-feed ul#feed-items li#feed-friends      { background-position: -892px 6px; }
+
+/* Small items use small_icons.png (20×910px vertical sprite) */
+#new-personal-info #habbo-feed ul#feed-items li.small {
     font-size: 10px;
-    color: #fff;
-    font-style: normal;
+    background: transparent url('/assets/havana/web-gallery/v2/images/shared_icons/small_icons.png') no-repeat 15px 7px;
+    min-height: 15px;
 }
 
-.feed-icon::before {
-    font-family: FontAwesome;
-    font-style: normal;
-}
+#new-personal-info #habbo-feed ul#feed-items li#feed-lastlogin        { background-position: 15px -297px; }
+#new-personal-info #habbo-feed ul#feed-items li#feed-group-discussion  { background-position: 15px -456px; }
+#new-personal-info #habbo-feed ul#feed-items li#feed-trading-enabled   { background-position: 15px -825px; }
+#new-personal-info #habbo-feed ul#feed-items li#feed-trading-disabled  { background-position: 15px -886px; }
 
-.feed-icon-feedback {
-    background: #f0a800;
-}
-
-.feed-icon-feedback::before {
-    content: "\f06a"; /* fa-exclamation-circle */
-    color: #fff;
-}
-
-.feed-icon-friends {
-    background: #4a9ad4;
-}
-
-.feed-icon-friends::before {
-    content: "\f0c0"; /* fa-users */
-    color: #fff;
-    font-size: 9px;
-}
-
-.feed-icon-groups {
-    background: #c03040;
-}
-
-.feed-icon-groups::before {
-    content: "\f0e5"; /* fa-comment */
-    color: #fff;
-    font-size: 9px;
-}
-
-.feed-icon-trading-on {
-    background: #4aaa20;
-}
-
-.feed-icon-trading-on::before {
-    content: "\f0ec"; /* fa-exchange */
-    color: #fff;
-    font-size: 9px;
-}
-
-.feed-icon-trading-off {
-    background: #999;
-}
-
-.feed-icon-trading-off::before {
-    content: "\f0ec"; /* fa-exchange */
-    color: #fff;
-    font-size: 9px;
-}
-
-.feed-icon-lastlogin {
-    background: #c03040;
-}
-
-.feed-icon-lastlogin::before {
-    content: "\f017"; /* fa-clock-o */
-    color: #fff;
-    font-size: 10px;
-}
-
-.habbo-motto-bar-below .habbo-motto-input {
-    width: 100%;
-    border: 1px solid #ccc;
-    padding: 4px 8px;
-    font-size: 11px;
-    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    color: #666;
-    background: #fff;
-    border-radius: 2px;
-    box-sizing: border-box;
-}
-
-.habbo-motto-bar-below .habbo-motto-input:focus {
-    outline: none;
-    border-color: #7ab0d0;
-    color: #333;
+/* Bottom edge of the personal info panel */
+#new-personal-info p.last {
+    display: block;
+    height: 3px;
+    background: url('/assets/havana/web-gallery/v2/images/personal_info/bottom.png') no-repeat top left;
+    margin: 0;
 }
 
 /* Stats bar */
