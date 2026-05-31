@@ -338,6 +338,23 @@ class Profile
 
         // If it's a sticker, return it to inventory
         if($type === 's') {
+            // New (unsaved) sticker widgets have IDs starting with "new-".
+            // They are not in the database yet, so use catalogue_id to restore inventory.
+            if(strpos((string)$item_id, 'new-') === 0) {
+                $catalogue_id = (int) input()->post('catalogue_id')->value;
+                if($catalogue_id) {
+                    $inv = Profiles::hasInInventory(request()->player->id, $catalogue_id);
+                    if($inv) {
+                        Profiles::incrementInventoryQuantity(request()->player->id, $catalogue_id);
+                    } else {
+                        Profiles::addToInventory(request()->player->id, $catalogue_id);
+                    }
+                }
+                // No database record to delete for unsaved stickers
+                response()->json(["status" => "success", "message" => "Widget deleted!"]);
+                return;
+            }
+
             $home = Profiles::getHomeItem(request()->player->id, $item_id);
             if($home) {
                 $catalogue = Profiles::getCatalogueItemByData($home->name);
@@ -354,6 +371,46 @@ class Profile
 
         Profiles::remove(request()->player->id, $item_id, $type);
         response()->json(["status" => "success", "message" => "Widget deleted!"]); 
+    }
+
+    public function restoreUnsaved()
+    {
+        if(!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $rawItems = input()->post('items')->value;
+        if(empty($rawItems)) {
+            response()->json(["status" => "error", "message" => "No items provided."]);
+            return;
+        }
+
+        $items = json_decode($rawItems);
+        if(!is_array($items)) {
+            response()->json(["status" => "error", "message" => "Invalid items format."]);
+            return;
+        }
+
+        foreach($items as $item) {
+            $catalogue_id = isset($item->catalogue_id) ? (int) $item->catalogue_id : 0;
+            $quantity     = isset($item->quantity)     ? (int) $item->quantity     : 0;
+
+            if($catalogue_id < 1 || $quantity < 1) continue;
+
+            // Verify the catalogue item exists and is a sticker
+            $catalogue = Profiles::getCatalogueItem($catalogue_id);
+            if(!$catalogue || $catalogue->type !== 's') continue;
+
+            $inv = Profiles::hasInInventory(request()->player->id, $catalogue_id);
+            if($inv) {
+                Profiles::addQuantityToInventory(request()->player->id, $catalogue_id, $quantity);
+            } else {
+                Profiles::addToInventoryWithQuantity(request()->player->id, $catalogue_id, $quantity);
+            }
+        }
+
+        response()->json(["status" => "success"]);
     }
 
     public function save()

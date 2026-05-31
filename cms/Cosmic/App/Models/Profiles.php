@@ -181,6 +181,24 @@ class Profiles
             ->first();
     }
 
+    public static function addQuantityToInventory($user_id, $catalogue_id, $amount)
+    {
+        return QueryBuilder::table('website_profile_inventories')
+            ->where('user_id', $user_id)
+            ->where('catalogue_id', $catalogue_id)
+            ->increment('quantity', $amount);
+    }
+
+    public static function addToInventoryWithQuantity($user_id, $catalogue_id, $quantity)
+    {
+        return QueryBuilder::table('website_profile_inventories')->insert([
+            'user_id'      => $user_id,
+            'catalogue_id' => $catalogue_id,
+            'quantity'     => (int) $quantity,
+            'purchased_at' => time(),
+        ]);
+    }
+
     public static function addToInventory($user_id, $catalogue_id)
     {
         return QueryBuilder::table('website_profile_inventories')->insert([
