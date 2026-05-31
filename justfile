@@ -90,6 +90,27 @@ watch-cms:
   docker logs -f cms
 
 
+# Run the full Playwright test suite against the Nitro React client.
+# The first run may take 5-10 minutes while yarn installs dependencies.
+# Subsequent runs are fast thanks to Docker layer and volume caching.
+# Screenshots are saved to client-tests/screenshots/
+# HTML report is saved to client-tests/test-results/
+test-client:
+  docker-compose -p nitro-docker-test -f docker-compose.client-test.yaml up --build --exit-code-from client-tests --abort-on-container-exit
+
+# Run only the screenshot tests (tagged @screenshot) against the Nitro client.
+# Starts the nitro service automatically if it is not already running, then
+# waits for the healthcheck before launching Playwright.
+screenshot-client:
+  docker-compose -p nitro-docker-test -f docker-compose.client-test.yaml run --build --rm client-tests npx playwright test --grep @screenshot
+  docker-compose -p nitro-docker-test -f docker-compose.client-test.yaml down
+
+# Stop and clean up client test containers and volumes.
+clean-client-tests:
+  docker-compose -p nitro-docker-test -f docker-compose.client-test.yaml down -v
+  docker image rm nitro-docker-test-client-tests -f
+  docker image rm nitro-docker-test-nitro -f
+
 # Extract nitro assets from SWF
 extract-nitro-assets:
   docker exec -it nitro bash -c "cp /app/configuration/nitro-converter/configuration.json /app/nitro-converter/configuration.json"

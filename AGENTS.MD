@@ -171,3 +171,59 @@ CMS      → [MySQL :3306] → same database
 - **CMS configuration** is handled through environment variables in `docker-compose.yaml`.
 - The default SSO ticket is `123`. It is seeded by the SQL dump in `mysql/dumps/`.
 - All `just` commands assume the Docker containers are already running unless noted otherwise.
+
+---
+
+## Client Testing & Debug Environment
+
+The `client-tests/` directory contains a self-contained [Playwright](https://playwright.dev/) test suite for the Nitro React client.  
+It runs headless Chromium inside Docker and does **not** require the emulator, CMS, or MySQL.
+
+### Directory layout
+
+```
+client-tests/
+├── Dockerfile             # Playwright runner image (mcr.microsoft.com/playwright)
+├── package.json           # @playwright/test dependency
+├── playwright.config.ts   # Timeout, reporter, browser, and BASE_URL config
+├── tests/
+│   └── client.spec.ts     # Smoke tests: HTTP 200, #root element, screenshot
+└── screenshots/           # Output screenshots (git-ignored PNGs)
+```
+
+### Compose file
+
+`docker-compose.client-test.yaml` defines two services:
+
+| Service        | Role |
+|----------------|------|
+| `nitro`        | Nitro React Vite dev server (identical to the main compose, but with separate volumes and a healthcheck on port 5154) |
+| `client-tests` | Playwright test runner; starts only after `nitro` is healthy |
+
+### Key commands for AI agents
+
+| Goal | Command |
+|------|---------|
+| Run all client tests | `just test-client` |
+| Capture screenshot only | `just screenshot-client` |
+| Run tests on host against a running client | `cd client-tests && BASE_URL=http://localhost:1080 npx playwright test` |
+| Clean test containers/volumes | `just clean-client-tests` |
+
+### How tests work
+
+1. The `nitro` container starts `supervisord` → `yarn install` → Vite dev server on port 5154.
+2. A Docker healthcheck polls port 5154 every 20 s (up to 10 min start window for the first `yarn install`).
+3. Once healthy, `client-tests` runs `npx playwright test` in headless Chromium.
+4. Screenshots are written inside the container at `/tests/screenshots/` which is bind-mounted to `client-tests/screenshots/` on the host.
+
+### Extending the tests
+
+- Add new `*.spec.ts` files under `client-tests/tests/`.
+- Tag a test `@screenshot` to include it in the `just screenshot-client` shortcut.
+- The `BASE_URL` env variable controls which server to test (default: `http://nitro:5154` inside Docker, `http://localhost:1080` on host).
+
+### Notes
+
+- The first run is slow (~5–10 min) because `yarn install` runs inside the container; subsequent runs reuse the `test-volume-nitro-react-node-modules` Docker volume.
+- The test environment uses **separate Docker volumes** (`test-volume-*`) so it can run alongside the main stack without conflicts.
+- Do **not** modify `client-tests/` test files to point at the submodule source; tests always talk to the running HTTP server.

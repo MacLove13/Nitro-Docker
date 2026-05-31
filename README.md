@@ -44,3 +44,48 @@ The first database come from mysql/dumps, it's the base Arcturus database for 3.
 - All the configurations for nitro-react are in `nitro/configuration`. If you make some change, just make `just restart-nitro`
 
 ### Have fun <3
+
+---
+
+## Testing & Debug (Copilot / CI)
+
+The repository ships a ready-to-use [Playwright](https://playwright.dev/) test environment that lets you run automated tests and capture screenshots of the Nitro React client without the full emulator/CMS stack.
+
+### Prerequisites
+- Docker & Docker Compose (same as the main setup)
+- `just` (optional – you can also run the `docker-compose` commands directly)
+
+### Run all client tests
+```bash
+just test-client
+```
+This command:
+1. Builds the `nitro` service and starts the Vite dev server in Docker.
+2. Waits until the dev server is healthy (first run: ~5–10 min for `yarn install`).
+3. Runs all Playwright tests in headless Chromium.
+4. Exits with the Playwright exit code (0 = all passed).
+
+Screenshots are saved to `client-tests/screenshots/`.  
+The HTML report is saved to `client-tests/test-results/`.
+
+### Capture a screenshot only
+```bash
+just screenshot-client
+```
+Runs only tests tagged `@screenshot` and exits immediately.
+
+### Run tests against an already-running client (host)
+```bash
+cd client-tests
+npm install
+BASE_URL=http://localhost:1080 npx playwright test
+```
+
+### Clean up test containers & volumes
+```bash
+just clean-client-tests
+```
+
+### Adding new tests
+Edit or add files in `client-tests/tests/`. Tests follow standard Playwright syntax.  
+Tag a test with `@screenshot` to include it in the `just screenshot-client` shortcut.
