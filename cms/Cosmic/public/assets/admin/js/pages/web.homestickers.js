@@ -115,7 +115,7 @@ var homestickers = function () {
 
             // Live preview on filename change
             $("[name=data]").off("input.preview").on("input.preview", function () {
-                var val = $(this).val();
+                var val = $(this).val().replace(/[^a-zA-Z0-9_\-]/g, '');
                 if (val) {
                     $("#stickerPreview").attr("src", "/assets/images/homestickers/" + val + ".gif").show();
                 } else {

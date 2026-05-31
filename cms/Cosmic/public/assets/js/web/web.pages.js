@@ -833,9 +833,12 @@ function WebPageProfileInterface(main_page) {
                         data.inventory,
                         data.categorys,
                         function(img) {
-                            $('<img src="' + img.attr("src") + '" class="widget"' +
-                                ' data-id="' + img.attr("data-name") + '.gif"' +
-                                ' data-type="s" style="position:relative;">').appendTo('.page-content').draggable({
+                            $('<img>').attr('src', img.attr("src"))
+                                .addClass('widget')
+                                .attr('data-id', img.attr("data-name") + '.gif')
+                                .attr('data-type', 's')
+                                .css('position', 'relative')
+                                .appendTo('.page-content').draggable({
                                 containment: $('.page-container'),
                                 stop: function() {
                                     $(this).attr('data-top', $(this).css("top").replace('px', ''));
@@ -885,17 +888,24 @@ function WebPageProfileInterface(main_page) {
                                 userCredits = result.credits;
                                 dialog.find(".balance-val").text(userCredits);
                                 // Move purchased item to inventory tab
-                                var inv = data.inventory || [];
-                                inv.push(result.item);
-                                var newImg = $('<img src="' + selectedItem.src + '" class="stickerImage"' +
-                                    ' data-name="' + result.item.data +
-                                    '" data-id="' + result.item.id +
-                                    '" data-price="0" height="34" width="34" title="' + result.item.name + '">');
+                                data.inventory = data.inventory || [];
+                                data.inventory.push(result.item);
+                                var newImg = $('<img>').attr('src', selectedItem.src)
+                                    .addClass('stickerImage')
+                                    .attr('data-name', result.item.data)
+                                    .attr('data-id', String(result.item.id))
+                                    .attr('data-price', '0')
+                                    .attr('height', '34')
+                                    .attr('width', '34')
+                                    .attr('title', result.item.name);
                                 dialog.find("#tab-inventory .cat-" + result.item.category).append(newImg);
                                 newImg.click(function() {
-                                    $('<img src="' + $(this).attr("src") + '" class="widget"' +
-                                        ' data-id="' + $(this).attr("data-name") + '.gif"' +
-                                        ' data-type="s" style="position:relative;">').appendTo('.page-content').draggable({
+                                    $('<img>').attr('src', $(this).attr("src"))
+                                        .addClass('widget')
+                                        .attr('data-id', $(this).attr("data-name") + '.gif')
+                                        .attr('data-type', 's')
+                                        .css('position', 'relative')
+                                        .appendTo('.page-content').draggable({
                                         containment: $('.page-container'),
                                         stop: function() {
                                             $(this).attr('data-top', $(this).css("top").replace('px', ''));

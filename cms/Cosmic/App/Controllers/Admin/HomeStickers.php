@@ -79,7 +79,7 @@ class HomeStickers
         $price    = (int) input()->post('price')->value;
         $type     = input()->post('type')->value ?? 's';
 
-        if(empty($data) || empty($name) || !$category) {
+        if(empty($data) || empty($name) || $category < 1) {
             response()->json(["status" => "error", "message" => "All fields are required."]);
             return;
         }
@@ -97,7 +97,7 @@ class HomeStickers
         $category = (int) input()->post('category')->value;
         $price    = (int) input()->post('price')->value;
 
-        if(!$id || empty($data) || empty($name) || !$category) {
+        if(!$id || empty($data) || empty($name) || $category < 1) {
             response()->json(["status" => "error", "message" => "Invalid input."]);
             return;
         }
