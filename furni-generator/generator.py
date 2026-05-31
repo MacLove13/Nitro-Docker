@@ -79,7 +79,12 @@ class NitroGenerator:
         sprite_entries: List[dict] = []
 
         for rotation_key, rel_path in self.images_meta.items():
-            abs_path = os.path.join(self.upload_dir, rel_path) if not os.path.isabs(rel_path) else rel_path
+            # Security: reject absolute paths and paths that escape the upload directory
+            norm = os.path.normpath(rel_path)
+            if os.path.isabs(norm) or norm.startswith(".."):
+                logger.warning("Skipping unsafe image path: %s (rotation=%s)", rel_path, rotation_key)
+                continue
+            abs_path = os.path.join(self.upload_dir, norm)
             if not os.path.exists(abs_path):
                 logger.warning("Image not found: %s (rotation=%s)", abs_path, rotation_key)
                 continue

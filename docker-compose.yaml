@@ -89,6 +89,7 @@ services:
       - DB_PASS=arcturus_pw
       - UPLOADS_DIR=/uploads
       - NITRO_ASSETS_DIR=/nitro-assets
+      - SPRITE_ID_OFFSET=10000
       - POLL_INTERVAL=5
       - PORT=5000
     volumes:

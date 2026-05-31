@@ -45,6 +45,9 @@ UPLOADS_DIR = os.getenv("UPLOADS_DIR", "/uploads")
 NITRO_ASSETS_DIR = os.getenv("NITRO_ASSETS_DIR", "/nitro-assets")
 SWF_DIR = os.getenv("SWF_DIR", "/nitro-swf")
 
+# sprite_id = SPRITE_ID_OFFSET + job_id  (avoids collisions with base furni)
+SPRITE_ID_OFFSET = int(os.getenv("SPRITE_ID_OFFSET", 10000))
+
 # Directory inside nitro-assets where custom furni .nitro files are stored
 CUSTOM_FURNI_SUBDIR = "hof_furni/custom"
 
@@ -119,7 +122,7 @@ def process_job(job: dict):
 
     # Generate unique item_name and sprite_id from the job id
     item_name = f"custom_furni_{job_id}"
-    sprite_id = 10000 + job_id  # offset to avoid collisions with existing furni
+    sprite_id = SPRITE_ID_OFFSET + job_id
 
     gen = NitroGenerator(
         item_name=item_name,
@@ -172,7 +175,8 @@ def trigger_job(job_id: int):
                 )
                 job = cur.fetchone()
     except Exception as exc:
-        return jsonify({"status": "error", "message": str(exc)}), 500
+        logger.exception("DB error fetching job %s", job_id)
+        return jsonify({"status": "error", "message": "Database error"}), 500
 
     if not job:
         return jsonify({"status": "error", "message": "Job not found or not in processing state"}), 404
@@ -181,7 +185,7 @@ def trigger_job(job_id: int):
         process_job(job)
     except Exception as exc:
         logger.exception("Manual trigger failed for job %s", job_id)
-        return jsonify({"status": "error", "message": str(exc)}), 500
+        return jsonify({"status": "error", "message": "Processing failed"}), 500
 
     return jsonify({"status": "success", "message": "Job processed"})
 
@@ -197,9 +201,8 @@ def job_status(job_id: int):
                 )
                 row = cur.fetchone()
     except Exception as exc:
-        return jsonify({"status": "error", "message": str(exc)}), 500
-
-    if not row:
+        logger.exception("DB error fetching status for job %s", job_id)
+        return jsonify({"status": "error", "message": "Database error"}), 500
         return jsonify({"status": "error", "message": "Job not found"}), 404
 
     return jsonify(row)

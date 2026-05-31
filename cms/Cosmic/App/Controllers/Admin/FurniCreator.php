@@ -40,15 +40,15 @@ class FurniCreator
             'length'                  => 'required|numeric',
             'stack_height'            => 'required',
             'page_id'                 => 'required|numeric',
-            'allow_stack'             => 'required|pattern:^(?:1OR0)$',
-            'allow_sit'               => 'required|pattern:^(?:1OR0)$',
-            'allow_lay'               => 'required|pattern:^(?:1OR0)$',
-            'allow_walk'              => 'required|pattern:^(?:1OR0)$',
-            'allow_gift'              => 'required|pattern:^(?:1OR0)$',
-            'allow_trade'             => 'required|pattern:^(?:1OR0)$',
-            'allow_recycle'           => 'required|pattern:^(?:1OR0)$',
-            'allow_marketplace_sell'  => 'required|pattern:^(?:1OR0)$',
-            'allow_inventory_stack'   => 'required|pattern:^(?:1OR0)$',
+            'allow_stack'             => 'required|pattern:^(?:1|0)$',
+            'allow_sit'               => 'required|pattern:^(?:1|0)$',
+            'allow_lay'               => 'required|pattern:^(?:1|0)$',
+            'allow_walk'              => 'required|pattern:^(?:1|0)$',
+            'allow_gift'              => 'required|pattern:^(?:1|0)$',
+            'allow_trade'             => 'required|pattern:^(?:1|0)$',
+            'allow_recycle'           => 'required|pattern:^(?:1|0)$',
+            'allow_marketplace_sell'  => 'required|pattern:^(?:1|0)$',
+            'allow_inventory_stack'   => 'required|pattern:^(?:1|0)$',
             'type'                    => 'required',
             'interaction_type'        => 'required',
             'interaction_modes_count' => 'required|numeric',
@@ -104,11 +104,15 @@ class FurniCreator
         // Handle image uploads
         $uploadDir = __DIR__ . '/../../../../public/uploads/furni_creator/' . $furniId . '/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0775, true);
+            if (!mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+                echo json_encode(['status' => 'error', 'message' => 'Failed to create upload directory.']);
+                exit;
+            }
         }
 
         $imagesMeta = [];
-        $allowedTypes = ['image/png', 'image/gif', 'image/jpeg'];
+        $allowedTypes = ['image/png', 'image/gif'];
+        $allowedExts  = ['png', 'gif'];
         if (!empty($_FILES)) {
             foreach ($_FILES as $fieldName => $fileData) {
                 if (strpos($fieldName, 'rotation_') !== 0 && strpos($fieldName, 'state_') !== 0) {
@@ -117,10 +121,24 @@ class FurniCreator
                 if (empty($fileData['tmp_name']) || $fileData['error'] !== UPLOAD_ERR_OK) {
                     continue;
                 }
+
+                // Validate MIME type via content inspection
                 $mime = mime_content_type($fileData['tmp_name']);
                 if (!in_array($mime, $allowedTypes, true)) {
                     continue;
                 }
+
+                // Confirm the file is a genuine image
+                if (getimagesize($fileData['tmp_name']) === false) {
+                    continue;
+                }
+
+                // Validate the original extension too
+                $origExt = strtolower(pathinfo($fileData['name'], PATHINFO_EXTENSION));
+                if (!in_array($origExt, $allowedExts, true)) {
+                    continue;
+                }
+
                 $ext = ($mime === 'image/gif') ? 'gif' : 'png';
                 $destFilename = $fieldName . '.' . $ext;
                 $destPath = $uploadDir . $destFilename;

@@ -936,21 +936,22 @@ class Admin
     /**
      * Insert generated furni into items_base and catalog_items,
      * mirroring the logic in updateFurniture().
+     * Both tables use AUTO_INCREMENT ids, so no manual ID calculation needed.
      */
     public static function addCustomFurniToGame($item, array $itemsBaseData)
     {
-        $lastItemBase    = QueryBuilder::table('items_base')->orderBy('id', 'desc')->limit(1)->first();
-        $lastItemCatalog = QueryBuilder::table('catalog_items')->orderBy('id', 'desc')->limit(1)->first();
-
-        $newItemId           = ($lastItemBase ? (int) $lastItemBase->id : 0) + 1;
-        $newCatalogId        = ($lastItemCatalog ? (int) $lastItemCatalog->id : 0) + 1;
-        $itemsBaseData['id'] = $newItemId;
-
         QueryBuilder::table('items_base')->insert($itemsBaseData);
 
+        $newItemBase = QueryBuilder::table('items_base')
+            ->where('item_name', $itemsBaseData['item_name'])
+            ->first();
+
+        if (!$newItemBase) {
+            return false;
+        }
+
         $catalogData = [
-            'id'            => $newCatalogId,
-            'item_ids'      => $newItemId,
+            'item_ids'      => $newItemBase->id,
             'page_id'       => (int) $item->page_id,
             'catalog_name'  => $item->catalog_name,
             'cost_credits'  => (int) $item->cost_credits,
