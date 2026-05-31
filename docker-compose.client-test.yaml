@@ -1,0 +1,64 @@
+version: '3.7'
+
+# Dedicated volumes for the test stack so it can run alongside the main stack
+# without volume conflicts.
+volumes:
+  test-volume-nitro-react-node-modules:
+  test-volume-nitro-converter-node-modules:
+
+services:
+  # ─── Nitro React dev server ───────────────────────────────────────────────
+  # Mirrors the `nitro` service from docker-compose.yaml but uses separate
+  # volumes and adds a healthcheck so the test runner starts only after Vite
+  # is ready to serve requests.
+  nitro:
+    container_name: nitro-test-server
+    build:
+      context: nitro
+    entrypoint: ["/bin/sh", "/app/scripts/build.sh"]
+    volumes:
+      - ./nitro/:/app/
+      - test-volume-nitro-converter-node-modules:/app/nitro-converter/node_modules
+      - test-volume-nitro-react-node-modules:/app/nitro-react/node_modules
+    healthcheck:
+      # Use the Node.js binary (guaranteed to be present) to probe the Vite
+      # port via a simple TCP connection.
+      test:
+        - "CMD-SHELL"
+        - >-
+          node -e "
+            const net = require('net');
+            const c = net.createConnection(5154, 'localhost');
+            c.on('connect', () => { c.end(); process.exit(0); });
+            c.on('error', () => process.exit(1));
+          "
+      # start_period: Allow up to 10 minutes for the initial `yarn install`
+      # to complete before Docker starts counting healthcheck failures.
+      # Subsequent starts are fast because node_modules are cached in a volume.
+      start_period: 600s
+      interval: 20s
+      timeout: 10s
+      retries: 30
+    networks:
+      - client-test
+
+  # ─── Playwright test runner ───────────────────────────────────────────────
+  client-tests:
+    container_name: client-tests-runner
+    build:
+      context: client-tests
+    environment:
+      # Resolve the nitro service by its Docker Compose service name.
+      - BASE_URL=http://nitro:5154
+    volumes:
+      # Screenshots and HTML reports are written here and persisted on the host.
+      - ./client-tests/screenshots:/tests/screenshots
+      - ./client-tests/test-results:/tests/test-results
+    depends_on:
+      nitro:
+        condition: service_healthy
+    networks:
+      - client-test
+
+networks:
+  client-test:
