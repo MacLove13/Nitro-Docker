@@ -330,7 +330,7 @@ var furniCreator = function () {
             try { images = JSON.parse(item.images); } catch (e) { return; }
 
             $.each(images, function (rotKey, filename) {
-                var src = '/uploads/furni_creator/' + encodeURIComponent(String(item.id)) + '/' + encodeURIComponent(filename) + '?t=' + Date.now();
+                var src = '/uploads/furni_creator/' + encodeURIComponent(item.id) + '/' + encodeURIComponent(filename) + '?t=' + Date.now();
                 $container.append(
                     '<div class="text-center kt-margin-r-10 kt-margin-b-10">' +
                     '<small class="d-block text-muted">Rotation ' + $('<span>').text(rotKey.replace('rotation_', '')).html() + '</small>' +

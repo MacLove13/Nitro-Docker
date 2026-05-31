@@ -115,6 +115,7 @@ class FurniCreator
         $allowedExts  = ['png', 'gif'];
         if (!empty($_FILES)) {
             foreach ($_FILES as $fieldName => $fileData) {
+                // Accept both rotation slots (rotation_N) and interaction-state slots (state_N)
                 if (strpos($fieldName, 'rotation_') !== 0 && strpos($fieldName, 'state_') !== 0) {
                     continue;
                 }

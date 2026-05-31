@@ -203,6 +203,8 @@ def job_status(job_id: int):
     except Exception as exc:
         logger.exception("DB error fetching status for job %s", job_id)
         return jsonify({"status": "error", "message": "Database error"}), 500
+
+    if not row:
         return jsonify({"status": "error", "message": "Job not found"}), 404
 
     return jsonify(row)
