@@ -69,7 +69,7 @@ export const CatalogView: FC<{}> = props =>
     return (
         <>
             { isVisible &&
-                <NitroCardView uniqueKey="catalog" className="nitro-catalog" style={ GetConfiguration('catalog.headers') ? { width: 710 } : {} }>
+                <NitroCardView uniqueKey="catalog" className="nitro-catalog" style={ GetConfiguration('catalog.headers') ? { width: 642 } : {} }>
                     <NitroCardHeaderView headerText={ LocalizeText('catalog.title') } onCloseClick={ event => setIsVisible(false) } />
                     <NitroCardTabsView className="nitro-catalog-tabs">
                         { rootNode && (rootNode.children.length > 0) && rootNode.children.map(child =>
