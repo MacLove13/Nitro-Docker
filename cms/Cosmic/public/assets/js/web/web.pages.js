@@ -627,8 +627,17 @@ function WebPageProfileInterface(main_page) {
             '      </div>' +
             '      <div class="profile-modal-content">' +
             '        <div class="inv-section" id="inv-stickers">' +
-            '          <div class="inv-filter-bar"></div>' +
-            '          <div class="inv-grid-wrap"><div class="inv-sticker-grid"></div></div>' +
+            '          <div class="inv-sticker-wrap">' +
+            '            <div class="inv-filter-bar"></div>' +
+            '            <div class="inv-sticker-main">' +
+            '              <div class="inv-grid-wrap"><div class="inv-sticker-grid"></div></div>' +
+            '              <div class="inv-sticker-preview">' +
+            '                <div class="inv-preview-img-wrap"><img class="inv-preview-img" src="" alt=""></div>' +
+            '                <button class="inv-place-btn">Colocar</button>' +
+            '                <button class="inv-place-all-btn" style="display:none">Colocar todos</button>' +
+            '              </div>' +
+            '            </div>' +
+            '          </div>' +
             '        </div>' +
             '        <div class="inv-section" id="inv-widgets" style="display:none">' +
             '          <div class="inv-widget-list"></div>' +
@@ -686,10 +695,82 @@ function WebPageProfileInterface(main_page) {
             '  </div>' +
             '</div>';
 
+        // ── Helper: create and place one sticker widget on the page ─────────────
+        function createStickerWidget(catalogueId, stickerData) {
+            var imgPath = '/assets/images/homestickers/' + stickerData + '.gif';
+            var uid = Date.now() + '-' + Math.floor(Math.random() * 100000);
+            var $widget = $(
+                '<div class="widget sticker-widget" ' +
+                '     data-id="' + stickerData + '.gif" ' +
+                '     data-ids="new-' + uid + '" ' +
+                '     data-type="s" data-skin="default_skin" ' +
+                '     data-top="0" data-left="0" ' +
+                '     style="position:relative;left:0px;top:0px;width:0px;">' +
+                '  <img id="new-' + uid + '-edit" data-id="new-' + uid + '" ' +
+                '       class="icon-edit editActive" ' +
+                '       src="/assets/images/homestickers/icon_edit.gif" ' +
+                '       style="display:none;position:absolute;top:-10px;right:-10px;z-index:10;cursor:pointer;">' +
+                '  <div class="edit-menu" id="new-' + uid + '-menu" ' +
+                '       style="position:absolute;z-index:20;display:none;">' +
+                '    <button class="deleteElement" data-type="s" data-id="new-' + uid + '" ' +
+                '            data-catalogue="' + catalogueId + '">Remover</button>' +
+                '  </div>' +
+                '  <img src="' + imgPath + '">' +
+                '</div>'
+            );
+
+            $('.page-content').append($widget);
+            $widget.draggable({
+                containment: $('.page-container'),
+                stop: function() {
+                    $(this).attr('data-top',  $(this).css('top').replace('px',''));
+                    $(this).attr('data-left', $(this).css('left').replace('px',''));
+                }
+            });
+
+            $widget.find('.icon-edit').click(function(e) {
+                e.stopPropagation();
+                $widget.find('.edit-menu').toggle();
+            });
+
+            $widget.find('.deleteElement').click(function() {
+                var $btn = $(this);
+                var catId = $btn.data('catalogue');
+                Web.ajax_manager.post("/home/profile/remove", {
+                    id: $btn.data('id'),
+                    type: 's',
+                    catalogue_id: catId,
+                    csrftoken: csrftoken
+                }, function(res) {
+                    if (res.status === 'success') {
+                        $widget.remove();
+                        // Update quantity badge in inventory if modal still open
+                        var $invWrap = $('#inventoryModal .inv-item-img[data-id="' + catId + '"]').closest('.inv-item-wrap');
+                        if ($invWrap.length) {
+                            var curQty = parseInt($invWrap.attr('data-qty') || 0);
+                            var nxtQty = curQty + 1;
+                            $invWrap.attr('data-qty', nxtQty);
+                            var $badge = $invWrap.find('.inv-qty-badge');
+                            if ($badge.length) $badge.text('x' + nxtQty);
+                            else $invWrap.append('<span class="inv-qty-badge">x' + nxtQty + '</span>');
+                            // Update preview "Colocar todos" button if this item is selected
+                            var $preview = $('#inventoryModal .inv-sticker-preview');
+                            if ($preview.is(':visible') && parseInt($preview.data('catalogue-id')) === catId) {
+                                if (nxtQty > 1) $preview.find('.inv-place-all-btn').show();
+                            }
+                        }
+                    }
+                });
+            });
+
+            return $widget;
+        }
+
         // ── Helper: build flat sticker grid with filter bar ──────────────────
-        function buildStickerInventoryGrid(filterBarSel, gridSel, categorys, items) {
-            var $bar  = $(filterBarSel).empty();
-            var $grid = $(gridSel).empty();
+        function buildStickerInventoryGrid(filterBarSel, gridSel, previewSel, categorys, items) {
+            var $bar     = $(filterBarSel).empty();
+            var $grid    = $(gridSel).empty();
+            var $preview = $(previewSel).hide();
 
             // Build category map
             var catMap = {};
@@ -713,7 +794,7 @@ function WebPageProfileInterface(main_page) {
             if (items && items.length > 0) {
                 $.each(items, function(i, item) {
                     var imgSrc = '/assets/images/homestickers/' + item.data + '.gif';
-                    var $wrap  = $('<div class="inv-item-wrap">').attr('data-cat', item.category);
+                    var $wrap  = $('<div class="inv-item-wrap">').attr('data-cat', item.category).attr('data-qty', item.quantity);
                     var $img   = $('<img>').attr('src', imgSrc)
                         .addClass('inv-item-img')
                         .attr('data-id', item.id)
@@ -733,96 +814,75 @@ function WebPageProfileInterface(main_page) {
                         var catalogueId = $(this).data('id');
                         var stickerData = $(this).data('data');
                         var imgPath     = '/assets/images/homestickers/' + stickerData + '.gif';
+                        var currentQty  = parseInt($wrap.attr('data-qty') || 1);
 
-                        // Call server to decrement inventory
-                        Web.ajax_manager.post("/home/profile/useSticker", {
-                            catalogue_id: catalogueId,
-                            csrftoken: csrftoken
-                        }, function(result) {
-                            if (result.status !== 'success') {
-                                Web.notifications_manager.create('error', 'Erro', result.message || 'Erro ao usar sticker.');
-                                return;
-                            }
+                        // Highlight selected item
+                        $grid.find('.inv-item-wrap').removeClass('selected');
+                        $wrap.addClass('selected');
 
-                            // Place sticker on page with edit overlay
-                            var uid = Date.now();
-                            var $widget = $(
-                                '<div class="widget sticker-widget" ' +
-                                '     data-id="' + stickerData + '.gif" ' +
-                                '     data-ids="new-' + uid + '" ' +
-                                '     data-type="s" data-skin="default_skin" ' +
-                                '     data-top="0" data-left="0" ' +
-                                '     style="position:relative;left:0px;top:0px;width:0px;">' +
-                                '  <img id="new-' + uid + '-edit" data-id="new-' + uid + '" ' +
-                                '       class="icon-edit editActive" ' +
-                                '       src="/assets/images/homestickers/icon_edit.gif" ' +
-                                '       style="display:none;position:absolute;top:-10px;right:-10px;z-index:10;cursor:pointer;">' +
-                                '  <div class="edit-menu" id="new-' + uid + '-menu" ' +
-                                '       style="position:absolute;z-index:20;display:none;">' +
-                                '    <button class="deleteElement" data-type="s" data-id="new-' + uid + '" ' +
-                                '            data-catalogue="' + catalogueId + '">Remover</button>' +
-                                '  </div>' +
-                                '  <img src="' + imgPath + '">' +
-                                '</div>'
-                            );
+                        // Update preview panel
+                        $preview.data('catalogue-id', catalogueId);
+                        $preview.find('.inv-preview-img').attr('src', imgPath);
 
-                            $('.page-content').append($widget);
-                            $widget.draggable({
-                                containment: $('.page-container'),
-                                stop: function() {
-                                    $(this).attr('data-top',  $(this).css('top').replace('px',''));
-                                    $(this).attr('data-left', $(this).css('left').replace('px',''));
+                        // Wire "Colocar" button — place one sticker
+                        $preview.find('.inv-place-btn').off('click').on('click', function() {
+                            Web.ajax_manager.post("/home/profile/useSticker", {
+                                catalogue_id: catalogueId,
+                                csrftoken: csrftoken
+                            }, function(result) {
+                                if (result.status !== 'success') {
+                                    Web.notifications_manager.create('error', 'Erro', result.message || 'Erro ao usar sticker.');
+                                    return;
                                 }
-                            });
 
-                            // Wire edit icon
-                            $widget.find('.icon-edit').click(function(e) {
-                                e.stopPropagation();
-                                $widget.find('.edit-menu').toggle();
-                            });
+                                createStickerWidget(catalogueId, stickerData);
 
-                            // Wire remove button — returns sticker to inventory
-                            $widget.find('.deleteElement').click(function() {
-                                var $btn = $(this);
-                                var catId = $btn.data('catalogue');
-                                Web.ajax_manager.post("/home/profile/remove", {
-                                    id: $btn.data('id'),
-                                    type: 's',
-                                    catalogue_id: catId,
-                                    csrftoken: csrftoken
-                                }, function(res) {
-                                    if (res.status === 'success') {
-                                        $widget.remove();
-                                        // Update quantity badge in inventory if modal still open
-                                        var $invWrap = $('#inventoryModal .inv-item-img[data-id="' + catId + '"]').closest('.inv-item-wrap');
-                                        if ($invWrap.length) {
-                                            var $badge = $invWrap.find('.inv-qty-badge');
-                                            var cur = $badge.length ? parseInt($badge.text().replace('x','')) : 0;
-                                            var nxt = cur + 1;
-                                            if ($badge.length) $badge.text('x' + nxt);
-                                            else $invWrap.append('<span class="inv-qty-badge">x' + nxt + '</span>');
-                                        }
+                                var newQty = result.quantity;
+                                $wrap.attr('data-qty', newQty);
+                                if (newQty <= 0) {
+                                    $wrap.remove();
+                                    $preview.hide();
+                                    var catId2 = item.category;
+                                    var remaining = $grid.find('.inv-item-wrap[data-cat="' + catId2 + '"]').length;
+                                    if (remaining === 0) {
+                                        $bar.find('.inv-filter[data-cat="' + catId2 + '"]').remove();
                                     }
-                                });
-                            });
-
-                            // Update qty badge in modal
-                            var newQty = result.quantity;
-                            if (newQty <= 0) {
-                                $wrap.remove();
-                                // Remove filter button if no items left in that cat
-                                var catId2 = item.category;
-                                var remaining = $grid.find('.inv-item-wrap[data-cat="' + catId2 + '"]').length;
-                                if (remaining === 0) {
-                                    $bar.find('.inv-filter[data-cat="' + catId2 + '"]').remove();
+                                } else {
+                                    $wrap.find('.inv-qty-badge').remove();
+                                    if (newQty > 1) $wrap.append('<span class="inv-qty-badge">x' + newQty + '</span>');
+                                    $preview.find('.inv-place-all-btn').toggle(newQty > 1);
                                 }
-                            } else {
-                                $wrap.find('.inv-qty-badge').remove();
-                                if (newQty > 1) $wrap.append('<span class="inv-qty-badge">x' + newQty + '</span>');
-                            }
+                                $('#inventoryModal').hide();
+                            });
                         });
 
-                        $('#inventoryModal').hide();
+                        // Wire "Colocar todos" button — place all stickers of this type
+                        $preview.find('.inv-place-all-btn').toggle(currentQty > 1).off('click').on('click', function() {
+                            Web.ajax_manager.post("/home/profile/useStickerAll", {
+                                catalogue_id: catalogueId,
+                                csrftoken: csrftoken
+                            }, function(result) {
+                                if (result.status !== 'success') {
+                                    Web.notifications_manager.create('error', 'Erro', result.message || 'Erro ao usar stickers.');
+                                    return;
+                                }
+
+                                for (var n = 0; n < result.quantity; n++) {
+                                    createStickerWidget(catalogueId, stickerData);
+                                }
+
+                                $wrap.remove();
+                                $preview.hide();
+                                var catId3 = item.category;
+                                var remaining3 = $grid.find('.inv-item-wrap[data-cat="' + catId3 + '"]').length;
+                                if (remaining3 === 0) {
+                                    $bar.find('.inv-filter[data-cat="' + catId3 + '"]').remove();
+                                }
+                                $('#inventoryModal').hide();
+                            });
+                        });
+
+                        $preview.show();
                     });
                 });
             } else {
@@ -889,6 +949,7 @@ function WebPageProfileInterface(main_page) {
                 buildStickerInventoryGrid(
                     '#inventoryModal .inv-filter-bar',
                     '#inventoryModal .inv-sticker-grid',
+                    '#inventoryModal .inv-sticker-preview',
                     data.sticker_categorys,
                     data.sticker_inventory
                 );

@@ -1522,3 +1522,89 @@ a.new-button b {
     cursor: not-allowed;
 }
 .shop-buy-btn:not(:disabled):hover { background: #d49200; color: #fff; }
+
+/* Inventory sticker section layout */
+.inv-sticker-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+.inv-filter-bar {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+.inv-filter {
+    padding: 3px 10px;
+    background: #eee;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #555;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+}
+.inv-filter:hover,
+.inv-filter.active {
+    background: #f1a900;
+    color: #fff;
+}
+.inv-sticker-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Inventory sticker preview panel */
+.inv-sticker-preview {
+    width: 160px;
+    min-width: 160px;
+    border-left: 1px solid #e0e0e0;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: #fafafa;
+    overflow-y: auto;
+}
+.inv-preview-img-wrap {
+    width: 80px;
+    height: 80px;
+    background: #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.inv-preview-img {
+    max-width: 76px;
+    max-height: 76px;
+    image-rendering: pixelated;
+}
+.inv-place-btn,
+.inv-place-all-btn {
+    width: 100%;
+    padding: 7px 0;
+    border: none;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background .15s;
+}
+.inv-place-btn {
+    background: #f1a900;
+    color: #333;
+}
+.inv-place-btn:hover { background: #d49200; color: #fff; }
+.inv-place-all-btn {
+    background: #eee;
+    color: #555;
+}
+.inv-place-all-btn:hover { background: #ccc; color: #333; }
