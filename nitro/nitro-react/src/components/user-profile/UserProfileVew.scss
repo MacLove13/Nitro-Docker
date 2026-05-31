@@ -1,0 +1,87 @@
+.user-profile {
+    width: $user-profile-width;
+    height: $user-profile-height;
+
+    .user-container {
+        border-right: 1px solid gray;
+
+        .avatar-container {
+            width: 75px;
+            height: 120px;
+        }
+
+        .user-stats-container {
+            width: 160px;
+        }
+
+        .user-stat-progress {
+            height: 14px;
+
+            &.health {
+                .nitro-progress-bar-inner {
+                    background: repeating-linear-gradient(#d74848, #d74848 50%, #b63131 50%, #b63131 100%);
+                }
+            }
+
+            &.stamina {
+                .nitro-progress-bar-inner {
+                    background: repeating-linear-gradient(#55b86a, #55b86a 50%, #3d9750 50%, #3d9750 100%);
+                }
+            }
+        }
+    }
+
+    .rooms-button-container {
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+    }
+
+    .user-relationship {
+        height: 25px;
+
+        .avatar-image-container {
+            width: 50px;
+            height: 50px;
+
+            .avatar-image {
+                top: 20px;
+                right: -8pxpx;
+            }
+        }
+    }
+
+    .user-relationship-count {
+        margin-top: 2px;
+        margin-left: 5px;
+        color: #939392 !important;
+    }
+
+    .user-groups-container {
+
+        .layout-grid-item {
+            width: 50px;
+        }
+    }
+
+    .no-group-spritesheet {
+        background: transparent url('@/assets/images/groups/no-group-spritesheet.png') no-repeat;
+
+        &.image-1 {
+            width: 95px;
+            height: 136px;
+            background-position: -3px -3px;
+        }
+        
+        &.image-2 {
+            width: 95px;
+            height: 136px;
+            background-position: -104px -3px;
+        }
+        
+        &.image-3 {
+            width: 95px;
+            height: 136px;
+            background-position: -205px -3px;
+        }
+    }    
+}

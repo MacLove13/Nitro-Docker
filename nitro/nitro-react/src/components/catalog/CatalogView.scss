@@ -1,0 +1,490 @@
+.nitro-catalog {
+    width: $catalog-width;
+    height: $catalog-height;
+
+    font[size='16'] { font-size: 20px; }
+
+    .quantity-input {
+        min-height: 17px;
+        height: 17px;
+        width: 28px;
+        padding: 0 4px;
+        text-align: right;
+    }
+
+    // ── Tabs ──────────────────────────────────────────────────────────
+    .nitro-catalog-tabs {
+        gap: 2px !important;
+        padding: 3px 6px 0 !important;
+        background: #2a7a96;
+        border-bottom: 0;
+
+        .nitro-catalog-tab-item {
+            padding: 0 10px;
+            min-height: 28px;
+            border: 1px solid #587a88 !important;
+            border-bottom: 0 !important;
+            border-radius: 6px 6px 0 0 !important;
+            background: linear-gradient(180deg, #b8b3a6 0%, #a8a398 100%);
+            box-shadow: inset 0 1px rgba(255,255,255,0.35);
+
+            &.active {
+                background: linear-gradient(180deg, #f2ede3 0%, #e4dfd5 100%);
+                border-color: #786e5e #786e5e transparent !important;
+                z-index: 2;
+            }
+
+            .nitro-catalog-tab-label {
+                font-size: 12.5px;
+                font-weight: 700;
+                color: #1f1a10;
+                line-height: 1;
+            }
+        }
+    }
+
+    // ── Content wrapper ───────────────────────────────────────────────
+    .nitro-catalog-content {
+        padding: 0 !important;
+        background: #2a7a96;
+        overflow: hidden;
+    }
+
+    .nitro-catalog-main-grid {
+        height: 100%;
+        margin: 0 !important;
+        row-gap: 0 !important;
+        column-gap: 0 !important;
+    }
+
+    // ── Left sidebar ──────────────────────────────────────────────────
+    .nitro-catalog-sidebar-column {
+        padding: 5px 3px 5px 5px;
+        background: #2a7a96;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    // ── Right page column ─────────────────────────────────────────────
+    .nitro-catalog-page-column {
+        padding: 5px 5px 5px 3px;
+        background: #2a7a96;
+    }
+
+    // ── Search ────────────────────────────────────────────────────────
+    .catalog-search-button {
+        min-width: 28px;
+        width: 28px;
+    }
+
+    .nitro-catalog-search {
+        position: relative;
+        flex-shrink: 0;
+        width: 100%;
+    }
+
+    .nitro-catalog-search-input {
+        height: 26px;
+        border: 1px solid #b0a898;
+        border-radius: 4px;
+        background: #f8f4ed;
+        font-size: 12px;
+        padding-right: 26px;
+        color: #3a3020;
+        width: 100%;
+    }
+
+    .nitro-catalog-search-icon {
+        position: absolute;
+        right: 7px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #7a7060;
+        font-size: 12px;
+        pointer-events: none;
+        z-index: 1;
+
+        &.clickable {
+            pointer-events: all;
+            cursor: pointer;
+            &:hover { color: #3a3020; }
+        }
+    }
+
+    .nitro-catalog-navigation-panel {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+.nitro-catalog-gift {
+    width: 325px;
+
+    .gift-preview {
+        width: 80px;
+        height: 80px;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .gift-color {
+        width: 15px;
+        height: 15px;
+        border-radius: $border-radius;
+    }
+}
+
+.nitro-catalog-navigation-grid-container {
+    background: #ddd8ce;
+    border: 1px solid #a09888;
+    border-radius: 4px !important;
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+
+    .nitro-catalog-navigation-list {
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 100%;
+        padding: 3px;
+    }
+
+    .nitro-catalog-navigation-section {
+        display: grid;
+
+        .nitro-catalog-navigation-section {
+            padding-left: 10px;
+        }
+    }
+
+    .layout-grid-item {
+        font-size: 12.5px;
+        min-height: 22px !important;
+        border: 1px solid transparent !important;
+        border-radius: 3px !important;
+        background: transparent;
+        padding: 2px 5px;
+        box-shadow: none !important;
+
+        &.nitro-catalog-navigation-item {
+            justify-content: flex-start;
+
+            &:hover:not(.is-active) {
+                background: rgba(255,255,255,0.45);
+            }
+
+            &.is-child {
+                padding-left: 18px;
+            }
+
+            &.is-active {
+                background: linear-gradient(180deg, #5bbde0 0%, #2e8cbf 100%) !important;
+                border-color: #1e70a0 !important;
+
+                .nitro-catalog-navigation-item-label {
+                    color: #fff;
+                    text-shadow: 0 1px rgba(0,0,0,0.3);
+                }
+
+                .nitro-catalog-navigation-item-arrow {
+                    color: rgba(255,255,255,0.7);
+                }
+            }
+
+            .nitro-catalog-navigation-item-icon {
+                min-width: 16px;
+                width: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 4px;
+            }
+
+            .nitro-catalog-navigation-item-label {
+                font-size: 12.5px;
+                font-weight: 600;
+                color: #2a2010;
+                line-height: 1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .nitro-catalog-navigation-item-arrow {
+                color: #7a7060;
+                font-size: 10px;
+                margin-left: auto;
+                flex-shrink: 0;
+            }
+        }
+
+        .svg-inline--fa {
+            font-size: 10px;
+        }
+    }
+}
+
+.nitro-catalog-layout-info-loyalty {
+    .info-loyalty-content {
+        background-repeat: no-repeat;
+        background-position: top right;
+        background-image: url('@/assets/images/catalog/diamond_info_illustration.gif');
+        padding-right: 123px;
+    }
+
+    .info-image {
+        width: 123px;
+        height: 350px;
+        background-image: url('@/assets/images/catalog/diamond_info_illustration.gif');
+    }
+}
+
+.nitro-catalog-layout-vip-buy-grid {
+    .layout-grid-item {
+        height: 50px !important;
+        max-height: 50px !important;
+
+        .icon-hc-banner {
+            width: 68px;
+            height: 40px;
+            background: url('@/assets/images/catalog/hc_big.png') center
+                no-repeat;
+        }
+    }
+}
+
+.nitro-catalog-layout-marketplace-grid {
+    .layout-grid-item {
+        height: 75px !important;
+    }
+}
+
+.nitro-catalog-layout-vip-gifts-grid {
+    .layout-grid-item {
+        height: 55px !important;
+        max-height: 55px !important;
+    }
+}
+
+.nitro-catalog-layout-marketplace-post-offer {
+    width: $marketplace-post-offer-width;
+    height: $marketplace-post-offer-height;
+}
+
+.nitro-catalog-layout-bundle-grid {
+    .layout-grid-item {
+        background-color: transparent;
+    }
+}
+
+.nitro-catalog-header {
+    width: 100%;
+    min-height: 80px;
+    max-height: 80px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(135deg, #0e4d66 0%, #1a7a9e 100%);
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+    }
+}
+
+// ── Default catalog page layout (Image 1) ────────────────────────────────
+
+.nitro-catalog-default-page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #9a9080;
+}
+
+.nitro-catalog-item-name-bar {
+    background: linear-gradient(180deg, #1d7290 0%, #155f78 100%);
+    padding: 5px 10px;
+    min-height: 28px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #0e4a60;
+
+    .nitro-catalog-item-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        text-shadow: 0 1px rgba(0,0,0,0.35);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.nitro-catalog-previewer {
+    flex-shrink: 0;
+    height: 185px;
+    position: relative;
+    overflow: hidden;
+    background:
+        repeating-linear-gradient(
+            -55deg,
+            transparent,
+            transparent 20px,
+            rgba(0,0,0,0.018) 20px,
+            rgba(0,0,0,0.018) 21px
+        ),
+        linear-gradient(145deg, #e0dcd4 0%, #cecac1 50%, #c4bfb7 100%);
+    border-bottom: 1px solid #b8b3aa;
+}
+
+.nitro-catalog-item-grid-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: #d4cfc5;
+    padding: 5px;
+}
+
+// Grid cell with price label below the item icon
+.nitro-catalog-grid-cell {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    .layout-grid-item {
+        width: 100%;
+        min-height: 50px !important;
+        height: 50px !important;
+        background-color: #cdc8be;
+        border: 1px solid #a09888 !important;
+        border-radius: 4px !important;
+        box-shadow: inset 0 1px rgba(255,255,255,0.5);
+
+        &.active {
+            border-color: #4aaad4 !important;
+            box-shadow: 0 0 0 2px rgba(74,170,212,0.4), inset 0 1px rgba(255,255,255,0.5);
+        }
+    }
+
+    .nitro-catalog-item-price {
+        font-size: 11px;
+        color: #2a2010;
+        line-height: 1;
+        white-space: nowrap;
+
+        span, b {
+            font-weight: 700;
+        }
+    }
+}
+
+// Bottom purchase bar
+.nitro-catalog-bottom-bar {
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #eae5db 0%, #dbd5c8 100%);
+    border-top: 1px solid #c0bab0;
+    padding: 0 8px;
+    min-height: 44px;
+    height: 44px;
+
+    .nitro-catalog-bar-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #3a3020;
+        white-space: nowrap;
+    }
+
+    .nitro-catalog-qty-input {
+        width: 36px;
+        height: 24px;
+        min-height: 24px;
+        padding: 0 4px;
+        text-align: center;
+        font-size: 12px;
+        border: 1px solid #a09888;
+        border-radius: 3px;
+        background: #f8f4ec;
+        color: #2a2010;
+
+        &:disabled {
+            background: #ede8de;
+            color: #6a6050;
+        }
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        -moz-appearance: textfield;
+    }
+
+    .nitro-catalog-purchase-actions {
+        gap: 6px !important;
+
+        .btn {
+            min-height: 30px;
+            height: 30px;
+            padding: 0 14px;
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 4px;
+            box-shadow: inset 0 1px rgba(255,255,255,0.4);
+        }
+
+        .btn-primary,
+        .btn-warning {
+            min-width: 70px;
+            border: 1px solid #1e7500;
+            background: linear-gradient(180deg, #5ec825 0%, #2fa000 100%);
+            color: #fff;
+            text-shadow: 0 1px rgba(0,0,0,0.25);
+        }
+
+        .nitro-catalog-gift-button,
+        .btn:not(.btn-primary):not(.btn-warning):not(.btn-danger) {
+            min-width: 90px;
+            border: 1px solid #a09080;
+            background: linear-gradient(180deg, #ede8de 0%, #d8d2c4 100%);
+            color: #2a2010;
+        }
+    }
+}
+
+.autocomplete-gift-container {
+    background: #fff;
+    padding: 8px;
+    list-style-type: none;
+    min-width: 307px;
+    border-radius: 0.2rem;
+    position: absolute;
+    font-size: 0.7875rem;
+    top: 81px;
+    left: 8px;
+    border: 1px solid #b6c1ce;
+    margin: 0;
+    border-radius: 2px;
+    margin: 0;
+    box-sizing: border-box;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 1;
+
+    .autocomplete-gift-item {
+        width: 100%;
+        box-sizing: border-box;
+        &:hover {
+            background-color: #ebf4ff;
+        }
+    }
+}
+
+@import './views/targeted-offer/Offer.scss';
