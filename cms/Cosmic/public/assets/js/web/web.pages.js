@@ -696,9 +696,10 @@ function WebPageProfileInterface(main_page) {
             '</div>';
 
         // ── Helper: create and place one sticker widget on the page ─────────────
+        var _stickerWidgetCounter = 0;
         function createStickerWidget(catalogueId, stickerData) {
             var imgPath = '/assets/images/homestickers/' + stickerData + '.gif';
-            var uid = Date.now() + '-' + Math.floor(Math.random() * 100000);
+            var uid = 'sw-' + (++_stickerWidgetCounter);
             var $widget = $(
                 '<div class="widget sticker-widget" ' +
                 '     data-id="' + stickerData + '.gif" ' +
