@@ -781,6 +781,7 @@
 
         &:hover { background: #3e5268; }
         &:active { background: #1e3248; }
+        &:disabled { opacity: 0.35; cursor: default; }
 
         &.play::after {
             content: '';
@@ -807,6 +808,13 @@
             color: #9ab0b8;
             line-height: 1;
             display: block;
+        }
+
+        &.loop.active {
+            background: #1e4a28;
+            border-color: #4a9a60;
+
+            &::after { color: #72c050; }
         }
 
         &.rec::after {

@@ -113,6 +113,7 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
     } = useFurnitureSoundMachineWidget();
 
     const [ discPage, setDiscPage ] = useState(0);
+    const [ isLoopEnabled, setIsLoopEnabled ] = useState(false);
     const stopSampleRef = useRef<(() => void) | null>(null);
 
     if (!isOpen || objectId === -1) return null;
@@ -224,11 +225,25 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
                                 title={ isPlaying ? 'Stop' : 'Play' }
                             />
                             <button className="trax-tbt stop" onClick={ stopPreview } title="Stop" />
-                            <button className="trax-tbt loop" title="Loop" onClick={ () => {} } />
-                            <button className="trax-tbt rec" title="Record" onClick={ () => {} } />
+                            <button
+                                className={ `trax-tbt loop${ isLoopEnabled ? ' active' : '' }` }
+                                title={ isLoopEnabled ? 'Disable loop' : 'Enable loop' }
+                                onClick={ () => setIsLoopEnabled(prev => !prev) }
+                            />
+                            <button className="trax-tbt rec" title="Record (not available)" disabled />
                             <button className="trax-tbt clear" onClick={ clearTimeline } title="Clear timeline" />
-                            <button className="trax-tbt nav-prev" title="Previous" onClick={ () => {} } />
-                            <button className="trax-tbt nav-next" title="Next" onClick={ () => {} } />
+                            <button
+                                className="trax-tbt nav-prev"
+                                title="Previous page"
+                                disabled={ discPage === 0 }
+                                onClick={ () => setDiscPage(p => Math.max(0, p - 1)) }
+                            />
+                            <button
+                                className="trax-tbt nav-next"
+                                title="Next page"
+                                disabled={ discPage >= totalPages - 1 }
+                                onClick={ () => setDiscPage(p => Math.min(totalPages - 1, p + 1)) }
+                            />
                         </div>
 
                         {/* Sequencer grid */}
@@ -252,7 +267,7 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
                             )) }
                             <div className="trax-time-axis">
                                 <div className="trax-time-pad" />
-                                { ['0s10min', '0s20min', '0s30min', '0s40min'].map(t => (
+                                { ['0:10', '0:20', '0:30', '0:40'].map(t => (
                                     <div key={ t } className="trax-time-tick">{ t }</div>
                                 )) }
                             </div>
