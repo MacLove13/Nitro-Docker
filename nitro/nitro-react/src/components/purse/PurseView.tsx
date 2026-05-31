@@ -70,13 +70,20 @@ export const PurseView: FC<{}> = props =>
                         { getCurrencyElements(0, 2) }
                     </Column>
                     { !hcDisabled &&
-                        <Column center pointer size={ 4 } gap={ 1 } className="nitro-purse-subscription rounded" onClick={ event => CreateLinkEvent('habboUI/open/hccenter') }>
-                            <LayoutCurrencyIcon type="hc" />
-                            <Text variant="white">{ getClubText }</Text>
+                        <Column size={ 4 } gap={ 0 } className="nitro-purse-subscription rounded">
+                            <Flex center pointer fullHeight gap={ 1 } className="p-1" onClick={ event => CreateLinkEvent('habboUI/open/hccenter') }>
+                                <LayoutCurrencyIcon type="hc" />
+                                <Text variant="white">{ getClubText }</Text>
+                            </Flex>
+                            { GetConfiguration('hc.center')['payday.info'] &&
+                                <Flex center pointer fullHeight gap={ 1 } className="p-1 nitro-purse-payday" onClick={ event => CreateLinkEvent('habboUI/open/hccenter') }>
+                                    <LayoutCurrencyIcon type={ -1 } />
+                                    <Text variant="white">{ LocalizeText('purse.hc.payday.label') }</Text>
+                                </Flex> }
                         </Column> }
                     <Column justifyContent="center" size={ 2 } gap={ 0 }>
-                        <Flex center pointer fullHeight className="nitro-purse-button p-1 rounded" onClick={ event => CreateLinkEvent('help/show') }>
-                            <i className="icon icon-help"/>
+                        <Flex center pointer fullHeight className="nitro-purse-button nitro-purse-help-button p-1 rounded" onClick={ event => CreateLinkEvent('help/show') }>
+                            <Text small variant="white">{ LocalizeText('help.button.title') }</Text>
                         </Flex>
                         <Flex center pointer fullHeight className="nitro-purse-button p-1 rounded" onClick={ event => CreateLinkEvent('user-settings/toggle') } >
                             <i className="icon icon-cog"/>
