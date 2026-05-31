@@ -1,4 +1,5 @@
 import { IObjectData, IRoomEngine } from '@nitrots/nitro-renderer';
+import { GetSessionDataManager } from '../nitro';
 import { LocalizeText } from '../utils';
 import { FurniCategory } from './FurniCategory';
 import { FurnitureItem } from './FurnitureItem';
@@ -321,9 +322,17 @@ export class GroupItem
             case FurniCategory.POSTER:
                 key = (('poster_' + k.stuffData.getLegacyString()) + '_name');
                 break;
-            case FurniCategory.TRAX_SONG:
-                this._name = 'SONG_NAME';
+            case FurniCategory.SOUND_SET: {
+                const itemData = GetSessionDataManager().getFloorItemData(this._type);
+                this._name = itemData?.name ?? LocalizeText('roomItem.name.' + k.type);
                 return;
+            }
+            case FurniCategory.TRAX_SONG: {
+                const legacyData = k.stuffData?.getLegacyString() ?? '';
+                const parts = legacyData.split('\n');
+                this._name = (parts.length > 5 && parts[5]) ? parts[5] : LocalizeText('roomItem.name.' + k.type);
+                return;
+            }
             default:
                 if(this.isWallItem)
                 {

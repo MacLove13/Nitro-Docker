@@ -658,7 +658,11 @@ const useCatalogState = () =>
 
         resetState();
 
-        if(wasVisible) simpleAlert(LocalizeText('catalog.alert.published.description'), NotificationAlertType.ALERT, null, null, LocalizeText('catalog.alert.published.title'));
+        if(wasVisible)
+        {
+            setIsVisible(true);
+            simpleAlert(LocalizeText('catalog.alert.published.description'), NotificationAlertType.ALERT, null, null, LocalizeText('catalog.alert.published.title'));
+        }
     });
 
     useMessageEvent<BuildersClubFurniCountMessageEvent>(BuildersClubFurniCountMessageEvent, event =>

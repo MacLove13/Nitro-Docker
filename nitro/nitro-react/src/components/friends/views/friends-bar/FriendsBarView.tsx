@@ -4,7 +4,7 @@ import { MessengerFriend } from '../../../../api';
 import { Button, Flex } from '../../../../common';
 import { FriendBarItemView } from './FriendBarItemView';
 
-const MAX_DISPLAY_COUNT = 3;
+const MAX_DISPLAY_COUNT = 10;
 
 export const FriendBarView: FC<{ onlineFriends: MessengerFriend[] }> = props =>
 {
