@@ -48,10 +48,13 @@
         padding: 0 !important;
         background: #2a7a96;
         overflow: hidden;
+        display: flex !important;
+        flex-direction: column;
     }
 
     .nitro-catalog-main-grid {
-        height: 100%;
+        flex: 1;
+        min-height: 0;
         margin: 0 !important;
         row-gap: 0 !important;
         column-gap: 0 !important;
@@ -117,6 +120,67 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+    }
+}
+
+// ── Full-width category banner ─────────────────────────────────────────────
+.nitro-catalog-category-banner {
+    flex-shrink: 0;
+    width: 100%;
+    min-height: 72px;
+    max-height: 72px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0e4d66 0%, #1a7a9e 100%);
+    background-size: cover;
+    background-position: center top;
+
+    .nitro-catalog-banner-info {
+        position: relative;
+        z-index: 2;
+        padding: 8px 10px;
+        flex: 1;
+    }
+
+    .nitro-catalog-banner-icon {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            max-width: 30px;
+            max-height: 30px;
+        }
+    }
+
+    .nitro-catalog-banner-text {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .nitro-catalog-banner-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nitro-catalog-banner-description {
+        font-size: 11px;
+        color: rgba(255,255,255,0.85);
+        text-shadow: 0 1px rgba(0,0,0,0.35);
+        line-height: 1.3;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
 }
 
@@ -300,7 +364,7 @@
     }
 }
 
-// ── Default catalog page layout (Image 1) ────────────────────────────────
+// ── Default catalog page layout ──────────────────────────────────────────────
 
 .nitro-catalog-default-page {
     height: 100%;
@@ -314,7 +378,7 @@
 
 .nitro-catalog-item-name-bar {
     background: linear-gradient(180deg, #1d7290 0%, #155f78 100%);
-    padding: 5px 10px;
+    padding: 4px 6px 4px 10px;
     min-height: 28px;
     flex-shrink: 0;
     border-bottom: 1px solid #0e4a60;
@@ -327,12 +391,45 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        flex: 1;
+        min-width: 0;
+        margin-right: 6px;
+    }
+
+    .nitro-catalog-item-nav-arrows {
+        flex-shrink: 0;
+    }
+
+    .nitro-catalog-item-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        background: rgba(255,255,255,0.85);
+        border: 1px solid rgba(0,0,0,0.2);
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 0;
+        color: #1a4a60;
+        font-size: 9px;
+        line-height: 1;
+        transition: background 0.1s;
+
+        &:hover:not(:disabled) {
+            background: #fff;
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
     }
 }
 
 .nitro-catalog-previewer {
     flex-shrink: 0;
-    height: 210px;
+    height: 180px;
     position: relative;
     overflow: hidden;
     background:
@@ -345,6 +442,30 @@
         ),
         linear-gradient(145deg, #e0dcd4 0%, #cecac1 50%, #c4bfb7 100%);
     border-bottom: 1px solid #b8b3aa;
+}
+
+// Price badge overlay in the room previewer (bottom-right)
+.nitro-catalog-price-badge {
+    position: absolute !important;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.65);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 5px;
+    padding: 3px 7px;
+    gap: 4px !important;
+    z-index: 10;
+
+    .text-bold, b, span {
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .layout-currency-icon {
+        width: 16px;
+        height: 16px;
+    }
 }
 
 .nitro-catalog-item-grid-wrap {
@@ -425,6 +546,18 @@
         &::-webkit-inner-spin-button,
         &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         -moz-appearance: textfield;
+    }
+
+    .nitro-catalog-choose-btn {
+        min-width: 120px;
+        height: 30px;
+        font-size: 12.5px;
+        font-weight: 700;
+        border-radius: 4px;
+        border: 1px solid #a09080;
+        background: linear-gradient(180deg, #ede8de 0%, #d8d2c4 100%);
+        color: #888070;
+        cursor: default;
     }
 
     .nitro-catalog-purchase-actions {

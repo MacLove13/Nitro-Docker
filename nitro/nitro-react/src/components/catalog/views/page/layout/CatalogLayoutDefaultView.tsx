@@ -1,11 +1,12 @@
 import { FC, useEffect, useState } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { GetConfiguration, LocalizeText, ProductTypeEnum } from '../../../../../api';
 import { Button, Column, Flex, LayoutImage, Text } from '../../../../../common';
 import { useCatalog } from '../../../../../hooks';
-import { CatalogHeaderView } from '../../catalog-header/CatalogHeaderView';
 import { CatalogAddOnBadgeWidgetView } from '../widgets/CatalogAddOnBadgeWidgetView';
 import { CatalogItemGridWidgetView } from '../widgets/CatalogItemGridWidgetView';
 import { CatalogLimitedItemWidgetView } from '../widgets/CatalogLimitedItemWidgetView';
+import { CatalogPriceDisplayWidgetView } from '../widgets/CatalogPriceDisplayWidgetView';
 import { CatalogPurchaseWidgetView } from '../widgets/CatalogPurchaseWidgetView';
 import { CatalogTotalPriceWidget } from '../widgets/CatalogTotalPriceWidget';
 import { CatalogViewProductWidgetView } from '../widgets/CatalogViewProductWidgetView';
@@ -43,8 +44,19 @@ const CrackableButton: FC<{ spriteId: number; onShow: () => void }> = ({ spriteI
 export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
 {
     const { page = null } = props;
-    const { currentOffer = null, currentPage = null, purchaseOptions = null, setPurchaseOptions = null } = useCatalog();
+    const { currentOffer = null, currentPage = null, purchaseOptions = null, setPurchaseOptions = null, setCurrentOffer = null } = useCatalog();
     const [ showCrackablePrizes, setShowCrackablePrizes ] = useState(false);
+
+    const offers = currentPage?.offers ?? [];
+    const currentOfferIndex = currentOffer ? offers.findIndex(o => o.offerId === currentOffer.offerId) : -1;
+
+    const selectOfferAtIndex = (index: number) =>
+    {
+        const offer = offers[index];
+        if(!offer) return;
+        offer.activate();
+        setCurrentOffer(offer);
+    }
 
     const updateQuantity = (value: number) =>
     {
@@ -63,15 +75,25 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
                 /> }
             <Column fullHeight className="nitro-catalog-default-page" gap={ 0 } overflow="hidden">
 
-                { /* Header image (teal banner) */ }
-                { GetConfiguration('catalog.headers') &&
-                    <CatalogHeaderView imageUrl={ currentPage.localization.getImage(0) } /> }
-
-                { /* Item name bar */ }
-                <Flex alignItems="center" className="nitro-catalog-item-name-bar">
+                { /* Item name bar with prev/next arrows */ }
+                <Flex alignItems="center" justifyContent="between" className="nitro-catalog-item-name-bar">
                     <Text className="nitro-catalog-item-name">
                         { currentOffer ? currentOffer.localizationName : (page.localization.getText(0) || '') }
                     </Text>
+                    <Flex gap={ 1 } className="nitro-catalog-item-nav-arrows" alignItems="center">
+                        <button
+                            className="nitro-catalog-item-nav-btn"
+                            disabled={ !currentOffer || currentOfferIndex <= 0 }
+                            onClick={ () => selectOfferAtIndex(currentOfferIndex - 1) }>
+                            <FaChevronLeft className="fa-icon" />
+                        </button>
+                        <button
+                            className="nitro-catalog-item-nav-btn"
+                            disabled={ !currentOffer || currentOfferIndex < 0 || currentOfferIndex >= offers.length - 1 }
+                            onClick={ () => selectOfferAtIndex(currentOfferIndex + 1) }>
+                            <FaChevronRight className="fa-icon" />
+                        </button>
+                    </Flex>
                 </Flex>
 
                 { /* Room previewer */ }
@@ -86,6 +108,10 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
                     { !currentOffer && !!page.localization.getImage(1) &&
                         <LayoutImage imageUrl={ page.localization.getImage(1) } /> }
                     <CatalogLimitedItemWidgetView fullWidth />
+                    { currentOffer &&
+                        <Flex alignItems="center" gap={ 1 } className="nitro-catalog-price-badge" position="absolute">
+                            <CatalogPriceDisplayWidgetView offer={ currentOffer } separator={ true } />
+                        </Flex> }
                 </Flex>
 
                 { /* Item grid with price labels */ }
@@ -99,39 +125,45 @@ export const CatalogLayoutDefaultView: FC<CatalogLayoutProps> = props =>
 
                 { /* Bottom purchase bar */ }
                 <Flex className="nitro-catalog-bottom-bar" alignItems="center" gap={ 2 }>
-                    { /* Quantity */ }
-                    <Flex alignItems="center" gap={ 1 }>
-                        <Text className="nitro-catalog-bar-label">
-                            { LocalizeText('catalog.bundlewidget.quantity') }
-                        </Text>
-                        <input
-                            type="number"
-                            className="nitro-catalog-qty-input"
-                            min={ 1 }
-                            max={ 100 }
-                            value={ purchaseOptions?.quantity ?? 1 }
-                            onChange={ e => updateQuantity(e.target.valueAsNumber) }
-                        />
-                    </Flex>
+                    { !currentOffer ? (
+                        <Flex grow center>
+                            <Button className="nitro-catalog-choose-btn" disabled>
+                                { LocalizeText('catalog.footer.choose_item') }
+                            </Button>
+                        </Flex>
+                    ) : (
+                        <>
+                            { /* Quantity */ }
+                            <Flex alignItems="center" gap={ 1 }>
+                                <Text className="nitro-catalog-bar-label">
+                                    { LocalizeText('catalog.bundlewidget.quantity') }
+                                </Text>
+                                <input
+                                    type="number"
+                                    className="nitro-catalog-qty-input"
+                                    min={ 1 }
+                                    max={ 100 }
+                                    value={ purchaseOptions?.quantity ?? 1 }
+                                    onChange={ e => updateQuantity(e.target.valueAsNumber) }
+                                />
+                            </Flex>
 
-                    { /* Price (grows to push buttons right) */ }
-                    <Flex grow justifyContent="end" alignItems="center" gap={ 1 }>
-                        { currentOffer &&
-                            <>
+                            { /* Price (grows to push buttons right) */ }
+                            <Flex grow justifyContent="end" alignItems="center" gap={ 1 }>
                                 <Text className="nitro-catalog-bar-label">{ LocalizeText('catalog.price') }</Text>
                                 <CatalogTotalPriceWidget alignItems="center" />
-                            </> }
-                    </Flex>
+                            </Flex>
 
-                    { /* Crackable prizes */ }
-                    { currentOffer &&
-                        <CrackableButton
-                            spriteId={ currentOffer.product.productClassId }
-                            onShow={ () => setShowCrackablePrizes(true) }
-                        /> }
+                            { /* Crackable prizes */ }
+                            <CrackableButton
+                                spriteId={ currentOffer.product.productClassId }
+                                onShow={ () => setShowCrackablePrizes(true) }
+                            />
 
-                    { /* Buy as gift + Buy */ }
-                    <CatalogPurchaseWidgetView />
+                            { /* Buy as gift + Buy */ }
+                            <CatalogPurchaseWidgetView />
+                        </>
+                    ) }
                 </Flex>
 
             </Column>
