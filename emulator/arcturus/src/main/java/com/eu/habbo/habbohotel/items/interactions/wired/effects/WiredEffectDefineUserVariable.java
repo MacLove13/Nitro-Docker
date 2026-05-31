@@ -9,6 +9,8 @@ import com.eu.habbo.habbohotel.rooms.Room;
 import com.eu.habbo.habbohotel.rooms.RoomUnit;
 import com.eu.habbo.habbohotel.wired.WiredEffectType;
 import com.eu.habbo.habbohotel.wired.WiredHandler;
+import com.eu.habbo.habbohotel.wired.WiredTriggerType;
+import com.eu.habbo.habbohotel.items.interactions.wired.triggers.WiredTriggerUserVariableChanged;
 import com.eu.habbo.messages.ClientMessage;
 import com.eu.habbo.messages.ServerMessage;
 import com.eu.habbo.messages.incoming.wired.WiredSaveException;
@@ -102,11 +104,13 @@ public class WiredEffectDefineUserVariable extends InteractionWiredEffect {
     static void clearReferencesInRoom(Room room, String varName) {
         updateGiveReferences(room, varName, null);
         updateChangeReferences(room, varName, null);
+        updateTriggerReferences(room, varName, null);
     }
 
     static void renameReferencesInRoom(Room room, String oldName, String newName) {
         updateGiveReferences(room, oldName, newName);
         updateChangeReferences(room, oldName, newName);
+        updateTriggerReferences(room, oldName, newName);
     }
 
     private static void updateGiveReferences(Room room, String oldName, String newName) {
@@ -129,6 +133,18 @@ public class WiredEffectDefineUserVariable extends InteractionWiredEffect {
             WiredEffectChangeUserVariable change = (WiredEffectChangeUserVariable) effect;
             if (oldName.equals(change.getVariableName())) {
                 change.updateVariableName(newName != null ? newName : "");
+            }
+        }
+    }
+
+    private static void updateTriggerReferences(Room room, String oldName, String newName) {
+        gnu.trove.set.hash.THashSet<InteractionWiredTrigger> triggerWireds =
+                room.getRoomSpecialTypes().getTriggers(WiredTriggerType.USER_VARIABLE_CHANGED);
+        if (triggerWireds == null) return;
+        for (InteractionWiredTrigger trigger : triggerWireds) {
+            WiredTriggerUserVariableChanged t = (WiredTriggerUserVariableChanged) trigger;
+            if (oldName.equals(t.getVariableName())) {
+                t.updateVariableName(newName != null ? newName : "");
             }
         }
     }

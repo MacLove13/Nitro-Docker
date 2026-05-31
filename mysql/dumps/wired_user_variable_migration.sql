@@ -50,3 +50,6 @@ CREATE INDEX IF NOT EXISTS idx_wvd_room_name_persist
 
 -- INSERT INTO `items_base` (`id`, `sprite_id`, `item_name`, `type`, `width`, `length`, `max_status`, `allow_stack`, `allow_sit`, `allow_lay`, `allow_walk`, `allow_gift`, `allow_trade`, `allow_recycle`, `allow_marketplace_sell`, `allow_inventory_stack`, `interaction_type`, `interaction_modes_count`, `vending_ids`, `is_chroma`, `customparams`, `effect_id_male`, `effect_id_female`, `clothing_on_walk`)
 -- VALUES (NULL, 0, 'wf_act_change_user_variable', 's', 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 'wf_act_change_user_variable', 1, '0', 0, '', 0, 0, 0);
+
+-- INSERT INTO `items_base` (`id`, `sprite_id`, `item_name`, `type`, `width`, `length`, `max_status`, `allow_stack`, `allow_sit`, `allow_lay`, `allow_walk`, `allow_gift`, `allow_trade`, `allow_recycle`, `allow_marketplace_sell`, `allow_inventory_stack`, `interaction_type`, `interaction_modes_count`, `vending_ids`, `is_chroma`, `customparams`, `effect_id_male`, `effect_id_female`, `clothing_on_walk`)
+-- VALUES (NULL, 0, 'wf_trg_user_variable_changed', 's', 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 'wf_trg_user_variable_changed', 1, '0', 0, '', 0, 0, 0);
