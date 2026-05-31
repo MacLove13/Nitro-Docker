@@ -332,7 +332,6 @@ body.habbo-classic .page-container .page-content {
     background-image: url('../images/web/pages/home/header.gif');
     background-size: cover;
     background-position: center;
-    overflow: hidden;
 }
 
 .habbo-hotel-image-overlay {
@@ -393,42 +392,29 @@ body.habbo-classic .page-container .page-content {
     image-rendering: -webkit-optimize-contrast;
 }
 
-/* Motto bar */
-.habbo-motto-bar {
-    background: rgba(255,255,255,0.85);
+/* Motto bar BELOW the hotel image */
+.habbo-motto-bar-below {
+    background: #f0f0f0;
+    border-top: 1px solid #d0d8df;
     padding: 5px 10px;
-    display: flex;
-    align-items: center;
-    border-top: 1px solid #c0c8d0;
-    font-size: 11px;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
 }
 
-.habbo-motto-bar strong {
-    color: #333;
-    margin-right: 6px;
-    font-size: 11px;
-}
-
-.habbo-motto-input {
-    background: transparent;
-    border: none;
-    color: #666;
+.habbo-motto-bar-below .habbo-motto-input {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
     font-size: 11px;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-    flex: 1;
-    outline: none;
-    cursor: text;
+    color: #666;
+    background: #fff;
+    border-radius: 2px;
+    box-sizing: border-box;
 }
 
-.habbo-motto-input:focus {
+.habbo-motto-bar-below .habbo-motto-input:focus {
+    outline: none;
+    border-color: #7ab0d0;
     color: #333;
-    background: rgba(255,255,255,0.9);
-    border-radius: 2px;
-    padding: 1px 3px;
 }
 
 /* Stats bar */
@@ -481,7 +467,7 @@ body.habbo-classic .page-container .page-content {
     display: inline-block;
 }
 
-/* Trading & Last Login */
+/* Trading & Last Login — legacy, replaced by habbo-info-panel rows */
 .habbo-info-bar {
     background: #e0e8f0;
     padding: 5px 10px;
@@ -491,15 +477,32 @@ body.habbo-classic .page-container .page-content {
 
 .habbo-info-row {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 0;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 10px;
+    border-bottom: 1px solid #e8eaed;
+    font-size: 11px;
+    min-height: 26px;
+}
+
+.habbo-info-row:last-child {
+    border-bottom: none;
 }
 
 .habbo-info-row img {
     width: 16px;
     height: 16px;
     image-rendering: pixelated;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.habbo-info-icon {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+    margin-top: 1px;
 }
 
 .habbo-info-row a {
@@ -520,6 +523,160 @@ body.habbo-classic .page-container .page-content {
 
 .habbo-last-login strong {
     color: #333;
+}
+
+/* =============================================
+   INFO PANEL (5 rows on home page)
+   ============================================= */
+.habbo-info-panel {
+    border: 1px solid #c0c8d0;
+    background: #fff;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.habbo-info-panel .habbo-info-row:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+.habbo-info-panel .habbo-info-row:nth-child(even) {
+    background: #fff;
+}
+
+/* =============================================
+   MY CHARACTERS PANEL
+   ============================================= */
+.habbo-mycharacters-panel {
+    border: 1px solid #c0c8d0;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.habbo-mycharacters-header {
+    background: linear-gradient(to bottom, #4a8ad4, #2a6ab4);
+    color: #fff;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+.habbo-mycharacters-content {
+    background: #fff;
+    padding: 10px 12px;
+    font-size: 11px;
+    color: #333;
+}
+
+.habbo-mycharacters-content p {
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+}
+
+.habbo-mycharacters-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* =============================================
+   HOTEL PICKS PANEL
+   ============================================= */
+.habbo-hotelpicks-panel {
+    border: 1px solid #c0c8d0;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.habbo-hotelpicks-header {
+    background: linear-gradient(to bottom, #c03040, #9a1828);
+    color: #fff;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+.habbo-hotelpicks-content {
+    background: #fff;
+    padding: 4px 0;
+}
+
+.habbo-hotelpick-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eeeeee;
+    font-size: 11px;
+}
+
+.habbo-hotelpick-item:last-child {
+    border-bottom: none;
+}
+
+.habbo-hotelpick-icon {
+    width: 30px;
+    height: 30px;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+
+.habbo-hotelpick-name {
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.habbo-hotelpick-name:hover {
+    color: #c36a05;
+    text-decoration: underline;
+}
+
+.habbo-empty-msg {
+    padding: 8px 12px;
+    color: #888;
+    font-size: 11px;
+    margin: 0;
+}
+
+/* =============================================
+   EVENTS PANEL
+   ============================================= */
+.habbo-events-panel {
+    border: 1px solid #c0c8d0;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.habbo-events-header {
+    background: linear-gradient(to bottom, #4a8ad4, #2a6ab4);
+    color: #fff;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+.habbo-events-content {
+    background: #fff;
+    padding: 8px 12px;
+    font-size: 11px;
+}
+
+.habbo-events-content p {
+    margin: 0 0 6px 0;
+    color: #333;
+}
+
+.habbo-events-select {
+    width: 100%;
+    padding: 3px 5px;
+    font-size: 11px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
 }
 
 /* =============================================
@@ -595,7 +752,7 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-news-header {
-    background: linear-gradient(to bottom, #9b1f2e, #7a1522);
+    background: linear-gradient(to bottom, #1e2540, #141928);
     color: #fff;
     padding: 8px 12px;
     font-size: 11px;
@@ -621,17 +778,42 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-news-featured {
-    background: linear-gradient(to bottom, #8a1825, #6a1018);
+    background: linear-gradient(to bottom, #1e2540, #141928);
     color: #fff;
     padding: 10px 12px;
     min-height: 60px;
     position: relative;
 }
 
+.habbo-news-label {
+    font-size: 10px;
+    color: #7890b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
 .habbo-news-featured h3 {
     color: #fff;
-    font-size: 20px;
-    margin: 0 0 8px 0;
+    font-size: 18px;
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+
+.habbo-news-featured h3 a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.habbo-news-featured h3 a:hover {
+    text-decoration: underline;
+}
+
+.habbo-news-subtitle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    margin: 2px 0 6px 0;
 }
 
 .habbo-news-featured-inner {
@@ -646,17 +828,24 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-news-featured-img {
-    width: 80px;
+    width: 90px;
     flex-shrink: 0;
 }
 
+.habbo-news-featured-img img {
+    max-width: 90px;
+    max-height: 75px;
+    object-fit: cover;
+}
+
 .habbo-news-readmore {
-    color: rgba(255,255,255,0.8) !important;
+    color: #7ab8e0 !important;
     font-size: 11px;
+    text-decoration: underline !important;
 }
 
 .habbo-news-readmore:hover {
-    color: #fff !important;
+    color: #aad8f8 !important;
     text-decoration: underline !important;
 }
 
@@ -667,9 +856,6 @@ body.habbo-classic .page-container .page-content {
 .habbo-news-item {
     padding: 6px 12px;
     border-bottom: 1px solid #e8e8e8;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
 }
 
 .habbo-news-item:last-child {
@@ -677,22 +863,22 @@ body.habbo-classic .page-container .page-content {
 }
 
 .habbo-news-item-title {
+    display: block;
     font-size: 11px;
     font-weight: bold;
-    color: #333;
+    color: #c36a05;
     text-decoration: none;
 }
 
 .habbo-news-item-title:hover {
     text-decoration: underline;
-    color: #c36a05;
+    color: #a05000;
 }
 
 .habbo-news-item-date {
     font-size: 10px;
     color: #888;
-    white-space: nowrap;
-    margin-left: 8px;
+    margin-top: 2px;
 }
 
 .habbo-news-footer {

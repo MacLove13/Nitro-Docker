@@ -209,23 +209,21 @@
             <a href="/me" class="habbo-tab habbo-tab-user {% if "home" in page or "me" in page %}habbo-tab-active{% endif %}">{{player.username}}</a>
             {% endif %}
             <a href="/articles" class="habbo-tab habbo-tab-blue {% if "community" in page %}habbo-tab-active{% endif %}">Community</a>
-            <a href="/shop" class="habbo-tab habbo-tab-blue {% if "shop" in page %}habbo-tab-active{% endif %}">Coins</a>
-            <a href="/games/ranking" class="habbo-tab habbo-tab-blue {% if "games" in page %}habbo-tab-active{% endif %}">Games</a>
+            <a href="/help" class="habbo-tab habbo-tab-blue {% if "help" in page %}habbo-tab-active{% endif %}">Safety</a>
+            <a href="/shop" class="habbo-tab habbo-tab-blue {% if "shop" in page %}habbo-tab-active{% endif %}">Credits</a>
             {% if 'housekeeping' in permissions %}
             <a href="/housekeeping" target="_blank" class="habbo-tab habbo-tab-housekeeping">Housekeeping</a>
             {% endif %}
         </div>
     </div>
 
-    <!-- SUB NAVIGATION: Home, My Page, Account Settings, Habbo Club, Habbo Guides -->
+    <!-- SUB NAVIGATION: Home, My Page, Account Settings -->
     {% if player %}
     <div class="habbo-subnav">
         <div class="habbo-subnav-inner">
             <a href="/home" class="{% if "home" in page %}active{% endif %}">Home</a>
             <a href="/profile/{{player.username}}" class="{% if "profile" in page %}active{% endif %}">My Page</a>
             <a href="/settings" class="{% if "settings" in page %}active{% endif %}">Account Settings</a>
-            <a href="/shop/club" class="{% if "club" in page %}active{% endif %}">{{site.shortname}} Club</a>
-            <a href="/help" class="{% if "help" in page %}active{% endif %}">{{site.shortname}} Guides</a>
         </div>
     </div>
     {% else %}

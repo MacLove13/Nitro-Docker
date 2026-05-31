@@ -7,218 +7,163 @@
     <!-- MAIN (left) column -->
     <div class="habbo-main-col">
 
-        <!-- Player Hotel Panel -->
+        <!-- Hotel Image + Motto -->
         <div class="habbo-home-panel">
             <div class="habbo-hotel-image">
-                <div class="habbo-username-watermark">{{player.username}}</div>
                 <div class="habbo-hotel-image-overlay">
                     <a href="/hotel" class="habbo-enter-hotel-center hotel-button">Enter {{site.sitename}} Hotel</a>
                 </div>
                 <div class="habbo-player-figure">
-                    <img src="{{site.fpath}}/avatarimage?figure={{player.look}}&action=std&gesture=sml&direction=2&head_direction=2" 
+                    <img src="{{site.fpath}}/avatarimage?figure={{player.look}}&action=std&gesture=sml&direction=2&head_direction=2"
                          alt="{{player.username}}" width="64" height="110">
                 </div>
-                <!-- Motto bar overlaid at bottom of image -->
-                <div class="habbo-motto-bar">
-                    <strong>{{player.username}}:</strong>
-                    <input type="text" class="habbo-motto-input" 
-                           id="mottoInput"
-                           value="{% if player.motto %}{{player.motto}}{% endif %}"
-                           data-placeholder="Click to enter your motto/ status"
-                           placeholder="Click to enter your motto/ status"
-                           maxlength="190"
-                           autocomplete="off">
-                    <input type="hidden" name="csrftoken" value="{{csrf_token}}" id="csrfMotto">
-                </div>
             </div>
-
-            <!-- Stats bar -->
-            <div class="habbo-stats-bar">
-                <div class="habbo-stats-bar-row">
-                    <div class="habbo-stat-item">
-                        <img src="/assets/images/hotel/sprites/change_looks.png" alt="" onerror="this.style.display='none'">
-                        <a href="/settings">Change looks &raquo;</a>
-                    </div>
-                    <div class="habbo-stat-divider"></div>
-                    <div class="habbo-stat-item">
-                        <img src="/assets/images/hotel/purses/credits-icon.png" alt="Credits" class="habbo-purse-icon">
-                        <strong style="color:#c36a05;">{{player.credits}}</strong> Credits
-                    </div>
-                    <div class="habbo-stat-divider"></div>
-                    <div class="habbo-stat-item">
-                        <img src="/assets/images/hotel/purses/club-icon.png" alt="Club" class="habbo-purse-icon" onerror="this.style.display='none'">
-                        <a href="/shop/club">Join {{site.shortname}} club &raquo;</a>
-                    </div>
-                </div>
-                <div class="habbo-stats-bar-row" style="margin-top:4px;">
-                    <div class="habbo-stat-item">
-                        <img src="/assets/images/hotel/purses/0-icon.png" alt="Pixels" class="habbo-purse-icon" onerror="this.style.display='none'">
-                        <strong style="color:#c36a05;">{{player.pixels}}</strong> Pixels
-                    </div>
-                    {% for value in currencys %}
-                    <div class="habbo-stat-divider"></div>
-                    <div class="habbo-stat-item">
-                        <img src="/assets/images/hotel/purses/{{value.type}}-icon.png" alt="" class="habbo-purse-icon" onerror="this.style.display='none'">
-                        <strong style="color:#c36a05;">{{value.amount}}</strong>
-                    </div>
-                    {% endfor %}
-                </div>
+            <!-- Motto bar below the hotel image -->
+            <div class="habbo-motto-bar-below">
+                <input type="text" class="habbo-motto-input"
+                       id="mottoInput"
+                       value="{% if player.motto %}{{player.motto}}{% endif %}"
+                       placeholder="What's on your mind today?"
+                       maxlength="190"
+                       autocomplete="off">
+                <input type="hidden" name="csrftoken" value="{{csrf_token}}" id="csrfMotto">
             </div>
+        </div>
 
-            <!-- Info bar: Trading & Last Login -->
-            <div class="habbo-info-bar">
-                <div class="habbo-info-row habbo-trading-off">
-                    <img src="/assets/images/hotel/sprites/trading_off.png" alt="" onerror="this.style.display='none'">
-                    {% if player_settings and player_settings.can_trade == 1 %}
-                        Trading is <strong>on</strong>. <a href="#" class="habbo-trading-toggle">Click here to turn it off</a>
+        <!-- Info Panel (5 rows matching reference) -->
+        <div class="habbo-info-panel">
+            {% set trading_on = (player_settings is not empty and player_settings.can_trade == 1) %}
+            <div class="habbo-info-row">
+                <img src="/assets/images/hotel/sprites/feedback.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
+                <span>We'd love to hear from you! Please <a href="/help">visit our feedback site</a> and share your ideas with us.</span>
+            </div>
+            <div class="habbo-info-row">
+                <img src="/assets/images/hotel/sprites/friends_online.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
+                <span>
+                    {% if random is not empty %}
+                    You have <strong>{{ random|length }}</strong> friends online
+                    {% for f in random %}{% if loop.index <= 5 %}{{ f.username }}{% if not loop.last and loop.index < 5 %}, {% endif %}{% endif %}{% endfor %}
+                    <a href="/community/friends">&raquo; Show all</a>
                     {% else %}
-                        Trading is <strong>off</strong>. <a href="#" class="habbo-trading-toggle">Click here to turn it on</a>
+                    You have <strong>0</strong> friends online
                     {% endif %}
-                </div>
-                <div class="habbo-info-row habbo-last-login">
-                    <img src="/assets/images/hotel/sprites/last_login.png" alt="" onerror="this.style.display='none'">
-                    Last signed in: <strong>{{player.last_login|date("M d, Y h:i:s A")}}</strong>
-                </div>
+                </span>
+            </div>
+            <div class="habbo-info-row">
+                <img src="/assets/images/hotel/sprites/groups.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
+                <span>
+                    {% if groups is not empty %}
+                    <strong>{{ groups|length }}</strong> of your groups have new forum messages:
+                    {% else %}
+                    You have no group messages.
+                    {% endif %}
+                </span>
+            </div>
+            <div class="habbo-info-row">
+                <img src="/assets/images/hotel/sprites/trading_{{ trading_on ? 'on' : 'off' }}.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
+                <span>
+                    Trading is <strong>{{ trading_on ? 'on' : 'off' }}</strong>.
+                    <a href="#" class="habbo-trading-toggle">Click here to turn it {{ trading_on ? 'off' : 'on' }}</a>
+                </span>
+            </div>
+            <div class="habbo-info-row">
+                <img src="/assets/images/hotel/sprites/last_login.png" alt="" class="habbo-info-icon" onerror="this.style.display='none'">
+                <span>Last signed in: <strong>{{player.last_login|date("M j, Y g:i:s A")}}</strong></span>
             </div>
         </div>
 
-        <!-- Your Next Gift (if applicable) -->
-        {% if gift is not empty %}
-        <div class="habbo-gift-panel">
-            <h3>Your next gift!</h3>
-            <div class="habbo-gift-item">
-                <div class="habbo-gift-image">
-                    <img src="/assets/images/hotel/gift.png" alt="Gift" onerror="this.style.display='none'">
-                </div>
-                <div class="habbo-gift-info">
-                    <p>Your next piece of free furniture will be <strong>{{gift.name}}</strong></p>
-                    <p>Time left: <strong>{{gift.time_left}}</strong></p>
-                    <a href="/hotel" class="habbo-gift-btn hotel-button">Go to your room &gt;&gt;</a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Online Friends -->
-        {% if data.friends is not empty %}
-        <div class="habbo-friends-panel">
-            <div class="habbo-friends-header">Friends online</div>
-            <div class="habbo-friends-list">
-                {% for friend in data.friends %}
-                <div class="habbo-friend-avatar">
-                    <a href="/profile/{{friend.username}}" title="{{friend.username}}">
-                        <img src="{{site.fpath}}/avatarimage?figure={{friend.look}}&head_direction=2&gesture=sml&headonly=true" 
-                             alt="{{friend.username}}">
-                    </a>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Popular Rooms -->
-        <div class="habbo-panel">
-            <div class="habbo-panel-header">Popular Rooms</div>
-            <div class="habbo-panel-content">
-                {% if rooms is empty %}
-                    <em>No popular rooms at the moment.</em>
-                {% else %}
-                <table style="width:100%;border-spacing:0;font-size:11px;">
-                    <tbody>
-                        {% for row in rooms %}
-                            {% if row.users >= 25 %}
-                                {% set number = 5 %}
-                            {% elseif row.users >= 15 %}
-                                {% set number = 4 %}
-                            {% elseif row.users >= 10 %}
-                                {% set number = 3 %}
-                            {% elseif row.users >= 1 %}
-                                {% set number = 2 %}
-                            {% else %}
-                                {% set number = 1 %}
-                            {% endif %}
-                        <tr style="border-bottom:1px solid #eee;">
-                            <td style="padding:3px;text-align:center;width:20px;">
-                                <img src="/assets/images/web/pages/community/rooms/room_icon_{{number}}.gif" alt="">
-                            </td>
-                            <td style="padding:3px;">{{row.name}}</td>
-                            <td style="padding:3px;white-space:nowrap;">
-                                <img src="/assets/images/web/pages/community/rooms/visitors.gif" alt=""> <b>{{row.users}}</b>
-                            </td>
-                            <td style="padding:3px;width:100px;">
-                                <a href="/api/room/{{row.id}}" class="btn btn-primary" style="font-size:10px;padding:2px 6px;">Enter</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
+        <!-- My characters panel -->
+        <div class="habbo-mycharacters-panel">
+            <div class="habbo-mycharacters-header">My characters</div>
+            <div class="habbo-mycharacters-content">
+                <p>Want to add a new character to your {{site.sitename}} account? Switch between the characters by clicking "play" next to the character.</p>
+                <p><a href="/registration">Add another character</a> to my account.</p>
             </div>
         </div>
 
     </div>
     <!-- END MAIN COLUMN -->
 
-    <!-- RIGHT COLUMN: News + Discord -->
+    <!-- RIGHT COLUMN: News + Hotel Picks + Events + Discord -->
     <div class="habbo-right-col">
 
         <!-- Latest News -->
         <div class="habbo-news-panel">
-            <div class="habbo-news-header">
-                <span>Latest News</span>
+            <div class="habbo-news-featured">
+                <div class="habbo-news-label">LATEST NEWS</div>
                 {% if news is not empty %}
-                <a href="/articles">Read more &raquo;</a>
-                {% endif %}
-            </div>
-
-            {% if news is empty %}
-            <div class="habbo-news-featured">
+                {% set firstNews = news|first %}
                 <div class="habbo-news-featured-inner">
                     <div class="habbo-news-featured-text">
-                        <h3>No news</h3>
-                        <a href="/articles" class="habbo-news-readmore">Read more &raquo;</a>
-                    </div>
-                    <div class="habbo-news-featured-img">
-                        <img src="/assets/images/web/pages/home/banner.png" alt="No news" style="max-width:80px;" onerror="this.style.display='none'">
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            {% set firstNews = news|first %}
-            <div class="habbo-news-featured">
-                <div class="habbo-news-featured-inner">
-                    <div class="habbo-news-featured-text">
-                        <h3><a href="/article/{{firstNews.id}}-{{firstNews.slug}}" style="color:#fff;text-decoration:none;">{{firstNews.title}}</a></h3>
+                        <h3><a href="/article/{{firstNews.id}}-{{firstNews.slug}}">{{firstNews.title}}</a></h3>
+                        {% if firstNews.short_story %}
+                        <p class="habbo-news-subtitle">{{firstNews.short_story|slice(0,80)}}</p>
+                        {% endif %}
                         <a href="/article/{{firstNews.id}}-{{firstNews.slug}}" class="habbo-news-readmore">Read more &raquo;</a>
                     </div>
                     {% if firstNews.header %}
                     <div class="habbo-news-featured-img">
-                        <img src="{{firstNews.header}}" alt="{{firstNews.title}}" style="max-width:80px;max-height:60px;object-fit:cover;" onerror="this.style.display='none'">
+                        <img src="{{firstNews.header}}" alt="{{firstNews.title}}" onerror="this.style.display='none'">
                     </div>
                     {% endif %}
                 </div>
+                {% else %}
+                <h3>No news available</h3>
+                {% endif %}
             </div>
-            {% endif %}
 
             <div class="habbo-news-list">
                 {% for news_item in news %}
-                {% if not loop.first %}
+                {% if not loop.first and loop.index <= 4 %}
                 <div class="habbo-news-item">
-                    <a href="/article/{{news_item.id}}-{{news_item.slug}}" class="habbo-news-item-title">{{news_item.title}}</a>
-                    <span class="habbo-news-item-date">{{news_item.timestamp|date("D d M, Y")}}</span>
+                    <a href="/article/{{news_item.id}}-{{news_item.slug}}" class="habbo-news-item-title">{{news_item.title}} &raquo;</a>
+                    <div class="habbo-news-item-date">{{news_item.timestamp|date("M j, Y")}}</div>
                 </div>
                 {% endif %}
                 {% endfor %}
                 {% if news is empty %}
                 <div class="habbo-news-item">
-                    <span class="habbo-news-item-title">No news</span>
-                    <span class="habbo-news-item-date">-</span>
+                    <span style="font-size:11px;color:#888;">No news</span>
                 </div>
                 {% endif %}
             </div>
 
             <div class="habbo-news-footer">
                 <a href="/articles">More news &raquo;</a>
+            </div>
+        </div>
+
+        <!-- Hotel Picks -->
+        <div class="habbo-hotelpicks-panel">
+            <div class="habbo-hotelpicks-header">Hotel Picks</div>
+            <div class="habbo-hotelpicks-content">
+                {% if rooms is not empty %}
+                {% for room in rooms|slice(0, 3) %}
+                <div class="habbo-hotelpick-item">
+                    <img src="/assets/images/web/pages/community/rooms/room_icon_2.gif" alt="" class="habbo-hotelpick-icon" onerror="this.style.display='none'">
+                    <div class="habbo-hotelpick-info">
+                        <a href="/api/room/{{room.id}}" class="habbo-hotelpick-name">{{room.name}}</a>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="habbo-empty-msg">No picks available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Events -->
+        <div class="habbo-events-panel">
+            <div class="habbo-events-header">Events</div>
+            <div class="habbo-events-content">
+                <p>Browse latest events by their category</p>
+                <select class="habbo-events-select">
+                    <option>Parties &amp; Music</option>
+                    <option>Games</option>
+                    <option>Fashion</option>
+                    <option>Trade</option>
+                    <option>Roleplaying</option>
+                </select>
             </div>
         </div>
 
@@ -251,17 +196,6 @@
     </div>
     <!-- END RIGHT COLUMN -->
 
-    <!-- FAR RIGHT COLUMN: Decorative -->
-    <div class="habbo-far-right-col">
-        <div class="habbo-keep-real">
-            <a href="/help">Keep it fun!real!</a>
-        </div>
-        <div class="habbo-right-banner">
-            <img src="/assets/images/web/big-banner.png" alt="{{site.sitename}}" onerror="this.style.display='none'">
-        </div>
-    </div>
-    <!-- END FAR RIGHT COLUMN -->
-
     {% else %}
     <!-- LOGGED OUT: Show news articles -->
     <div style="width:100%;">
@@ -289,9 +223,7 @@
 
 <script>
 $(document).ready(function() {
-    // Motto save on Enter or blur
     var mottoSaved = true;
-    var originalMotto = $('#mottoInput').val();
 
     $('#mottoInput').on('input', function() {
         mottoSaved = false;
