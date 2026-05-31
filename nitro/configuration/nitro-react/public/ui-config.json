@@ -1,10 +1,10 @@
 {
     "image.library.notifications.url": "${image.library.url}notifications/%image%.png",
     "achievements.images.url": "${image.library.url}Quests/%image%.png",
-    "camera.url": "http://localhost:8082/camera",
-    "thumbnails.url": "http://localhost:8082/camera/thumbnail/%thumbnail%.png",
+    "camera.url": "http://${asset.host}:8082/camera",
+    "thumbnails.url": "http://${asset.host}:8082/camera/thumbnail/%thumbnail%.png",
     "url.prefix": "https://website.com",
-    "cms.url": "http://localhost:8082",
+    "cms.url": "http://${asset.host}:8082",
     "habbopages.url": "${url.prefix}/",
     "group.homepage.url": "${url.prefix}/groups/%groupid%/id",
     "guide.help.alpha.groupid": 0,

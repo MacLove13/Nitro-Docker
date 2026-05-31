@@ -73,7 +73,8 @@ function WebHotelManagerInterface() {
                     if (container.find(".client-frame").length === 0)
                       
                     Web.ajax_manager.get("/api/ssoTicket", function(result) {
-                      container.prepend('<iframe class="client-frame" src="' + Client.nitro_path + '/?sso=' + result.ticket + '"></iframe>');
+                      var nitroUrl = window.location.protocol + '//' + window.location.hostname + ':1080';
+                      container.prepend('<iframe class="client-frame" src="' + nitroUrl + '/?sso=' + result.ticket + '"></iframe>');
                     })
 
                     body.addClass("hotel-visible");
