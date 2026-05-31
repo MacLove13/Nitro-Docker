@@ -301,6 +301,31 @@ class Profile
         response()->json(["status" => "success", "quantity" => $newQty]);
     }
 
+    public function useStickerAll()
+    {
+        if(!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $catalogue_id = (int) input()->post('catalogue_id')->value;
+        if(!$catalogue_id) {
+            response()->json(["status" => "error", "message" => "Item inválido."]);
+            return;
+        }
+
+        $inv = Profiles::hasInInventory(request()->player->id, $catalogue_id);
+        if(!$inv || $inv->quantity < 1) {
+            response()->json(["status" => "error", "message" => "Você não possui este sticker no inventário."]);
+            return;
+        }
+
+        $quantity = (int) $inv->quantity;
+        Profiles::removeFromInventory(request()->player->id, $catalogue_id);
+
+        response()->json(["status" => "success", "quantity" => $quantity]);
+    }
+
     public function remove() 
     {
         if(!request()->player->id) {
