@@ -964,10 +964,6 @@ function WebPageProfileInterface(main_page) {
                         $btn.click(function() {
                             Web.ajax_manager.post("/home/profile/add", {
                                 data: 'w', type: 'p', add: w, csrftoken: csrftoken
-                            }, function(result) {
-                                if (result.status === 'success') {
-                                    window.location.reload();
-                                }
                             });
                             $modal.hide();
                         });
