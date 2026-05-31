@@ -558,6 +558,45 @@ class Admin
     }
 
     /*
+     * Crackable queries
+     */
+
+    public static function getCrackableItems()
+    {
+        return QueryBuilder::table('items_crackable')
+            ->select('items_crackable.item_id')
+            ->select('items_crackable.item_name')
+            ->select('items_crackable.count')
+            ->select('items_crackable.prizes')
+            ->select(QueryBuilder::raw('items_base.public_name'))
+            ->select(QueryBuilder::raw('items_base.sprite_id'))
+            ->join('items_base', 'items_base.id', '=', 'items_crackable.item_id')
+            ->orderBy('items_crackable.item_id', 'asc')
+            ->get();
+    }
+
+    public static function getCrackableById($item_id)
+    {
+        return QueryBuilder::table('items_crackable')
+            ->select('items_crackable.item_id')
+            ->select('items_crackable.item_name')
+            ->select('items_crackable.count')
+            ->select('items_crackable.prizes')
+            ->select(QueryBuilder::raw('items_base.public_name'))
+            ->select(QueryBuilder::raw('items_base.sprite_id'))
+            ->join('items_base', 'items_base.id', '=', 'items_crackable.item_id')
+            ->where('items_crackable.item_id', $item_id)
+            ->first();
+    }
+
+    public static function updateCrackablePrizes($item_id, $prizes)
+    {
+        return QueryBuilder::table('items_crackable')
+            ->where('item_id', $item_id)
+            ->update(['prizes' => $prizes]);
+    }
+
+    /*
      * Rank Management & Permissions queries
      */
 
