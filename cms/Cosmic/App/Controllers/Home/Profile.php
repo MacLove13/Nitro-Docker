@@ -120,10 +120,67 @@ class Profile
             }
         }
 
+        if(input('data') == "s") {
+            $categorys = Profiles::getCategorys();
+            $items = Profiles::getItems('s');
+            $inventory = Profiles::getInventory(request()->player->id);
+            $player = Player::getDataById(request()->player->id, ['id', 'credits']);
+
+            response()->json([
+                "items"     => $items,
+                "categorys" => $categorys,
+                "inventory" => $inventory,
+                "credits"   => (int) $player->credits,
+                "widgets"   => $myWidgets ?? null,
+            ]);
+            return;
+        }
+
         $categorys = Profiles::getCategorys();
         $items = Profiles::getItems(input('data'));
 
         response()->json(["items" => $items, "categorys" => $categorys, "widgets" => $myWidgets ?? null]);
+    }
+
+    public function buy()
+    {
+        if(!request()->player->id) {
+            response()->json(["status" => "error", "message" => Locale::get('core/notification/something_wrong')]);
+            return;
+        }
+
+        $catalogue_id = (int) input()->post('catalogue_id')->value;
+        if(!$catalogue_id) {
+            response()->json(["status" => "error", "message" => "Invalid sticker."]);
+            return;
+        }
+
+        $item = Profiles::getCatalogueItem($catalogue_id);
+        if(!$item) {
+            response()->json(["status" => "error", "message" => "Sticker not found."]);
+            return;
+        }
+
+        if(Profiles::hasInInventory(request()->player->id, $catalogue_id)) {
+            response()->json(["status" => "error", "message" => "You already own this sticker."]);
+            return;
+        }
+
+        $player = Player::getDataById(request()->player->id, ['id', 'credits']);
+        if($player->credits < $item->price) {
+            response()->json(["status" => "error", "message" => "Not enough credits."]);
+            return;
+        }
+
+        Player::update(request()->player->id, ['credits' => $player->credits - $item->price]);
+        Profiles::addToInventory(request()->player->id, $catalogue_id);
+
+        response()->json([
+            "status"  => "success",
+            "message" => "Sticker purchased successfully!",
+            "credits" => $player->credits - $item->price,
+            "item"    => $item,
+        ]);
     }
   
     public function remove() 

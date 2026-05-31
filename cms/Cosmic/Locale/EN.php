@@ -217,6 +217,25 @@ $GLOBALS['language'] = array (
         ),
 
         /*     App/View/Community     */
+        'community_home' => array (
+            'header_title'    => 'Community',
+            'header_desc'     => 'News, photos, rooms and more from the ' . Config::site['shortname'] . ' community.',
+            'latest_news'     => 'Latest News',
+            'read_more'       => 'Read more',
+            'random_habbos'   => 'Random ' . Config::site['shortname'] . 's',
+            'popular_rooms'   => 'Popular Rooms',
+            'users_online'    => 'users online',
+            'community_links' => 'Community',
+            'link_articles'   => 'Articles',
+            'link_photos'     => 'Photos',
+            'link_staff'      => 'Staff',
+            'link_fansites'   => 'Fansites',
+        ),
+        'community_fansites' => array (
+            'header_title'    => 'Fansites',
+            'header_desc'     => 'These are ' . Config::site['shortname'] . ' approved fansites.',
+            'intro'           => 'Below you can find the official ' . Config::site['shortname'] . ' fansites. Do you have a fansite? Apply via the Help Tool!',
+        ),
         'community_photos' => array (
             'by'          => 'by',
             'photos_by'   => 'Photos\'s by',

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+<header class="page-header flex-container flex-vertical-center">
+    <div class="page-header-content">
+        <h1>{{locale.header_title}}</h1>
+        {{locale.header_desc}}
+    </div>
+</header>
+
+<div class="page-content">
+    <div class="left-side">
+        <article class="default-section">
+            <div class="aside-title-content">{{locale.header_title}}</div>
+            <div class="aside-content">
+                <p>{{locale.intro}}</p>
+            </div>
+        </article>
+    </div>
+
+    <div class="right-side">
+        <aside class="default-section">
+            <div class="aside-content">
+                <img src="/assets/images/web/pages/fansites/banner.png" alt="Fansites" style="max-width:100%;">
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends "Admin/base.html" %}
+{% block page %}Home Stickers management{% endblock %}
+{% block jsfile %}homestickers{% endblock %}
+{% block body %}
+<div class="row">
+
+    <!-- ── Item form ──────────────────────────────────────────── -->
+    <div class="col-xl-12" id="itemManage" style="display: none">
+        <div class="kt-portlet">
+            <form method="post" id="itemForm">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <span class="kt-portlet__head-icon"><i class="flaticon2-image-file"></i></span>
+                        <h3 class="kt-portlet__head-title itemFormTitle">Sticker</h3>
+                    </div>
+                    <div class="kt-subheader__wrapper kt-margin-t-10">
+                        <a id="goBackItem" class="btn btn-clean btn-icon-sm">
+                            <i class="la la-long-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Image filename (without .gif)</label>
+                        <div class="col-9">
+                            <input type="text" name="data" class="form-control" placeholder="e.g. trax_sfx" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Display name</label>
+                        <div class="col-9">
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Category</label>
+                        <div class="col-9">
+                            <select name="category" class="form-control" id="itemCategorySelect">
+                                {% for cat in categorys %}
+                                {% if cat.type == 's' %}
+                                <option value="{{cat.id}}">{{cat.name}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Price (credits)</label>
+                        <div class="col-9">
+                            <input type="number" name="price" class="form-control" min="0" value="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="stickerPreviewRow">
+                        <label class="col-3 col-form-label">Preview</label>
+                        <div class="col-9">
+                            <img id="stickerPreview" src="" style="display:none; max-width:100px;" alt="preview">
+                        </div>
+                    </div>
+                </div>
+                <div class="kt-portlet__foot">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 kt-align-right">
+                            <input type="hidden" name="itemId">
+                            <button type="submit" class="btn btn-brand">Save sticker</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Category form ─────────────────────────────────────── -->
+    <div class="col-xl-12" id="categoryManage" style="display: none">
+        <div class="kt-portlet">
+            <form method="post" id="categoryForm">
+                <div class="kt-portlet__head">
+                    <div class="kt-portlet__head-label">
+                        <span class="kt-portlet__head-icon"><i class="flaticon2-folder"></i></span>
+                        <h3 class="kt-portlet__head-title categoryFormTitle">Category</h3>
+                    </div>
+                    <div class="kt-subheader__wrapper kt-margin-t-10">
+                        <a id="goBackCategory" class="btn btn-clean btn-icon-sm">
+                            <i class="la la-long-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
+                <div class="kt-portlet__body">
+                    <div class="form-group row">
+                        <label class="col-3 col-form-label">Name</label>
+                        <div class="col-9">
+                            <input type="text" name="catName" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="kt-portlet__foot">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 kt-align-right">
+                            <input type="hidden" name="categoryId">
+                            <button type="submit" class="btn btn-brand">Save category</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Items list ─────────────────────────────────────────── -->
+    <div class="col-xl-12" id="itemsList">
+        <div class="kt-portlet kt-portlet--height-fluid kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon"><i class="kt-font-brand flaticon2-image-file"></i></span>
+                    <h3 class="kt-portlet__head-title">Sticker items</h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <a class="btn btn-brand btn-sm createItem">
+                        <i class="la la-plus"></i> Add sticker
+                    </a>
+                    &nbsp;
+                    <a class="btn btn-secondary btn-sm showCategories">
+                        <i class="la la-list"></i> Manage categories
+                    </a>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_datatable_items">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Preview</th>
+                            <th>Name</th>
+                            <th>Filename</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        {% if item.type == 's' %}
+                        <tr>
+                            <td>{{item.id}}</td>
+                            <td><img src="/assets/images/homestickers/{{item.data}}.gif" style="max-width:34px;max-height:34px;" alt="{{item.name}}" onerror="this.style.display='none'"></td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.data}}</td>
+                            <td>{{item.category}}</td>
+                            <td>{{item.price}} credits</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-warning editItem" data-id="{{item.id}}" data-data="{{item.data}}" data-name="{{item.name}}" data-category="{{item.category}}" data-price="{{item.price}}">Edit</a>
+                                <a href="#" class="btn btn-sm btn-danger deleteItem" data-id="{{item.id}}">Delete</a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Categories list ────────────────────────────────────── -->
+    <div class="col-xl-12" id="categoriesList" style="display: none">
+        <div class="kt-portlet kt-portlet--height-fluid kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon"><i class="kt-font-brand flaticon2-folder"></i></span>
+                    <h3 class="kt-portlet__head-title">Sticker categories</h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <a class="btn btn-brand btn-sm createCategory">
+                        <i class="la la-plus"></i> Add category
+                    </a>
+                    &nbsp;
+                    <a class="btn btn-secondary btn-sm backToItems">
+                        <i class="la la-long-arrow-left"></i> Back to stickers
+                    </a>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_datatable_categories">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                        {% for cat in categorys %}
+                        <tr data-id="{{cat.id}}">
+                            <td>{{cat.id}}</td>
+                            <td>{{cat.name}}</td>
+                            <td>{{cat.type}}</td>
+                            <td>
+                                <a href="#" class="btn btn-sm btn-warning editCategory" data-id="{{cat.id}}" data-name="{{cat.name}}">Edit</a>
+                                <a href="#" class="btn btn-sm btn-danger deleteCategory" data-id="{{cat.id}}">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

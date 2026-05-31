@@ -613,10 +613,27 @@ function WebPageProfileInterface(main_page) {
 
 
         var stickers = [
-            '<div class="dialog-popup" style="width: 744px; max-width: 850px;">\n' +
-            '<div class="sidenav">' +
+            '<div class="dialog-popup sticker-shop-dialog" style="width: 780px; max-width: 850px;">' +
+            '<div class="sticker-shop-tabs">' +
+            '<button class="tab-btn active" data-tab="inventory">Inventory</button>' +
+            '<button class="tab-btn" data-tab="webstore">Web Store</button>' +
             '</div>' +
-            '<div class="main">' +
+            '<div class="sticker-shop-body">' +
+            '<div class="tab-panel" id="tab-inventory">' +
+            '<div class="shop-sidenav"></div>' +
+            '<div class="shop-main inventory-main"></div>' +
+            '</div>' +
+            '<div class="tab-panel" id="tab-webstore" style="display:none">' +
+            '<div class="shop-sidenav webstore-sidenav"></div>' +
+            '<div class="shop-main webstore-main"></div>' +
+            '<div class="shop-preview">' +
+            '<div class="preview-img-wrap"><img class="preview-img" src="" alt=""></div>' +
+            '<div class="preview-name"></div>' +
+            '<div class="preview-price"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle;"> Price: <span class="price-val">0</span> credits</div>' +
+            '<div class="preview-balance"><img src="/assets/images/web/pages/shop/habbo_gold.gif" style="vertical-align:middle;"> You have: <span class="balance-val">0</span> credits</div>' +
+            '<button class="purchaseBtn btn btn-primary" disabled>Purchase</button>' +
+            '</div>' +
+            '</div>' +
             '</div>' +
             '</div>'
         ].join("");
@@ -760,48 +777,150 @@ function WebPageProfileInterface(main_page) {
                 }, function(data) {
 
                     var dialog = $(stickers);
+                    var selectedItem = null;
+                    var userCredits = data.credits !== undefined ? data.credits : 0;
 
                     $.magnificPopup.open({
-                        items: {
-                            src: dialog,
-                            type: 'inline'
-                        }
+                        items: { src: dialog, type: 'inline' }
                     });
 
-                    // Create sidebar categorys
-                    if (data.categorys.length > 0) {
-                        for (var i = 0; i < data.categorys.length; i++) {
+                    // ── Tab switching ───────────────────────────────────────
+                    dialog.find(".tab-btn").click(function() {
+                        dialog.find(".tab-btn").removeClass("active");
+                        $(this).addClass("active");
+                        dialog.find(".tab-panel").hide();
+                        dialog.find("#tab-" + $(this).data("tab")).show();
+                    });
 
-                            var category = data.categorys[i];
+                    // ── Helper: build category sidebar ──────────────────────
+                    function buildSidebar(sidenavSel, mainSel, items, categorys, clickFn) {
+                        if (categorys && categorys.length > 0) {
+                            for (var i = 0; i < categorys.length; i++) {
+                                var cat = categorys[i];
+                                dialog.find(sidenavSel).append('<a href="#" data-cat="' + cat.id + '">' + cat.name + '</a>');
+                                dialog.find(mainSel).append('<div class="sticker-grid cat-' + cat.id + '" style="display:none"></div>');
+                            }
+                            // Show first category by default
+                            dialog.find(sidenavSel + " a").first().addClass("active");
+                            dialog.find(mainSel + " .sticker-grid").first().show();
 
-                            dialog.find(".sidenav").append('<a href="#" data-category="' + category.id + '">' + category.name + '</a>');
-                            dialog.find(".main").append('<div class="' + category.id + '" style="font-size: 22px; display: none"><b>' + category.name + '</b><br /><br /></div>');
-
-                            dialog.find(".sidenav a[data-category=" + category.id + "]").click(function() {
-                                dialog.find(".main").children().hide();
-                                dialog.find(".main div[class=" + $(this).attr("data-category") + "]").show();
+                            dialog.find(sidenavSel + " a").click(function() {
+                                dialog.find(sidenavSel + " a").removeClass("active");
+                                $(this).addClass("active");
+                                dialog.find(mainSel + " .sticker-grid").hide();
+                                dialog.find(mainSel + " .cat-" + $(this).data("cat")).show();
                             });
+                        }
+
+                        if (items && items.length > 0) {
+                            for (var x = 0; x < items.length; x++) {
+                                var item = items[x];
+                                var img = $('<img src="/assets/images/homestickers/' + item.data + '.gif"' +
+                                    ' class="stickerImage" data-name="' + item.data +
+                                    '" data-id="' + item.id +
+                                    '" data-price="' + (item.price || 0) +
+                                    '" height="34" width="34" title="' + item.name + '">');
+                                dialog.find(mainSel + " .cat-" + item.category).append(img);
+                                img.click(function() { clickFn($(this)); });
+                            }
                         }
                     }
 
-                    // Create items
-                    if (data.items.length > 0) {
-                        for (var x = 0; x < data.items.length; x++) {
-                            var items = data.items[x];
-                            dialog.find('.' + items.category + '').append('<img src="/assets/images/homestickers/' + items.data + '.gif" class="stickerImage" data-name="' + items.data + '" data-id="' + items.id + '" height="34" width="34">');
+                    // ── Inventory tab ───────────────────────────────────────
+                    buildSidebar(
+                        "#tab-inventory .shop-sidenav",
+                        "#tab-inventory .inventory-main",
+                        data.inventory,
+                        data.categorys,
+                        function(img) {
+                            $('<img>').attr('src', img.attr("src"))
+                                .addClass('widget')
+                                .attr('data-id', img.attr("data-name") + '.gif')
+                                .attr('data-type', 's')
+                                .css('position', 'relative')
+                                .appendTo('.page-content').draggable({
+                                containment: $('.page-container'),
+                                stop: function() {
+                                    $(this).attr('data-top', $(this).css("top").replace('px', ''));
+                                    $(this).attr('data-left', $(this).css("left").replace('px', ''));
+                                }
+                            });
+                            $.magnificPopup.close();
+                        }
+                    );
 
-                            dialog.find(".main img[data-id=" + items.id + "]").click(function() {
-                                $('<img src="' + $(this).attr("src") + '" class="widget" data-id="' + $(this).attr("data-name") + '.gif" data-type="s" style="position: relative;"></div>').appendTo('.page-content').draggable({
-                                    containment: $('.page-container'),
-                                    stop: function() {
-                                        $(this).attr('data-top', $(this).css("top").replace('px', ''))
-                                        $(this).attr('data-left', $(this).css("left").replace('px', ''))
-                                    }
+                    // ── Web Store tab ───────────────────────────────────────
+                    // Use credits returned in store() response
+                    if (data.credits !== undefined) {
+                        userCredits = data.credits;
+                    }
+                    dialog.find(".balance-val").text(userCredits);
+
+                    buildSidebar(
+                        "#tab-webstore .webstore-sidenav",
+                        "#tab-webstore .webstore-main",
+                        data.items,
+                        data.categorys,
+                        function(img) {
+                            selectedItem = {
+                                id:    img.attr("data-id"),
+                                name:  img.attr("title"),
+                                src:   img.attr("src"),
+                                price: parseInt(img.attr("data-price"), 10) || 0
+                            };
+                            dialog.find(".preview-img").attr("src", selectedItem.src);
+                            dialog.find(".preview-name").text(selectedItem.name);
+                            dialog.find(".price-val").text(selectedItem.price);
+                            dialog.find(".purchaseBtn").prop("disabled", false);
+                        }
+                    );
+
+                    // Purchase button
+                    dialog.find(".purchaseBtn").click(function() {
+                        if (!selectedItem) return;
+                        var btn = $(this);
+                        btn.prop("disabled", true);
+                        Web.ajax_manager.post("/home/profile/buy", {
+                            catalogue_id: selectedItem.id,
+                            csrftoken: csrftoken
+                        }, function(result) {
+                            if (result.status === "success") {
+                                userCredits = result.credits;
+                                dialog.find(".balance-val").text(userCredits);
+                                // Move purchased item to inventory tab
+                                data.inventory = data.inventory || [];
+                                data.inventory.push(result.item);
+                                var newImg = $('<img>').attr('src', selectedItem.src)
+                                    .addClass('stickerImage')
+                                    .attr('data-name', result.item.data)
+                                    .attr('data-id', String(result.item.id))
+                                    .attr('data-price', '0')
+                                    .attr('height', '34')
+                                    .attr('width', '34')
+                                    .attr('title', result.item.name);
+                                dialog.find("#tab-inventory .cat-" + result.item.category).append(newImg);
+                                newImg.click(function() {
+                                    $('<img>').attr('src', $(this).attr("src"))
+                                        .addClass('widget')
+                                        .attr('data-id', $(this).attr("data-name") + '.gif')
+                                        .attr('data-type', 's')
+                                        .css('position', 'relative')
+                                        .appendTo('.page-content').draggable({
+                                        containment: $('.page-container'),
+                                        stop: function() {
+                                            $(this).attr('data-top', $(this).css("top").replace('px', ''));
+                                            $(this).attr('data-left', $(this).css("left").replace('px', ''));
+                                        }
+                                    });
+                                    $.magnificPopup.close();
                                 });
-                                $.magnificPopup.close();
-                            });
-                        }
-                    }
+                                Web.notifications_manager.create("success", "Purchased!", "Sticker added to your inventory.");
+                            } else {
+                                Web.notifications_manager.create("error", "Error", result.message);
+                                btn.prop("disabled", false);
+                            }
+                        });
+                    });
 
                 });
             });
