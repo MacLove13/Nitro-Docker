@@ -259,7 +259,7 @@ public class Incoming {
     public static final int JukeBoxEventOne = 2304;
     public static final int JukeBoxEventTwo = 1435;
     public static final int RoomUserMuteEvent = 3485;
-    //public static final int JukeBoxEventThree = 3846;
+    public static final int JukeBoxEventThree = 3846;
     public static final int RequestDeleteRoomEvent = 532;
     public static final int RequestPromotionRoomsEvent = 1075;
     public static final int BuyRoomPromotionEvent = 777;

@@ -524,3 +524,250 @@
         }
     }
 }
+
+
+.nitro-sound-machine-widget {
+    .trax-editor {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .trax-discs {
+        width: 130px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .trax-section-title {
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #aaa;
+            padding-bottom: 2px;
+            border-bottom: 1px solid #333;
+        }
+
+        .trax-disc-list {
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .trax-disc-item {
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            background: #2a2a3a;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid transparent;
+            transition: background 0.15s;
+
+            &:hover {
+                background: #3a3a4a;
+            }
+
+            &.selected {
+                border-color: #4db6ac;
+                background: #1e3a38;
+            }
+
+            .trax-disc-name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                flex: 1;
+            }
+
+            .trax-disc-slot {
+                background: #4db6ac;
+                color: #fff;
+                border-radius: 50%;
+                width: 16px;
+                height: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                flex-shrink: 0;
+                margin-left: 4px;
+            }
+        }
+
+        .trax-empty {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            padding: 8px;
+        }
+    }
+
+    .trax-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .trax-cartridges {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    .trax-cartridge {
+        flex: 1;
+        border-radius: 6px;
+        background: #1e1e2e;
+        border: 1px solid #333;
+        padding: 4px;
+        cursor: pointer;
+        transition: border-color 0.15s;
+
+        &.selected {
+            border-color: #4db6ac;
+        }
+
+        &.empty {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        &:hover:not(.empty) {
+            border-color: #4db6ac;
+        }
+
+        .trax-cartridge-header {
+            font-size: 10px;
+            font-weight: bold;
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .trax-pads-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+    }
+
+    .trax-pad {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 3px;
+        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8px;
+        color: rgba(255,255,255,0.7);
+        user-select: none;
+        transition: opacity 0.1s, transform 0.1s;
+
+        &:hover {
+            opacity: 0.85;
+            transform: scale(1.05);
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        &.trax-pad-empty {
+            background: #2a2a3a !important;
+            cursor: default;
+        }
+
+        .trax-pad-label {
+            font-size: 7px;
+            pointer-events: none;
+        }
+    }
+
+    .trax-sequencer {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1;
+    }
+
+    .trax-track {
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+        align-items: center;
+
+        .trax-track-label {
+            width: 14px;
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            flex-shrink: 0;
+        }
+    }
+
+    .trax-cell {
+        flex: 1;
+        height: 24px;
+        border-radius: 3px;
+        background: #1e1e2e;
+        border: 1px solid #2a2a3a;
+        cursor: default;
+        transition: background 0.1s, border-color 0.1s;
+
+        &.filled {
+            cursor: pointer;
+            opacity: 0.9;
+            border-color: rgba(255,255,255,0.2);
+
+            &:hover {
+                opacity: 1;
+                border-color: #fff;
+            }
+        }
+
+        &.drag-over {
+            border-color: #4db6ac;
+            background: #1e3a38;
+        }
+    }
+
+    .trax-controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+
+        .trax-name-input {
+            flex: 1;
+            background: #1e1e2e;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            padding: 3px 6px;
+            outline: none;
+
+            &:focus {
+                border-color: #4db6ac;
+            }
+        }
+
+        .btn {
+            flex-shrink: 0;
+        }
+    }
+}
