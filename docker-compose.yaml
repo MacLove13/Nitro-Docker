@@ -63,6 +63,7 @@ services:
       - CMS_ASSET_PATH=http://localhost:8080
       - CMS_SHORTNAME=Nitro
       - CMS_SITENAME=Nitro
+      - AUTO_UPDATER_URL=http://auto-updater:5001
     volumes:
       - ./cms/Cosmic:/var/www/html
       - ./cms/Database:/database
@@ -99,6 +100,33 @@ services:
       - 5010:5000
     depends_on:
       - mysql
+    networks:
+      nitro:
+
+  auto-updater:
+    container_name: auto-updater
+    build:
+      context: auto-updater
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=arcturus
+      - DB_USER=arcturus_user
+      - DB_PASS=arcturus_pw
+      - NITRO_CONTAINER_NAME=nitro
+      - NITRO_SWF_DIR=/nitro-swf
+      - NITRO_ASSETS_DIR=/nitro-assets
+      - SCRAPE_HOUR=4
+      - PORT=5001
+    volumes:
+      - ./nitro/nitro-swf:/nitro-swf
+      - ./nitro/nitro-assets:/nitro-assets
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 5011:5001
+    depends_on:
+      - mysql
+      - nitro
     networks:
       nitro:
 
