@@ -1,6 +1,7 @@
 import { WiredActionLayoutCode } from '../../../../api';
 import { WiredActionBotChangeFigureView } from './WiredActionBotChangeFigureView';
 import { WiredActionChangeUserVariableView } from './WiredActionChangeUserVariableView';
+import { WiredActionDefineUserVariableView } from './WiredActionDefineUserVariableView';
 import { WiredActionGiveUserVariableView } from './WiredActionGiveUserVariableView';
 import { WiredActionBotFollowAvatarView } from './WiredActionBotFollowAvatarView';
 import { WiredActionBotGiveHandItemView } from './WiredActionBotGiveHandItemView';
@@ -85,6 +86,8 @@ export const WiredActionLayoutView = (code: number) =>
             return <WiredActionGiveUserVariableView />;
         case WiredActionLayoutCode.CHANGE_USER_VARIABLE:
             return <WiredActionChangeUserVariableView />;
+        case WiredActionLayoutCode.DEFINE_USER_VARIABLE:
+            return <WiredActionDefineUserVariableView />;
     }
 
     return null;

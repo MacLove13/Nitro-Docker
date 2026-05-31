@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
     private static final Logger LOGGER = LoggerFactory.getLogger(WiredEffectChangeUserVariable.class);
@@ -37,9 +38,6 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
     private static final String OP_CONCAT = "concat";
 
     private String variableName = "";
-    private String variableType = "number";
-    private String defaultValue = "0";
-    private boolean isPersistent = false;
     private String operation = "=";
     private String operationValue = "0";
 
@@ -49,6 +47,15 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
 
     public WiredEffectChangeUserVariable(int id, int userId, Item item, String extradata, int limitedStack, int limitedSells) {
         super(id, userId, item, extradata, limitedStack, limitedSells);
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public void updateVariableName(String newName) {
+        this.variableName = newName;
+        this.needsUpdate(true);
     }
 
     @Override
@@ -61,9 +68,11 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         int userId = habbo.getHabboInfo().getId();
 
         try (Connection connection = Emulator.getDatabase().getDataSource().getConnection()) {
-            upsertVariableDefinition(connection, roomId);
-            String currentValue = loadUserVariableValue(connection, roomId, userId);
-            String newValue = applyOperation(currentValue);
+            VariableDefinition def = loadVariableDefinition(connection, roomId);
+            if (def == null) return false;
+
+            String currentValue = loadUserVariableValue(connection, roomId, userId, def.defaultValue);
+            String newValue = applyOperation(currentValue, def.variableType);
             if (newValue == null) return false;
             upsertUserVariableValue(connection, roomId, userId, newValue);
         } catch (SQLException e) {
@@ -74,21 +83,21 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         return true;
     }
 
-    private void upsertVariableDefinition(Connection connection, int roomId) throws SQLException {
+    private VariableDefinition loadVariableDefinition(Connection connection, int roomId) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO wired_variable_definitions (room_id, variable_name, variable_type, default_value, is_persistent) " +
-                "VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE variable_type = VALUES(variable_type), " +
-                "default_value = VALUES(default_value), is_persistent = VALUES(is_persistent)")) {
+                "SELECT variable_type, default_value FROM wired_variable_definitions WHERE room_id = ? AND variable_name = ? LIMIT 1")) {
             stmt.setInt(1, roomId);
             stmt.setString(2, variableName);
-            stmt.setString(3, variableType);
-            stmt.setString(4, defaultValue);
-            stmt.setBoolean(5, isPersistent);
-            stmt.executeUpdate();
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new VariableDefinition(rs.getString("variable_type"), rs.getString("default_value"));
+                }
+            }
         }
+        return null;
     }
 
-    private String loadUserVariableValue(Connection connection, int roomId, int userId) throws SQLException {
+    private String loadUserVariableValue(Connection connection, int roomId, int userId, String defaultValue) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement(
                 "SELECT value FROM wired_user_variable_values WHERE room_id = ? AND user_id = ? AND variable_name = ? LIMIT 1")) {
             stmt.setInt(1, roomId);
@@ -115,7 +124,7 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         }
     }
 
-    private String applyOperation(String currentValue) {
+    private String applyOperation(String currentValue, String variableType) {
         try {
             switch (operation) {
                 case OP_SET:
@@ -156,10 +165,27 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         }
     }
 
+    private List<String> loadAvailableVariables(int roomId) {
+        List<String> vars = new ArrayList<>();
+        try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     "SELECT variable_name FROM wired_variable_definitions WHERE room_id = ? ORDER BY variable_name")) {
+            stmt.setInt(1, roomId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    vars.add(rs.getString("variable_name"));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to load available variables for room {}", roomId, e);
+        }
+        return vars;
+    }
+
     @Override
     public String getWiredData() {
         return WiredHandler.getGsonBuilder().create().toJson(
-                new JsonData(variableName, variableType, defaultValue, isPersistent, operation, operationValue, getDelay()));
+                new JsonData(variableName, operation, operationValue, getDelay()));
     }
 
     @Override
@@ -169,9 +195,6 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         if (wiredData.startsWith("{")) {
             JsonData data = WiredHandler.getGsonBuilder().create().fromJson(wiredData, JsonData.class);
             this.variableName = data.variableName != null ? data.variableName : "";
-            this.variableType = data.variableType != null ? data.variableType : "number";
-            this.defaultValue = data.defaultValue != null ? data.defaultValue : "0";
-            this.isPersistent = data.isPersistent;
             this.operation = data.operation != null ? data.operation : "=";
             this.operationValue = data.operationValue != null ? data.operationValue : "0";
             this.setDelay(data.delay);
@@ -181,9 +204,6 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
     @Override
     public void onPickUp() {
         this.variableName = "";
-        this.variableType = "number";
-        this.defaultValue = "0";
-        this.isPersistent = false;
         this.operation = "=";
         this.operationValue = "0";
         this.setDelay(0);
@@ -191,12 +211,15 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
 
     @Override
     public void serializeWiredData(ServerMessage message, Room room) {
+        List<String> availableVars = loadAvailableVariables(room.getId());
+        String varList = availableVars.stream().collect(Collectors.joining(","));
+
         message.appendBoolean(false);
         message.appendInt(0);
         message.appendInt(0);
         message.appendInt(this.getBaseItem().getSpriteId());
         message.appendInt(this.getId());
-        message.appendString(variableName + "\t" + variableType + "\t" + defaultValue + "\t" + isPersistent + "\t" + operation + "\t" + operationValue);
+        message.appendString(variableName + "\t" + operation + "\t" + operationValue + "\t" + varList);
         message.appendInt(0);
         message.appendInt(0);
         message.appendInt(type.code);
@@ -229,22 +252,16 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         String rawString = packet.readString();
         String[] parts = rawString.split("\t", -1);
 
-        if (parts.length < 6) throw new WiredSaveException("Invalid data for ChangeUserVariable");
+        if (parts.length < 3) throw new WiredSaveException("Invalid data for ChangeUserVariable");
 
         String name = parts[0].trim();
         if (name.isEmpty()) throw new WiredSaveException("Variable name cannot be empty");
         if (name.length() > 100) throw new WiredSaveException("Variable name too long");
 
-        String vType = parts[1].trim();
-        if (!vType.equals("number") && !vType.equals("text") && !vType.equals("boolean") && !vType.equals("user"))
-            throw new WiredSaveException("Invalid variable type: " + vType);
+        String op = parts[1].trim();
+        String opValue = parts[2].trim();
 
-        String defValue = parts[2].trim();
-        boolean persistent = Boolean.parseBoolean(parts[3].trim());
-        String op = parts[4].trim();
-        String opValue = parts[5].trim();
-
-        validateOperationForType(vType, op, opValue);
+        validateOperation(op, opValue);
 
         packet.readInt();
 
@@ -253,9 +270,6 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
             throw new WiredSaveException("Delay too long");
 
         this.variableName = name;
-        this.variableType = vType;
-        this.defaultValue = defValue;
-        this.isPersistent = persistent;
         this.operation = op;
         this.operationValue = opValue;
         this.setDelay(delay);
@@ -263,34 +277,18 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         return true;
     }
 
-    private void validateOperationForType(String vType, String op, String opValue) throws WiredSaveException {
-        switch (vType) {
-            case "number":
-                if (op.equals(OP_CONCAT))
-                    throw new WiredSaveException("concat is not allowed for type 'number'");
-                try {
-                    double val = Double.parseDouble(opValue);
-                    if (op.equals(OP_DIVIDE) && val == 0)
-                        throw new WiredSaveException("Division by zero is not allowed");
-                } catch (NumberFormatException e) {
-                    if (!op.equals(OP_SET))
-                        throw new WiredSaveException("Arithmetic operations (+, -, *, /) require a numeric value for type 'number'");
-                }
-                break;
-            case "text":
-                if (!op.equals(OP_SET) && !op.equals(OP_CONCAT))
-                    throw new WiredSaveException("Only '=' and 'concat' are allowed for type 'text'");
-                break;
-            case "boolean":
-                if (!op.equals(OP_SET))
-                    throw new WiredSaveException("Only '=' is allowed for type 'boolean'");
-                if (!opValue.equals("true") && !opValue.equals("false"))
-                    throw new WiredSaveException("Value must be 'true' or 'false' for type 'boolean'");
-                break;
-            case "user":
-                if (!op.equals(OP_SET))
-                    throw new WiredSaveException("Only '=' is allowed for type 'user'");
-                break;
+    private void validateOperation(String op, String opValue) throws WiredSaveException {
+        if (!op.equals(OP_ADD) && !op.equals(OP_SUBTRACT) && !op.equals(OP_MULTIPLY)
+                && !op.equals(OP_DIVIDE) && !op.equals(OP_SET) && !op.equals(OP_CONCAT)) {
+            throw new WiredSaveException("Invalid operation: " + op);
+        }
+        if (op.equals(OP_DIVIDE)) {
+            try {
+                double val = Double.parseDouble(opValue);
+                if (val == 0) throw new WiredSaveException("Division by zero is not allowed");
+            } catch (NumberFormatException e) {
+                throw new WiredSaveException("Division requires a numeric operand");
+            }
         }
     }
 
@@ -304,21 +302,24 @@ public class WiredEffectChangeUserVariable extends InteractionWiredEffect {
         return true;
     }
 
+    private static class VariableDefinition {
+        final String variableType;
+        final String defaultValue;
+
+        VariableDefinition(String variableType, String defaultValue) {
+            this.variableType = variableType;
+            this.defaultValue = defaultValue != null ? defaultValue : "0";
+        }
+    }
+
     static class JsonData {
         String variableName;
-        String variableType;
-        String defaultValue;
-        boolean isPersistent;
         String operation;
         String operationValue;
         int delay;
 
-        public JsonData(String variableName, String variableType, String defaultValue,
-                        boolean isPersistent, String operation, String operationValue, int delay) {
+        public JsonData(String variableName, String operation, String operationValue, int delay) {
             this.variableName = variableName;
-            this.variableType = variableType;
-            this.defaultValue = defaultValue;
-            this.isPersistent = isPersistent;
             this.operation = operation;
             this.operationValue = operationValue;
             this.delay = delay;

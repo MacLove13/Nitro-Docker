@@ -28,7 +28,8 @@ public enum WiredEffectType {
     BOT_CLOTHES(26),
     BOT_TALK_TO_AVATAR(27),
     GIVE_USER_VARIABLE(28),
-    CHANGE_USER_VARIABLE(29);
+    CHANGE_USER_VARIABLE(29),
+    DEFINE_USER_VARIABLE(30);
 
     public final int code;
 
