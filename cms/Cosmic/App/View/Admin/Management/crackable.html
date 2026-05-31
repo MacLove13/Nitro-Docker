@@ -1,0 +1,89 @@
+{% extends "Admin/base.html" %}
+{% block page %}Crackable management{% endblock %}
+{% block jsfile %}crackable{% endblock %}
+
+{% block body %}
+<div class="row">
+
+    {# List view #}
+    <div class="col-md-12" id="crackableList">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">Gerenciamento de Crackables</h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="kt-portlet__head-actions">
+                            <div class="kt-input-icon kt-input-icon--left">
+                                <input type="text" class="form-control" placeholder="Buscar por nome..." id="crackableSearch">
+                                <span class="kt-input-icon__icon kt-input-icon__icon--left"><span><i class="la la-search"></i></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <div id="kt_datatable_crackable"></div>
+            </div>
+        </div>
+    </div>
+
+    {# Detail view #}
+    <div class="col-md-12" id="crackableDetail" style="display: none;">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title" id="crackableDetailTitle">Detalhes do Crackable</h3>
+                </div>
+                <div class="kt-subheader__wrapper kt-margin-t-10">
+                    <a class="btn btn-clean btn-icon-sm" id="backToList" style="cursor:pointer;">
+                        <i class="la la-long-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+
+                <div class="form-group row kt-margin-b-20">
+                    <label class="col-3 col-form-label">Buscar furni para adicionar</label>
+                    <div class="col-6">
+                        <input type="text" id="furniSearchInput" class="form-control" placeholder="Nome do furni...">
+                    </div>
+                    <div class="col-3">
+                        <button class="btn btn-primary" id="furniSearchBtn"><i class="la la-search"></i> Buscar</button>
+                    </div>
+                </div>
+
+                <div id="furniSearchResults" class="row kt-margin-b-20" style="display:none;">
+                    <div class="col-12">
+                        <div class="kt-portlet kt-portlet--bordered">
+                            <div class="kt-portlet__head"><div class="kt-portlet__head-label"><h4 class="kt-portlet__head-title">Resultados da busca</h4></div></div>
+                            <div class="kt-portlet__body">
+                                <div id="furniSearchList" class="row"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kt-portlet kt-portlet--bordered kt-margin-b-0">
+                    <div class="kt-portlet__head">
+                        <div class="kt-portlet__head-label">
+                            <h4 class="kt-portlet__head-title">Prêmios</h4>
+                        </div>
+                    </div>
+                    <div class="kt-portlet__body">
+                        <div id="prizesList"></div>
+                    </div>
+                </div>
+
+                <div class="kt-margin-t-20">
+                    <button class="btn btn-success" id="savePrizesBtn"><i class="la la-save"></i> Salvar alterações</button>
+                </div>
+
+                <input type="hidden" id="currentCrackableId" aria-label="Current Crackable Item ID">
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
