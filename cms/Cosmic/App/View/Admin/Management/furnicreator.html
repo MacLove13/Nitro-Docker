@@ -1,0 +1,355 @@
+{% extends "Admin/base.html" %}
+{% block page %}Furniture Creator{% endblock %}
+{% block jsfile %}furnicreator{% endblock %}
+{% block body %}
+<div class="row">
+
+    <!-- ===== CREATION FORM ===== -->
+    <div class="col-md-12" id="furniCreatorForm">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        <i class="kt-font-brand flaticon2-plus"></i>
+                    </span>
+                    <h3 class="kt-portlet__head-title">Create New Furni</h3>
+                </div>
+                <div class="kt-subheader__wrapper kt-margin-t-10">
+                    <a class="btn btn-clean btn-icon-sm" id="btnShowList">
+                        <i class="la la-list"></i> View List
+                    </a>
+                </div>
+            </div>
+            <form class="kt-form" id="createFurniForm" method="post" enctype="multipart/form-data">
+                <div class="kt-portlet__body">
+
+                    <div class="kt-section kt-section--first">
+                        <div class="kt-section__title">Basic Info</div>
+                        <div class="kt-section__body">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Public Name <span class="text-danger">*</span></label>
+                                <div class="col-9">
+                                    <input type="text" name="public_name" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Item Type</label>
+                                <div class="col-9">
+                                    <select name="type" class="form-control">
+                                        <option value="s">Floor (s)</option>
+                                        <option value="i">Wall (i)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Dimensions</label>
+                                <div class="col-3">
+                                    <label>Width</label>
+                                    <input type="number" name="width" class="form-control" value="1" min="1" required>
+                                </div>
+                                <div class="col-3">
+                                    <label>Length</label>
+                                    <input type="number" name="length" class="form-control" value="1" min="1" required>
+                                </div>
+                                <div class="col-3">
+                                    <label>Stack Height</label>
+                                    <input type="number" name="stack_height" class="form-control" value="1.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kt-separator kt-separator--dashed"></div>
+                    <div class="kt-section">
+                        <div class="kt-section__title">Permissions</div>
+                        <div class="kt-section__body">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Allow Stack</label>
+                                <div class="col-3">
+                                    <select name="allow_stack" class="form-control">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <label class="col-3 col-form-label">Allow Sit</label>
+                                <div class="col-3">
+                                    <select name="allow_sit" class="form-control">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Allow Lay</label>
+                                <div class="col-3">
+                                    <select name="allow_lay" class="form-control">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <label class="col-3 col-form-label">Allow Walk</label>
+                                <div class="col-3">
+                                    <select name="allow_walk" class="form-control">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Allow Gift</label>
+                                <div class="col-3">
+                                    <select name="allow_gift" class="form-control">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <label class="col-3 col-form-label">Allow Trade</label>
+                                <div class="col-3">
+                                    <select name="allow_trade" class="form-control">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Allow Recycle</label>
+                                <div class="col-3">
+                                    <select name="allow_recycle" class="form-control">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                                <label class="col-3 col-form-label">Allow Marketplace Sell</label>
+                                <div class="col-3">
+                                    <select name="allow_marketplace_sell" class="form-control">
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Allow Inventory Stack</label>
+                                <div class="col-3">
+                                    <select name="allow_inventory_stack" class="form-control">
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kt-separator kt-separator--dashed"></div>
+                    <div class="kt-section">
+                        <div class="kt-section__title">Interaction</div>
+                        <div class="kt-section__body">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Interaction Type</label>
+                                <div class="col-9">
+                                    <select name="interaction_type" class="form-control">
+                                        <option value="default">default</option>
+                                        <option value="adjustable_height">adjustable_height</option>
+                                        <option value="adjustable_height_seat">adjustable_height_seat</option>
+                                        <option value="alert">alert</option>
+                                        <option value="background">background</option>
+                                        <option value="badge">badge</option>
+                                        <option value="badge_display">badge_display</option>
+                                        <option value="ball">ball</option>
+                                        <option value="bed">bed</option>
+                                        <option value="clothing">clothing</option>
+                                        <option value="crackable">crackable</option>
+                                        <option value="dice">dice</option>
+                                        <option value="dimmer">dimmer</option>
+                                        <option value="gate">gate</option>
+                                        <option value="gift">gift</option>
+                                        <option value="group_gate">group_gate</option>
+                                        <option value="lovelock">lovelock</option>
+                                        <option value="onewaygate">onewaygate</option>
+                                        <option value="postit">postit</option>
+                                        <option value="roller">roller</option>
+                                        <option value="teleport">teleport</option>
+                                        <option value="trophy">trophy</option>
+                                        <option value="vendingmachine">vendingmachine</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Interaction Modes Count</label>
+                                <div class="col-9">
+                                    <input type="number" name="interaction_modes_count" class="form-control" value="1" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kt-separator kt-separator--dashed"></div>
+                    <div class="kt-section">
+                        <div class="kt-section__title">Catalog Settings</div>
+                        <div class="kt-section__body">
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Catalog Page</label>
+                                <div class="col-9">
+                                    <select name="page_id" id="furniPageSelect" class="form-control" required></select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label">Catalog Name</label>
+                                <div class="col-9">
+                                    <input type="text" name="catalog_name" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label"></label>
+                                <div class="col-2">
+                                    <label>Credits</label>
+                                    <input type="number" name="cost_credits" class="form-control" value="0" min="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>Points</label>
+                                    <input type="number" name="cost_points" class="form-control" value="0" min="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>Point Type</label>
+                                    <input type="number" name="points_type" class="form-control" value="0" min="0">
+                                </div>
+                                <div class="col-2">
+                                    <label>Amount</label>
+                                    <input type="number" name="amount" class="form-control" value="1" min="1">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-3 col-form-label"></label>
+                                <div class="col-3">
+                                    <label>Limited Sells</label>
+                                    <input type="number" name="limited_sells" class="form-control" value="0" min="0">
+                                </div>
+                                <div class="col-3">
+                                    <label>Limited Stack</label>
+                                    <input type="number" name="limited_stack" class="form-control" value="0" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kt-separator kt-separator--dashed"></div>
+                    <div class="kt-section">
+                        <div class="kt-section__title">Rotation Images (PNG / GIF)</div>
+                        <p class="text-muted kt-margin-b-10">
+                            Upload images for each rotation direction.
+                            Use GIFs to include frame-by-frame animations.
+                            Directions: 0 = North, 2 = East, 4 = South, 6 = West (and diagonals 1/3/5/7).
+                        </p>
+                        <div class="kt-section__body">
+                            <div class="row" id="rotationUploads">
+                                {% for rot in [0,1,2,3,4,5,6,7] %}
+                                <div class="col-md-3 kt-margin-b-20">
+                                    <div class="kt-portlet kt-portlet--bordered">
+                                        <div class="kt-portlet__head kt-portlet__head--sm">
+                                            <div class="kt-portlet__head-label">
+                                                <span class="kt-portlet__head-title">Rotation {{ rot }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="kt-portlet__body">
+                                            <input type="file" name="rotation_{{ rot }}" accept="image/png,image/gif"
+                                                   class="rotation-upload" data-rotation="{{ rot }}">
+                                            <img src="#" class="rotation-preview img-fluid kt-margin-t-10"
+                                                 style="display:none;max-height:80px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="kt-portlet__foot kt-portlet__foot--solid">
+                    <div class="kt-form__actions">
+                        <button type="submit" class="btn btn-primary" id="btnCreateFurni">
+                            <i class="la la-plus"></i> Create Furni
+                        </button>
+                        <button type="button" class="btn btn-secondary kt-margin-l-10" id="btnShowList2">
+                            <i class="la la-list"></i> View List
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== ITEM LIST ===== -->
+    <div class="col-md-12" id="furniCreatorList" style="display:none;">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        <i class="kt-font-brand flaticon-bag"></i>
+                    </span>
+                    <h3 class="kt-portlet__head-title">Custom Furnis</h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <button class="btn btn-primary btn-sm" id="btnShowCreate">
+                        <i class="la la-plus"></i> New Furni
+                    </button>
+                    &nbsp;
+                    <button class="btn btn-secondary btn-sm" id="btnReloadList">
+                        <i class="la la-refresh"></i> Reload
+                    </button>
+                </div>
+            </div>
+            <div class="kt-portlet__body kt-portlet__body--fit">
+                <div id="kt_datatable_furni_list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ITEM DETAIL / PREVIEW ===== -->
+    <div class="col-md-12" id="furniCreatorDetail" style="display:none;">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title" id="detailTitle">Furni Detail</h3>
+                </div>
+                <div class="kt-subheader__wrapper kt-margin-t-10">
+                    <a class="btn btn-clean btn-icon-sm" id="btnBackToList">
+                        <i class="la la-long-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tbody id="detailTable"></tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="nitroPreviewContainer" style="display:none;">
+                            <h5>Nitro Asset Preview</h5>
+                            <div id="nitroPreview" style="border:1px solid #ddd;padding:10px;min-height:100px;background:#f7f7f7;">
+                                <p class="text-muted" id="previewPlaceholder">Asset preview will appear here once generated.</p>
+                                <div id="rotationImages" class="d-flex flex-wrap"></div>
+                            </div>
+                        </div>
+                        <div id="processingIndicator" style="display:none;">
+                            <div class="kt-spinner kt-spinner--sm kt-spinner--brand kt-margin-r-10"></div>
+                            Processing… Please wait.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kt-portlet__foot kt-portlet__foot--solid">
+                <div class="kt-form__actions">
+                    <button type="button" class="btn btn-success" id="btnAddToGame" style="display:none;">
+                        <i class="la la-check"></i> Add to Game
+                    </button>
+                    <button type="button" class="btn btn-danger kt-margin-l-10" id="btnDeleteItem">
+                        <i class="la la-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

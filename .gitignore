@@ -7,3 +7,5 @@ client-tests/test-results/
 client-tests/screenshots/*.png
 client-tests/screenshots/*.jpg
 client-tests/screenshots/*.jpeg
+furni-generator/__pycache__/
+furni-generator/*.pyc

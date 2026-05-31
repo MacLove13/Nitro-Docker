@@ -7,6 +7,7 @@ volumes:
   volume-nitro-converter-node-modules:
   volume-nitro-react-node-modules:
   volume-cms-vendor:
+  volume-furni-uploads:
 
 services:
   arcturus:
@@ -66,12 +67,37 @@ services:
       - ./cms/Cosmic:/var/www/html
       - ./cms/Database:/database
       - volume-cms-vendor:/var/www/html/vendor
+      - volume-furni-uploads:/var/www/html/public/uploads/furni_creator
     ports:
       - 8082:80
     depends_on:
       - mysql
       - arcturus
       - nitro
+    networks:
+      nitro:
+
+  furni-generator:
+    container_name: furni-generator
+    build:
+      context: furni-generator
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=arcturus
+      - DB_USER=arcturus_user
+      - DB_PASS=arcturus_pw
+      - UPLOADS_DIR=/uploads
+      - NITRO_ASSETS_DIR=/nitro-assets
+      - POLL_INTERVAL=5
+      - PORT=5000
+    volumes:
+      - volume-furni-uploads:/uploads
+      - ./nitro/nitro-assets:/nitro-assets
+    ports:
+      - 5010:5000
+    depends_on:
+      - mysql
     networks:
       nitro:
 
