@@ -48,6 +48,12 @@
               <i class="kt-menu__link-icon flaticon-technology-2"></i><span class="kt-menu__link-text">Crackable control</span></a>
           </li>
           {% endif %}
+          {% if 'housekeeping_auto_update' in permissions or 'housekeeping_tools' in permissions %}
+          <li class="kt-menu__item ajaxLoading" aria-haspopup="true" >
+              <a  href="/housekeeping/autoUpdate/manage" class="kt-menu__link ">
+              <i class="kt-menu__link-icon flaticon2-reload"></i><span class="kt-menu__link-text">Auto Update</span></a>
+          </li>
+          {% endif %}
           {% if 'housekeeping_room_control' in permissions or 'housekeeping_tools' in permissions %}
           <li class="kt-menu__item ajaxLoading" aria-haspopup="true" >
               <a  href="/housekeeping/rooms/manage" class="kt-menu__link ">

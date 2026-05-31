@@ -1,0 +1,221 @@
+{% extends "Admin/base.html" %}
+{% block page %}Auto Update{% endblock %}
+{% block jsfile %}autoupdate{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="kt-portlet">
+            <div class="kt-portlet__head">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        <i class="kt-font-brand flaticon2-reload"></i>
+                    </span>
+                    <h3 class="kt-portlet__head-title">Auto Update – Habbo COM Assets</h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <button class="btn btn-sm btn-outline-brand" id="btnForceScrape">
+                        <i class="la la-refresh"></i> Buscar novos agora
+                    </button>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs kt-margin-b-20" id="autoUpdateTabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="tab-packs" data-toggle="tab" href="#pane-packs" role="tab">
+                            <i class="la la-archive"></i> SWF Packs
+                            <span class="kt-badge kt-badge--brand kt-badge--inline kt-badge--pill" id="badge-packs">–</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tab-furniture" data-toggle="tab" href="#pane-furniture" role="tab">
+                            <i class="la la-couch"></i> Mobílias
+                            <span class="kt-badge kt-badge--warning kt-badge--inline kt-badge--pill" id="badge-furniture">–</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tab-effects" data-toggle="tab" href="#pane-effects" role="tab">
+                            <i class="la la-magic"></i> Effects
+                            <span class="kt-badge kt-badge--success kt-badge--inline kt-badge--pill" id="badge-effects">–</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="tab-logs" data-toggle="tab" href="#pane-logs" role="tab">
+                            <i class="la la-list-alt"></i> Logs Diários
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <!-- ===== SWF PACKS ===== -->
+                    <div class="tab-pane fade show active" id="pane-packs" role="tabpanel">
+
+                        <!-- Filter -->
+                        <div class="form-group row kt-margin-b-10">
+                            <div class="col-md-3">
+                                <select class="form-control form-control-sm" id="filterPackStatus">
+                                    <option value="">Todos os status</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="processing">Processando</option>
+                                    <option value="done">Concluído</option>
+                                    <option value="error">Erro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="tblPacks">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Revision Name</th>
+                                        <th>Status</th>
+                                        <th>Arquivos Adicionados</th>
+                                        <th>Data</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblPacksBody">
+                                    <tr><td colspan="6" class="text-center">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginationPacks" class="kt-margin-t-10"></div>
+                    </div>
+
+                    <!-- ===== FURNITURE ===== -->
+                    <div class="tab-pane fade" id="pane-furniture" role="tabpanel">
+
+                        <div class="form-group row kt-margin-b-10">
+                            <div class="col-md-3">
+                                <select class="form-control form-control-sm" id="filterFurniStatus">
+                                    <option value="">Todos os status</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="processing">Processando</option>
+                                    <option value="done">Concluído</option>
+                                    <option value="error">Erro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="tblFurniture">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Class Name</th>
+                                        <th>Revisão</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblFurniBody">
+                                    <tr><td colspan="6" class="text-center">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginationFurni" class="kt-margin-t-10"></div>
+                    </div>
+
+                    <!-- ===== EFFECTS ===== -->
+                    <div class="tab-pane fade" id="pane-effects" role="tabpanel">
+
+                        <div class="form-group row kt-margin-b-10">
+                            <div class="col-md-3">
+                                <select class="form-control form-control-sm" id="filterEffectStatus">
+                                    <option value="">Todos os status</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="processing">Processando</option>
+                                    <option value="done">Concluído</option>
+                                    <option value="error">Erro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="tblEffects">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Effect Name</th>
+                                        <th>Revisão</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblEffectsBody">
+                                    <tr><td colspan="6" class="text-center">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="paginationEffects" class="kt-margin-t-10"></div>
+                    </div>
+
+                    <!-- ===== LOGS ===== -->
+                    <div class="tab-pane fade" id="pane-logs" role="tabpanel">
+
+                        <div class="form-group row kt-margin-b-10">
+                            <div class="col-md-3">
+                                <select class="form-control form-control-sm" id="filterLogCategory">
+                                    <option value="">Todas as categorias</option>
+                                    <option value="packs">Packs</option>
+                                    <option value="furniture">Mobílias</option>
+                                    <option value="effects">Effects</option>
+                                    <option value="system">Sistema</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control form-control-sm" id="filterLogDate" placeholder="Filtrar por data">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-sm btn-primary" id="btnFilterLogs">
+                                    <i class="la la-filter"></i> Filtrar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm" id="tblLogs">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Categoria</th>
+                                        <th>Mensagem</th>
+                                        <th>Hora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblLogsBody">
+                                    <tr><td colspan="4" class="text-center">Carregando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>{# /tab-content #}
+            </div>{# /portlet body #}
+        </div>{# /portlet #}
+    </div>
+</div>
+
+<!-- Error modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger"><i class="la la-warning"></i> Detalhes do Erro</h5>
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <pre id="errorModalText" style="white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto;font-size:12px;"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

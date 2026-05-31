@@ -968,4 +968,74 @@ class Admin
 
         return QueryBuilder::table('catalog_items')->insert($catalogData);
     }
+
+    /*
+     * Auto Update queries
+     */
+
+    public static function getAutoUpdatePacks($status = null, $page = 1, $perPage = 50)
+    {
+        $q = QueryBuilder::table('auto_update_swf_packs')->orderBy('id', 'desc')->limit($perPage)->offset(($page - 1) * $perPage);
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->get();
+    }
+
+    public static function countAutoUpdatePacks($status = null)
+    {
+        $q = QueryBuilder::table('auto_update_swf_packs');
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->count();
+    }
+
+    public static function getAutoUpdateFurniture($status = null, $page = 1, $perPage = 50)
+    {
+        $q = QueryBuilder::table('auto_update_furniture')->orderBy('id', 'desc')->limit($perPage)->offset(($page - 1) * $perPage);
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->get();
+    }
+
+    public static function countAutoUpdateFurniture($status = null)
+    {
+        $q = QueryBuilder::table('auto_update_furniture');
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->count();
+    }
+
+    public static function getAutoUpdateEffects($status = null, $page = 1, $perPage = 50)
+    {
+        $q = QueryBuilder::table('auto_update_effects')->orderBy('id', 'desc')->limit($perPage)->offset(($page - 1) * $perPage);
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->get();
+    }
+
+    public static function countAutoUpdateEffects($status = null)
+    {
+        $q = QueryBuilder::table('auto_update_effects');
+        if ($status !== null) {
+            $q = $q->where('status', $status);
+        }
+        return $q->count();
+    }
+
+    public static function getAutoUpdateLogs($limit = 200, $category = null, $logDate = null)
+    {
+        $q = QueryBuilder::table('auto_update_logs')->orderBy('id', 'desc')->limit($limit);
+        if ($category !== null) {
+            $q = $q->where('category', $category);
+        }
+        if ($logDate !== null) {
+            $q = $q->where('log_date', $logDate);
+        }
+        return $q->get();
+    }
 }
