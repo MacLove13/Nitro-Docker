@@ -1,73 +1,78 @@
 import { FC, DragEvent, useRef, useState } from 'react';
-import { LocalizeText } from '../../../../../api';
+import { GetDiskColor, GetNitroInstance, LocalizeText } from '../../../../../api';
 import { NitroCardContentView, NitroCardHeaderView, NitroCardView } from '../../../../../common';
-import { useFurnitureSoundMachineWidget, playSamplePreview, TRAX_TRACKS, TRAX_STEPS, TRAX_MAX_CARTRIDGES } from '../../../../../hooks';
+import { buildTrackCode, playSamplePreview, TRAX_MAX_CARTRIDGES, TRAX_STEPS, TRAX_TRACKS, useFurnitureSoundMachineWidget } from '../../../../../hooks';
 
-const STEP_COLORS = [
-    '#e74c3c', '#3498db', '#2ecc71', '#f39c12',
-    '#9b59b6', '#1abc9c', '#e67e22', '#e91e63',
-    '#00bcd4', '#8bc34a', '#ff5722', '#607d8b',
-    '#795548', '#9c27b0', '#03a9f4', '#cddc39'
+// Habbo classic 3x3 pad colours (indexed 0–8, left-to-right, top-to-bottom)
+const PAD_COLORS: string[] = [
+    '#f0a028', '#f0a028', '#d4b020',
+    '#72b040', '#f0a028', '#72b040',
+    '#72b040', '#f0a028', '#72b040',
 ];
 
-const getSampleColor = (sampleId: number): string =>
-    STEP_COLORS[sampleId % STEP_COLORS.length];
+const DISCS_PER_PAGE = 3;
 
-interface PadProps {
-    sampleId: number;
+// ── Pad button ──────────────────────────────────────────────────────────────
+interface TraxPadProps {
+    color: string | null;
+    sampleId: number | null;
     onHoverStart: (id: number) => void;
-    onHoverEnd: (id: number) => void;
+    onHoverEnd: () => void;
     onDragStart: (e: DragEvent<HTMLDivElement>, id: number) => void;
 }
 
-const Pad: FC<PadProps> = ({ sampleId, onHoverStart, onHoverEnd, onDragStart }) => (
+const TraxPad: FC<TraxPadProps> = ({ color, sampleId, onHoverStart, onHoverEnd, onDragStart }) => (
     <div
-        className="trax-pad"
-        style={{ background: getSampleColor(sampleId) }}
-        draggable
-        onMouseEnter={ () => onHoverStart(sampleId) }
-        onMouseLeave={ () => onHoverEnd(sampleId) }
-        onDragStart={ e => onDragStart(e, sampleId) }
-        title={ `Sample ${sampleId}` }
-    >
-        <span className="trax-pad-label">{ sampleId }</span>
-    </div>
+        className={ `trax-pad${ color ? ' loaded' : ' empty' }` }
+        style={ color ? { background: color } : undefined }
+        draggable={ color !== null && sampleId !== null }
+        onMouseEnter={ () => { if (sampleId !== null) onHoverStart(sampleId); } }
+        onMouseLeave={ onHoverEnd }
+        onDragStart={ e => { if (sampleId !== null) onDragStart(e, sampleId); } }
+    />
 );
 
-interface CartridgeProps {
-    diskId: number;
+// ── Cartridge slot ──────────────────────────────────────────────────────────
+interface CartridgeSlotProps {
+    diskId: number | undefined;
     samples: number[];
     songName: string;
-    isSelected: boolean;
-    onToggle: () => void;
+    onRemove: () => void;
     onHoverStart: (id: number) => void;
-    onHoverEnd: (id: number) => void;
+    onHoverEnd: () => void;
     onDragStart: (e: DragEvent<HTMLDivElement>, id: number) => void;
 }
 
-const CartridgeView: FC<CartridgeProps> = ({ diskId, samples, songName, isSelected, onToggle, onHoverStart, onHoverEnd, onDragStart }) => (
-    <div className={ `trax-cartridge ${ isSelected ? 'selected' : '' }` } onClick={ onToggle }>
-        <div className="trax-cartridge-header">{ songName }</div>
-        { isSelected && (
-            <div className="trax-pads-grid">
-                { samples.slice(0, 9).map((sid, i) => (
-                    <Pad
+const CartridgeSlot: FC<CartridgeSlotProps> = ({ diskId, samples, songName, onRemove, onHoverStart, onHoverEnd, onDragStart }) =>
+{
+    const loaded = diskId !== undefined;
+
+    return (
+        <div className={ `trax-cartridge${ loaded ? ' loaded' : ' empty' }` }>
+            <div className="trax-cartridge-name" title={ loaded ? songName : '' }>
+                { loaded ? songName : '' }
+            </div>
+            <div className="trax-cartridge-pads">
+                { Array.from({ length: 9 }).map((_, i) => (
+                    <TraxPad
                         key={ i }
-                        sampleId={ sid }
+                        color={ loaded ? PAD_COLORS[i] : null }
+                        sampleId={ loaded ? (samples[i] ?? null) : null }
                         onHoverStart={ onHoverStart }
                         onHoverEnd={ onHoverEnd }
                         onDragStart={ onDragStart }
                     />
                 )) }
-                { Array.from({ length: Math.max(0, 9 - samples.slice(0, 9).length) }).map((_, i) => (
-                    <div key={ `empty-${i}` } className="trax-pad trax-pad-empty" />
-                )) }
             </div>
-        ) }
-    </div>
-);
+            { loaded && (
+                <button className="trax-cartridge-eject" onClick={ onRemove } title="Eject">✕</button>
+            ) }
+        </div>
+    );
+};
 
-interface TimelineCellProps {
+// ── Sequencer cell ──────────────────────────────────────────────────────────
+interface SeqCellProps {
     track: number;
     step: number;
     sampleId: number | null;
@@ -75,131 +80,135 @@ interface TimelineCellProps {
     onClear: (track: number, step: number) => void;
 }
 
-const TimelineCell: FC<TimelineCellProps> = ({ track, step, sampleId, onDrop, onClear }) => {
-    const [ dragOver, setDragOver ] = useState(false);
-
-    const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setDragOver(true);
-    };
-
-    const handleDragLeave = () => setDragOver(false);
-
-    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        setDragOver(false);
-        const id = parseInt(e.dataTransfer.getData('sampleId'), 10);
-        if (!isNaN(id)) onDrop(track, step, id);
-    };
+const SeqCell: FC<SeqCellProps> = ({ track, step, sampleId, onDrop, onClear }) =>
+{
+    const [ over, setOver ] = useState(false);
 
     return (
         <div
-            className={ `trax-cell ${ sampleId !== null ? 'filled' : '' } ${ dragOver ? 'drag-over' : '' }` }
-            style={ sampleId !== null ? { background: getSampleColor(sampleId) } : undefined }
-            onDragOver={ handleDragOver }
-            onDragLeave={ handleDragLeave }
-            onDrop={ handleDrop }
+            className={ `trax-seq-cell${ sampleId !== null ? ' filled' : '' }${ over ? ' over' : '' }` }
+            style={ sampleId !== null ? { background: PAD_COLORS[sampleId % PAD_COLORS.length] } : undefined }
+            onDragOver={ e => { e.preventDefault(); setOver(true); } }
+            onDragLeave={ () => setOver(false) }
+            onDrop={ e => {
+                e.preventDefault();
+                setOver(false);
+                const id = parseInt(e.dataTransfer.getData('sampleId'), 10);
+                if (!isNaN(id)) onDrop(track, step, id);
+            } }
             onClick={ () => sampleId !== null && onClear(track, step) }
-            title={ sampleId !== null ? `Sample ${sampleId} (click to remove)` : undefined }
         />
     );
 };
 
+// ── Main widget ─────────────────────────────────────────────────────────────
 export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
 {
     const {
-        objectId,
-        isOpen,
-        diskInventory,
-        selectedDiskIds,
-        timeline,
-        trackName,
-        isPlaying,
-        onClose,
-        toggleDisk,
-        getSamplesForDisk,
-        dropSampleOnStep,
-        clearStep,
-        clearTimeline,
-        saveSong,
-        previewPlay,
-        stopPreview,
-        setTrackName,
-        getSongName
+        objectId, isOpen, diskInventory, selectedDiskIds,
+        timeline, trackName, isPlaying,
+        onClose, toggleDisk, getSamplesForDisk,
+        dropSampleOnStep, clearStep, clearTimeline,
+        saveSong, previewPlay, stopPreview, setTrackName, getSongName,
     } = useFurnitureSoundMachineWidget();
 
+    const [ discPage, setDiscPage ] = useState(0);
+    const [ isLoopEnabled, setIsLoopEnabled ] = useState(false);
     const stopSampleRef = useRef<(() => void) | null>(null);
 
     if (!isOpen || objectId === -1) return null;
 
     const diskIds: number[] = diskInventory?.getKeys() ?? [];
+    const totalPages = Math.max(1, Math.ceil(diskIds.length / DISCS_PER_PAGE));
+    const pageDiskIds = diskIds.slice(discPage * DISCS_PER_PAGE, (discPage + 1) * DISCS_PER_PAGE);
 
-    const handlePadHoverStart = (sampleId: number) => {
+    const handlePadHoverStart = (sampleId: number) =>
+    {
         if (stopSampleRef.current) stopSampleRef.current();
         stopSampleRef.current = playSamplePreview(sampleId);
     };
 
-    const handlePadHoverEnd = (_sampleId: number) => {
-        if (stopSampleRef.current) {
-            stopSampleRef.current();
-            stopSampleRef.current = null;
-        }
+    const handlePadHoverEnd = () =>
+    {
+        if (stopSampleRef.current) { stopSampleRef.current(); stopSampleRef.current = null; }
     };
 
-    const handleDragStart = (e: DragEvent<HTMLDivElement>, sampleId: number) => {
+    const handleDragStart = (e: DragEvent<HTMLDivElement>, sampleId: number) =>
+    {
         e.dataTransfer.setData('sampleId', String(sampleId));
         e.dataTransfer.effectAllowed = 'copy';
     };
 
+    const getDiskIconColor = (diskId: number): string =>
+    {
+        const ctrl = (GetNitroInstance().soundManager as any)?.musicController;
+        if (!ctrl) return '#4a6a80';
+        const songId = diskInventory.getValue(diskId) as number | undefined;
+        if (songId === undefined || songId === null) return '#4a6a80';
+        const info = ctrl.getSongInfo(songId);
+        return info?.songData ? GetDiskColor(info.songData) : '#4a6a80';
+    };
+
+    const habboCode = buildTrackCode(timeline);
+
     return (
-        <NitroCardView className="nitro-sound-machine-widget" theme="primary-slim" style={{ width: 700, minHeight: 420 }}>
-            <NitroCardHeaderView headerText={ LocalizeText('soundmachine.title') || 'Trax Machine' } onCloseClick={ onClose } />
-            <NitroCardContentView>
-                <div className="trax-editor">
-                    {/* Left: disc inventory list */}
-                    <div className="trax-discs">
-                        <div className="trax-section-title">{ LocalizeText('soundmachine.discs') || 'Discs' }</div>
+        <NitroCardView className="nitro-sound-machine-widget" theme="primary-slim" style={{ width: 600 }}>
+            <NitroCardHeaderView headerText={ LocalizeText('soundmachine.title') || 'Trax Editor' } onCloseClick={ onClose } />
+            <NitroCardContentView overflow="hidden">
+                <div className="trax-layout">
+
+                    {/* ── Left panel: disc inventory ───────────────────── */}
+                    <div className="trax-left">
                         <div className="trax-disc-list">
-                            { diskIds.length === 0 && (
-                                <div className="trax-empty">{ LocalizeText('soundmachine.no.discs') || 'No discs in inventory' }</div>
+                            { pageDiskIds.length === 0 && (
+                                <div className="trax-no-discs">{ LocalizeText('soundmachine.no.discs') || 'No discs' }</div>
                             ) }
-                            { diskIds.map(diskId => {
-                                const isSelected = selectedDiskIds.includes(diskId);
+                            { pageDiskIds.map(diskId =>
+                            {
+                                const selected = selectedDiskIds.includes(diskId);
                                 return (
                                     <div
                                         key={ diskId }
-                                        className={ `trax-disc-item ${ isSelected ? 'selected' : '' }` }
+                                        className={ `trax-disc-item${ selected ? ' selected' : '' }` }
                                         onClick={ () => toggleDisk(diskId) }
                                     >
-                                        <div className="trax-disc-name">{ getSongName(diskId) }</div>
-                                        { isSelected && <span className="trax-disc-slot">{ (selectedDiskIds.indexOf(diskId) + 1) }</span> }
+                                        <div className="trax-disc-thumb" style={{ background: getDiskIconColor(diskId) }} />
+                                        <span className="trax-disc-name">{ getSongName(diskId) }</span>
                                     </div>
                                 );
                             }) }
                         </div>
+                        <div className="trax-disc-nav">
+                            <span className="trax-nav-disc-icon" />
+                            <button
+                                className="trax-nav-btn"
+                                disabled={ discPage === 0 }
+                                onClick={ () => setDiscPage(p => Math.max(0, p - 1)) }
+                            >{'<'}</button>
+                            <span className="trax-nav-page">{ discPage + 1 }/{ totalPages }</span>
+                            <button
+                                className="trax-nav-btn"
+                                disabled={ discPage >= totalPages - 1 }
+                                onClick={ () => setDiscPage(p => Math.min(totalPages - 1, p + 1)) }
+                            >{'>'}</button>
+                        </div>
                     </div>
 
-                    {/* Center: cartridges + sequencer */}
+                    {/* ── Main area ────────────────────────────────────── */}
                     <div className="trax-main">
-                        {/* Cartridge row */}
-                        <div className="trax-cartridges">
-                            { Array.from({ length: TRAX_MAX_CARTRIDGES }).map((_, i) => {
+
+                        {/* Cartridge slots */}
+                        <div className="trax-cartridge-row">
+                            { Array.from({ length: TRAX_MAX_CARTRIDGES }).map((_, i) =>
+                            {
                                 const diskId = selectedDiskIds[i];
-                                if (diskId === undefined) {
-                                    return (
-                                        <div key={ i } className="trax-cartridge empty">
-                                            <div className="trax-cartridge-header">–</div>
-                                        </div>
-                                    );
-                                }
                                 return (
-                                    <CartridgeView
-                                        key={ diskId }
+                                    <CartridgeSlot
+                                        key={ i }
                                         diskId={ diskId }
-                                        samples={ getSamplesForDisk(diskId) }
-                                        songName={ getSongName(diskId) }
-                                        isSelected={ true }
-                                        onToggle={ () => toggleDisk(diskId) }
+                                        samples={ diskId !== undefined ? getSamplesForDisk(diskId) : [] }
+                                        songName={ diskId !== undefined ? getSongName(diskId) : '' }
+                                        onRemove={ () => diskId !== undefined && toggleDisk(diskId) }
                                         onHoverStart={ handlePadHoverStart }
                                         onHoverEnd={ handlePadHoverEnd }
                                         onDragStart={ handleDragStart }
@@ -208,48 +217,88 @@ export const FurnitureSoundMachineWidgetView: FC<{}> = () =>
                             }) }
                         </div>
 
-                        {/* Sequencer */}
-                        <div className="trax-sequencer">
-                            { Array.from({ length: TRAX_TRACKS }).map((_, track) => (
-                                <div key={ track } className="trax-track">
-                                    <div className="trax-track-label">{ track + 1 }</div>
-                                    { Array.from({ length: TRAX_STEPS }).map((_, step) => (
-                                        <TimelineCell
-                                            key={ step }
-                                            track={ track }
-                                            step={ step }
-                                            sampleId={ timeline[track][step] }
-                                            onDrop={ dropSampleOnStep }
-                                            onClear={ clearStep }
-                                        />
-                                    )) }
-                                </div>
-                            )) }
+                        {/* Transport controls */}
+                        <div className="trax-transport">
+                            <button
+                                className={ `trax-tbt play${ isPlaying ? ' active' : '' }` }
+                                onClick={ isPlaying ? stopPreview : previewPlay }
+                                title={ isPlaying ? 'Stop' : 'Play' }
+                            />
+                            <button className="trax-tbt stop" onClick={ stopPreview } title="Stop" />
+                            <button
+                                className={ `trax-tbt loop${ isLoopEnabled ? ' active' : '' }` }
+                                title={ isLoopEnabled ? 'Disable loop' : 'Enable loop' }
+                                onClick={ () => setIsLoopEnabled(prev => !prev) }
+                            />
+                            <button className="trax-tbt rec" title="Record (not available)" disabled />
+                            <button className="trax-tbt clear" onClick={ clearTimeline } title="Clear timeline" />
+                            <button
+                                className="trax-tbt nav-prev"
+                                title="Previous page"
+                                disabled={ discPage === 0 }
+                                onClick={ () => setDiscPage(p => Math.max(0, p - 1)) }
+                            />
+                            <button
+                                className="trax-tbt nav-next"
+                                title="Next page"
+                                disabled={ discPage >= totalPages - 1 }
+                                onClick={ () => setDiscPage(p => Math.min(totalPages - 1, p + 1)) }
+                            />
                         </div>
 
-                        {/* Controls */}
-                        <div className="trax-controls">
+                        {/* Sequencer grid */}
+                        <div className="trax-sequencer">
+                            { Array.from({ length: TRAX_TRACKS }).map((_, track) => (
+                                <div key={ track } className="trax-seq-row">
+                                    <div className="trax-seq-num">{ track + 1 }</div>
+                                    <div className="trax-seq-cells">
+                                        { Array.from({ length: TRAX_STEPS }).map((_, step) => (
+                                            <SeqCell
+                                                key={ step }
+                                                track={ track }
+                                                step={ step }
+                                                sampleId={ timeline[track][step] }
+                                                onDrop={ dropSampleOnStep }
+                                                onClear={ clearStep }
+                                            />
+                                        )) }
+                                    </div>
+                                </div>
+                            )) }
+                            <div className="trax-time-axis">
+                                <div className="trax-time-pad" />
+                                { ['0:10', '0:20', '0:30', '0:40'].map(t => (
+                                    <div key={ t } className="trax-time-tick">{ t }</div>
+                                )) }
+                            </div>
+                        </div>
+
+                        {/* Output format + track name/save */}
+                        <div className="trax-output">
+                            <div className="trax-output-label">
+                                { LocalizeText('soundmachine.format') || 'Music in Habbo format' }
+                            </div>
+                            <div className="trax-output-row">
+                                <input
+                                    className="trax-track-name"
+                                    type="text"
+                                    placeholder={ LocalizeText('soundmachine.track.name') || 'Track name…' }
+                                    value={ trackName }
+                                    maxLength={ 64 }
+                                    onChange={ e => setTrackName(e.target.value) }
+                                />
+                                <button
+                                    className="trax-save-btn"
+                                    disabled={ !trackName.trim() }
+                                    onClick={ saveSong }
+                                >{ LocalizeText('generic.save') || 'Save' }</button>
+                            </div>
                             <input
-                                className="trax-name-input"
+                                className="trax-habbo-code"
                                 type="text"
-                                placeholder={ LocalizeText('soundmachine.track.name') || 'Track name...' }
-                                value={ trackName }
-                                maxLength={ 64 }
-                                onChange={ e => setTrackName(e.target.value) }
+                                readOnly
+                                value={ habboCode }
                             />
-                            <button className="btn btn-sm btn-success" onClick={ isPlaying ? stopPreview : previewPlay }>
-                                { isPlaying ? '⏹' : '▶' }
-                            </button>
-                            <button className="btn btn-sm btn-secondary" onClick={ clearTimeline }>
-                                { LocalizeText('generic.clear') || 'Clear' }
-                            </button>
-                            <button
-                                className="btn btn-sm btn-primary"
-                                disabled={ !trackName.trim() }
-                                onClick={ saveSong }
-                            >
-                                { LocalizeText('generic.save') || 'Save' }
-                            </button>
                         </div>
                     </div>
                 </div>

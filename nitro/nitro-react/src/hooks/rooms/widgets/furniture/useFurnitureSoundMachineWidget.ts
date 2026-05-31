@@ -29,7 +29,7 @@ class SaveTraxSongComposer {
     dispose() {}
 }
 
-const buildTrackCode = (timeline: TraxTimeline): string => {
+export const buildTrackCode = (timeline: TraxTimeline): string => {
     const parts: string[] = [];
     for (let ch = 0; ch < TRAX_TRACKS; ch++) {
         const items = timeline[ch];

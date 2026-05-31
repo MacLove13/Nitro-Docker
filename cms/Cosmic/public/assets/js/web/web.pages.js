@@ -695,6 +695,46 @@ function WebPageProfileInterface(main_page) {
             '  </div>' +
             '</div>';
 
+        // ── Unsaved-sticker tracking (catalogue_id → count placed but not saved) ──
+        var _unsavedStickers = {};
+
+        function _markUnsaved(catalogueId, delta) {
+            var id = String(catalogueId);
+            _unsavedStickers[id] = (_unsavedStickers[id] || 0) + delta;
+            if (_unsavedStickers[id] <= 0) delete _unsavedStickers[id];
+            _syncBeforeUnload();
+        }
+
+        function _hasUnsaved() {
+            return Object.keys(_unsavedStickers).length > 0;
+        }
+
+        function _clearUnsaved() {
+            _unsavedStickers = {};
+            $(window).off('beforeunload.profileUnsaved');
+        }
+
+        function _syncBeforeUnload() {
+            $(window).off('beforeunload.profileUnsaved');
+            if (_hasUnsaved()) {
+                $(window).on('beforeunload.profileUnsaved', function (e) {
+                    // Attempt to restore inventory server-side before the page unloads.
+                    var items = [];
+                    Object.keys(_unsavedStickers).forEach(function (k) {
+                        items.push({ catalogue_id: parseInt(k, 10), quantity: _unsavedStickers[k] });
+                    });
+                    var formData = new FormData();
+                    formData.append('items', JSON.stringify(items));
+                    formData.append('csrftoken', csrftoken);
+                    navigator.sendBeacon('/home/profile/restoreUnsaved', formData);
+
+                    var msg = 'Você tem stickers não salvos. Deseja sair sem salvar? Os stickers serão devolvidos ao seu inventário.';
+                    e.returnValue = msg;
+                    return msg;
+                });
+            }
+        }
+
         // ── Helper: create and place one sticker widget on the page ─────────────
         var _stickerWidgetCounter = 0;
         function createStickerWidget(catalogueId, stickerData) {
@@ -719,6 +759,9 @@ function WebPageProfileInterface(main_page) {
                 '  <img src="' + imgPath + '">' +
                 '</div>'
             );
+
+            // Track this sticker as unsaved
+            _markUnsaved(catalogueId, 1);
 
             $('.page-content').append($widget);
             $widget.draggable({
@@ -745,6 +788,8 @@ function WebPageProfileInterface(main_page) {
                 }, function(res) {
                     if (res.status === 'success') {
                         $widget.remove();
+                        // This unsaved sticker has been explicitly removed — no longer unsaved
+                        _markUnsaved(catId, -1);
                         // Update quantity badge in inventory if modal still open
                         var $invWrap = $('#inventoryModal .inv-item-img[data-id="' + catId + '"]').closest('.inv-item-wrap');
                         if ($invWrap.length) {
@@ -1128,7 +1173,10 @@ function WebPageProfileInterface(main_page) {
                 background: $(".page-content").attr('data-background'),
                 csrftoken: csrftoken
             });
-            
+
+            // Clear unsaved state — stickers are now persisted
+            _clearUnsaved();
+
             // Disable drag and drop after saving
             $('.widget').draggable('destroy');
         });
