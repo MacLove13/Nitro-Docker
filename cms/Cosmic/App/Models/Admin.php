@@ -898,4 +898,70 @@ class Admin
     {
         return QueryBuilder::table('website_badge_requests')->where('id', $id)->update(array('status' => $status));
     }
+
+    /*
+     * Furni Creator queries (furnis_custom table)
+     */
+
+    public static function createCustomFurni(array $data)
+    {
+        return QueryBuilder::table('furnis_custom')->insertGetId($data);
+    }
+
+    public static function getCustomFurnis()
+    {
+        return QueryBuilder::table('furnis_custom')->orderBy('id', 'desc')->get();
+    }
+
+    public static function getCustomFurniById($id)
+    {
+        return QueryBuilder::table('furnis_custom')->find($id);
+    }
+
+    public static function updateCustomFurniImages($id, $imagesJson)
+    {
+        return QueryBuilder::table('furnis_custom')->where('id', $id)->update(['images' => $imagesJson]);
+    }
+
+    public static function updateCustomFurniStatus($id, $status)
+    {
+        return QueryBuilder::table('furnis_custom')->where('id', $id)->update(['status' => $status]);
+    }
+
+    public static function deleteCustomFurni($id)
+    {
+        return QueryBuilder::table('furnis_custom')->where('id', $id)->delete();
+    }
+
+    /**
+     * Insert generated furni into items_base and catalog_items,
+     * mirroring the logic in updateFurniture().
+     * Both tables use AUTO_INCREMENT ids, so no manual ID calculation needed.
+     */
+    public static function addCustomFurniToGame($item, array $itemsBaseData)
+    {
+        QueryBuilder::table('items_base')->insert($itemsBaseData);
+
+        $newItemBase = QueryBuilder::table('items_base')
+            ->where('item_name', $itemsBaseData['item_name'])
+            ->first();
+
+        if (!$newItemBase) {
+            return false;
+        }
+
+        $catalogData = [
+            'item_ids'      => $newItemBase->id,
+            'page_id'       => (int) $item->page_id,
+            'catalog_name'  => $item->catalog_name,
+            'cost_credits'  => (int) $item->cost_credits,
+            'cost_points'   => (int) $item->cost_points,
+            'points_type'   => (int) $item->points_type,
+            'amount'        => (int) $item->amount,
+            'limited_sells' => (int) $item->limited_sells,
+            'limited_stack' => (int) $item->limited_stack,
+        ];
+
+        return QueryBuilder::table('catalog_items')->insert($catalogData);
+    }
 }
