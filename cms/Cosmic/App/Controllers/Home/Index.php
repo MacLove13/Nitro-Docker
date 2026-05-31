@@ -24,6 +24,7 @@ class Index
         if(isset(request()->player->id)) {
             $random = Player::getMyOnlineFriends(request()->player->id);
             $currencys = Player::getCurrencys(request()->player->id);
+            $player_settings = Player::getSettings(request()->player->id);
         }
 
       
@@ -37,8 +38,9 @@ class Index
             'groups'    => $groups,
             'news'      => $news,
             'oftw'      => $oftw,
-            'currencys' => isset($currencys) ? $currencys : null,
-            'random'    => isset($random) ? $random : null
+            'currencys'       => isset($currencys) ? $currencys : null,
+            'random'          => isset($random) ? $random : null,
+            'player_settings' => isset($player_settings) ? $player_settings : null
         ], 10);
 
         return false;

@@ -1,6 +1,6 @@
 {% extends "permissions.html" %}{% set set_permission = 'homepage' %}{% block base %}{% if load is not defined %}
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,7 @@
     <meta name="description"
         content="Virtual world for young people where you can make and meet friends. Meet and make friends, chat with others, create your own avatar, design your own room for free and much more ...">
     <meta name="keywords"
-        content="cosmic, {{site.sitename}}, virtual, world, social network, free, community, avatar, chat, online, teen, roleplaying, join, social, groups, forums, safe, play, games, online, friends, teens, rare, rare meubi, collect, make, collect, contact, meubi, furniture, pets, furnish room, share, expression, badges, hangout, music, celebrity, VIP visits, celebs, mmo, mmorpgs, massive multiplayer, dox , dox hotel, dox hotel, space hotel, space hotel, space, sunnie, sunnie day, sunnieday, habbo, HABBO, habbo hotel, habboo, habbo city, habbocity, cool, virtual world, vip, retro, retro hotel, habbo retro, free , free habbo, holo">
+        content="{{site.sitename}}, virtual, world, social network, free, community, avatar, chat, online, teen, habbo, retro hotel">
 
     <meta property="og:title" content="{{site.sitename}}">
     <meta property="og:type" content="website">
@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="/assets/css/circle.css?v=5">
     <link rel="stylesheet" href="/assets/css/web.{% if player %}{{player.template}}{% else %}{% if template %}{{template}}{% else %}light{% endif %}{% endif %}.css?v=2">
     <link rel="stylesheet" href="/assets/css/web.responsive.css">
+    <link rel="stylesheet" href="/assets/css/habbo-classic.css?v=1">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   
@@ -81,7 +82,7 @@
     </script>
 </head>
 
-<body class="flex-container flex-direction-column">
+<body class="habbo-classic flex-container flex-direction-column">
     <noscript>
         <style>
             .loading-container {
@@ -118,7 +119,6 @@
             ♥<br><br>
             <h4>Cosmic 2.1.0</h4>Raizer
         </p>
-
         <h5>{{locale_base.and_all}} {{site.shortname}}'s ♥</h5>
     </div>
 
@@ -144,15 +144,13 @@
         </div>
     </div>
     {% endif %}
+
     {% if player %}
     <div id="report-item" class="payment-popup zoom-anim-dialog mfp-hide">
         <button title="{{locale_base.close}}" type="button" class="mfp-close" style="color:#000">&#215;</button>
         <h3 class="aside-title">{{locale_base.report_message}}</h3>
-        <p>
-            {{locale_base.report_certainty}}
-        </p>
+        <p>{{locale_base.report_certainty}}</p>
         <form action="/ajax/report/add" method="post" class="login-form" id="reportForm">
-
             <p>
                 <button type="submit" class="rounded-button blue plain"
                     id="reportItem">{{locale_base.report_inappropriate}}</button>
@@ -162,109 +160,91 @@
     </div>
     {% endif %}
 
-    <header class="header-container pixelated is-small">
-        <div class="header-content"> 
-            <div class="logo"><a href="/home"><img src="https://habbofont.net/font/hma/{{site.shortname}}.gif"
-                        style="margin-top: 30px;"></a></div>
-            <div class="account-container">
-                <div class="account-title">
-                    {{locale_base.header_slogan2}}
-                </div>
+    <!-- TOP BAR: My Friends, My Groups, My Rooms -->
+    {% if player %}
+    <div class="habbo-topbar">
+        <div class="habbo-topbar-inner">
+            <div class="habbo-topbar-left">
+                <a href="/community/friends">My Friends <span class="arrow">▶</span></a>
+                <a href="/guilds">My Groups <span class="arrow">▶</span></a>
+                <a href="/community/rooms">My Rooms <span class="arrow">▶</span></a>
+            </div>
+            <div class="habbo-topbar-right">
+                <a href="/help">Help</a>
+                <a href="/logout">Sign Out</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-                <div class="account-buttons">
+    <!-- MAIN HEADER: Logo + Enter Hotel + Online Count -->
+    <div class="habbo-header">
+        <div class="habbo-header-inner">
+            <div class="habbo-logo">
+                <a href="/home">
+                    <img src="https://habbofont.net/font/hma/{{site.shortname}}.gif" alt="{{site.sitename}}" style="height:55px;">
+                </a>
+            </div>
+            <div class="habbo-header-right">
+                <div class="habbo-header-buttons">
                     {% if player is empty %}
-                    <button class="rounded-button white login-dialog-button">{{locale_base.header_login}}</button>
-                    <span>of</span>
-                    <a href="/registration" class="rounded-button white plain">{{locale_base.header_register}}</a>
+                    <button class="habbo-enter-hotel-btn login-dialog-button" style="background:linear-gradient(to bottom,#5bcc00,#3a9900);color:#fff;font-weight:bold;font-size:13px;padding:6px 14px;border-radius:4px;border:1px solid #2a7700;cursor:pointer;">{{locale_base.header_login}}</button>
+                    <a href="/registration" class="habbo-enter-hotel-btn" style="background:linear-gradient(to bottom,#4a8ad4,#2a6ab4);border-color:#1a5aa4;">{{locale_base.header_register}}</a>
                     {% else %}
-                    <a href="/hotel" class="rounded-button white plain hotel-button">{{locale_base.header_to}} Beta {{site.sitename}}</a>
-                    <button class="rounded-button white plain">{{online_count}} {{site.sitename}}'s online</button>
+                    <a href="/hotel" class="habbo-enter-hotel-btn hotel-button">Enter {{site.sitename}} Hotel</a>
+                    <div class="habbo-online-count">
+                        <span>{{online_count}}</span>
+                        {{site.shortname}}s online
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <nav class="navigation-container">
-        <ul class="navigation-menu flex-container">
-            <li class="navigation-item {% if "home" in page %}selected {% endif %}" data-category="home"><a
-                    href="/home">{{locale_base.nav_home}}</a></li>
-            <li class="navigation-item has-items {% if "community" in page %}selected {% endif %}"
-                data-category="community">
-                <a href="/articles">{{locale_base.nav_community}}</a>
-                <ul class="navigation-submenu">
-                    <li class="navigation-subitem"><a href="/articles">{{locale_base.nav_news}}</a></li>
-                    <li class="navigation-subitem"><a href="/jobs">{{locale_base.nav_jobs}}</a></li>
-                    <li class="navigation-subitem"><a href="/community/photos">{{locale_base.nav_photos}}</a></li>
-                    <li class="navigation-subitem"><a href="/community/staff">{{site.shortname}} {{locale_base.nav_staff}}</a></li>
-                    <li class="navigation-subitem"><a href="/community/team">{{site.shortname}} {{locale_base.nav_team}}</a></li>
-                </ul>
-            </li>
-
+    <!-- TAB NAVIGATION: username, Community, Coins, Games, Housekeeping -->
+    <div class="habbo-tabnav">
+        <div class="habbo-tabnav-inner">
             {% if player %}
-            <li class="navigation-item has-items {% if "shop" in page %}selected {% endif %}" data-category="shop">
-                <a href="/shop">{{site.shortname}} {{locale_base.nav_shop}}</a>
-                <ul class="navigation-submenu">
-                    <li class="navigation-subitem"><a href="/shop">{{locale_base.nav_buy_points}}</a></li>
-                    <li class="navigation-subitem"><a href="/shop/club">{{locale_base.nav_buy_club}}</a></li>
-                    <li class="navigation-subitem"><a href="/shop/history">{{locale_base.nav_purchasehistory}}</a></li>
-                    <li class="navigation-subitem"><a href="/shop/drawbadge">{{locale_base.nav_drawyourbadge}}</a></li>
-                    <li class="navigation-subitem"><a href="/settings/namechange">{{locale_base.nav_changename}}</a>
-                    </li>
-                </ul>
-            </li>
+            <a href="/me" class="habbo-tab habbo-tab-user {% if "home" in page or "me" in page %}habbo-tab-active{% endif %}">{{player.username}}</a>
             {% endif %}
-
-            <li class="navigation-item {% if "games" in page %}selected {% endif %}" data-category="games"><a
-                    href="/games/ranking">{{locale_base.nav_highscores}}</a></li>
-            <li class="navigation-item {% if "forum" in page %}selected {% endif %}" data-category="forum"><a
-                    href="/guilds">{{locale_base.nav_forum}}</a></li>
-
-            <li class="navigation-item has-items {% if "help" in page %}selected {% endif %}" data-category="help">
-                <a href="/help">{{locale_base.nav_helptool}}</a>
-                <ul class="navigation-submenu">
-                    <li class="navigation-subitem"><a href="/help">{{locale_base.nav_helptool}}</a></li>
-                    {% if player %}
-                    <li class="navigation-subitem"><a href="/help/requests/view">{{locale_base.nav_helptickets}}</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </li>
-
+            <a href="/articles" class="habbo-tab habbo-tab-blue {% if "community" in page %}habbo-tab-active{% endif %}">Community</a>
+            <a href="/shop" class="habbo-tab habbo-tab-blue {% if "shop" in page %}habbo-tab-active{% endif %}">Coins</a>
+            <a href="/games/ranking" class="habbo-tab habbo-tab-blue {% if "games" in page %}habbo-tab-active{% endif %}">Games</a>
             {% if 'housekeeping' in permissions %}
-            <li class="navigation-item">
-                <a href="/housekeeping" target="_blank">{{locale_base.nav_housekeeping}}</a>
-            </li>
+            <a href="/housekeeping" target="_blank" class="habbo-tab habbo-tab-housekeeping">Housekeeping</a>
             {% endif %}
+        </div>
+    </div>
 
-            {% if player %}
-            <li class="navigation-item navigation-right-side-item has-items">
-                <a href="#">
-                    <div class="account-avatar"><img src="{{site.fpath}}/avatarimage?figure={{player.look}}&gesture=sml"
-                            alt="{{player.username}}" class="pixelated"></div>
-                    <span>{{player.username}}</span>
-                </a>
-                <ul class="navigation-submenu">
-                    <li class="navigation-subitem"><a href="/hotel">{{locale_base.user_to}} {{site.sitename}}</a></li>
-                    <li class="navigation-subitem"><a
-                            href="/profile/{{player.username}}">{{locale_base.user_profile}}</a></li>
-                    <li class="navigation-subitem"><a href="/settings">{{site.shortname}} ID
-                            {{locale_base.user_settings}}</a></li>
-                    <li class="navigation-subitem"><a href="/logout" target="_self">{{locale_base.user_logout}}</a></li>
-                </ul>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+    <!-- SUB NAVIGATION: Home, My Page, Account Settings, Habbo Club, Habbo Guides -->
+    {% if player %}
+    <div class="habbo-subnav">
+        <div class="habbo-subnav-inner">
+            <a href="/home" class="{% if "home" in page %}active{% endif %}">Home</a>
+            <a href="/profile/{{player.username}}" class="{% if "profile" in page %}active{% endif %}">My Page</a>
+            <a href="/settings" class="{% if "settings" in page %}active{% endif %}">Account Settings</a>
+            <a href="/shop/club" class="{% if "club" in page %}active{% endif %}">{{site.shortname}} Club</a>
+            <a href="/help" class="{% if "help" in page %}active{% endif %}">{{site.shortname}} Guides</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="habbo-subnav">
+        <div class="habbo-subnav-inner">
+            <a href="/home">Home</a>
+            <a href="/articles">Community</a>
+            <a href="/help">Help</a>
+        </div>
+    </div>
+    {% endif %}
 
     <section class="page-container" data-page="{% if page is empty %}lost{% else %}{{page}}{% endif %}">
         {% block body %} {% endblock %}
     </section>
 
-    <footer class="footer-container">
-        <div class="footer-copyright">&copy; 2019 {{site.domain}} | <a href="/help/">{{locale_base.footer_helptool}}</a> | <a
-                href="#" class="about-dialog-button">Cosmic</a></div>
-    </footer>
+    <div class="habbo-footer">
+        &copy; {{site.sitename}} | <a href="/help/">Help Tool</a> | <a href="#" class="about-dialog-button">About</a>
+    </div>
 
     {% if player %}
     <div id="hotel-container">
@@ -289,10 +269,8 @@
                 <audio controls id="stream" style="display:none">
                     <source type="audio/mpeg">
                 </audio>
-
                 <i class="fa fa-play"></i>
                 <i class="fa fa-pause" style="display: none"></i>
-
                 <i class="fa fa-volume-down"></i>
                 <i class="fa fa-volume-up"></i>
             </button>
@@ -310,6 +288,7 @@
     <script src="/assets/js/pagination.js"></script>
     <script src="/assets/js/jquery.wysibb.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="/assets/js/web/habbo-classic.js"></script>
 
 </body>
 
