@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { FaCaretDown, FaCaretUp } from 'react-icons/fa';
+import { FaCaretDown, FaCaretRight } from 'react-icons/fa';
 import { ICatalogNode } from '../../../../api';
 import { Base, LayoutGridItem, Text } from '../../../../common';
 import { useCatalog } from '../../../../hooks';
@@ -31,8 +31,8 @@ export const CatalogNavigationItemView: FC<CatalogNavigationItemViewProps> = pro
                 <Text grow truncate className="nitro-catalog-navigation-item-label">{ node.localization }</Text>
                 { node.isBranch &&
                     <Base className="nitro-catalog-navigation-item-arrow">
-                        { node.isOpen && <FaCaretUp className="fa-icon" /> }
-                        { !node.isOpen && <FaCaretDown className="fa-icon" /> }
+                        { node.isOpen && <FaCaretDown className="fa-icon" /> }
+                        { !node.isOpen && <FaCaretRight className="fa-icon" /> }
                     </Base> }
             </LayoutGridItem>
             { node.isOpen && node.isBranch &&
