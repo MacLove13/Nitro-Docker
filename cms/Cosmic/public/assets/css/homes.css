@@ -1126,3 +1126,111 @@ a.new-button b {
   pointer-events: none!important;
   text-decoration: none !important;
 }
+/* ── Sticker Shop Dialog ─────────────────────────────────── */
+.sticker-shop-dialog {
+    font-family: inherit;
+}
+.sticker-shop-tabs {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 8px;
+}
+.sticker-shop-tabs .tab-btn {
+    padding: 6px 18px;
+    border: none;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-size: 13px;
+    border-radius: 4px 4px 0 0;
+    margin-right: 4px;
+}
+.sticker-shop-tabs .tab-btn.active {
+    background: #fff;
+    border-bottom: 2px solid #fff;
+    font-weight: bold;
+}
+.sticker-shop-body {
+    min-height: 360px;
+}
+.tab-panel {
+    display: flex;
+}
+.shop-sidenav {
+    width: 160px;
+    min-width: 160px;
+    border-right: 1px solid #ddd;
+    padding-right: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+.shop-sidenav a {
+    display: block;
+    padding: 4px 6px;
+    font-size: 12px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 3px;
+}
+.shop-sidenav a.active,
+.shop-sidenav a:hover {
+    background: #e8f0fe;
+    color: #1a73e8;
+}
+.shop-main {
+    flex: 1;
+    padding: 0 10px;
+    max-height: 360px;
+    overflow-y: auto;
+}
+.sticker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 4px 0;
+}
+.sticker-grid .stickerImage {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 3px;
+    transition: border-color .15s;
+}
+.sticker-grid .stickerImage:hover {
+    border-color: #1a73e8;
+}
+.shop-preview {
+    width: 180px;
+    min-width: 180px;
+    border-left: 1px solid #ddd;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.preview-img-wrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-img {
+    max-width: 80px;
+    max-height: 80px;
+}
+.preview-name {
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+}
+.preview-price,
+.preview-balance {
+    font-size: 12px;
+    color: #555;
+}
+.purchaseBtn {
+    margin-top: 8px;
+    width: 100%;
+}

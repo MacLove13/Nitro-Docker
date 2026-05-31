@@ -133,6 +133,12 @@
               <i class="kt-menu__link-icon flaticon2-rectangular"></i><span class="kt-menu__link-text">Badge manage</span></a>
           </li>
           {% endif %}
+          {% if 'housekeeping_home_stickers' in permissions %}
+          <li class="kt-menu__item ajaxLoading" aria-haspopup="true" >
+              <a  href="/housekeeping/homestickers/manage" class="kt-menu__link ">
+              <i class="kt-menu__link-icon flaticon2-image-file"></i><span class="kt-menu__link-text">Home Stickers</span></a>
+          </li>
+          {% endif %}
           {% endif %}
        </ul>
     </div>
