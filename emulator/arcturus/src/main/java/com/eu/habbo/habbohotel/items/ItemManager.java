@@ -211,6 +211,7 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("wf_trg_score_achieved", WiredTriggerScoreAchieved.class));
         this.interactionsList.add(new ItemInteraction("wf_trg_game_team_win", WiredTriggerTeamWins.class));
         this.interactionsList.add(new ItemInteraction("wf_trg_game_team_lose", WiredTriggerTeamLoses.class));
+        this.interactionsList.add(new ItemInteraction("wf_trg_user_variable_changed", WiredTriggerUserVariableChanged.class));
 
 
         this.interactionsList.add(new ItemInteraction("wf_act_toggle_state", WiredEffectToggleFurni.class));
@@ -243,6 +244,9 @@ public class ItemManager {
         this.interactionsList.add(new ItemInteraction("wf_act_alert", WiredEffectAlert.class));
         this.interactionsList.add(new ItemInteraction("wf_act_give_handitem", WiredEffectGiveHandItem.class));
         this.interactionsList.add(new ItemInteraction("wf_act_give_effect", WiredEffectGiveEffect.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_give_user_variable", WiredEffectGiveUserVariable.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_change_user_variable", WiredEffectChangeUserVariable.class));
+        this.interactionsList.add(new ItemInteraction("wf_act_define_user_variable", WiredEffectDefineUserVariable.class));
 
         this.interactionsList.add(new ItemInteraction("wf_cnd_has_furni_on", WiredConditionFurniHaveFurni.class));
         this.interactionsList.add(new ItemInteraction("wf_cnd_furnis_hv_avtrs", WiredConditionFurniHaveHabbo.class));

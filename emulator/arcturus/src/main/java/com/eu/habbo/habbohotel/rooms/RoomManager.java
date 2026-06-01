@@ -986,6 +986,22 @@ public class RoomManager {
             } catch (SQLException e) {
                 LOGGER.error("Caught SQL exception", e);
             }
+
+            deleteNonPersistentVariableValues(habbo.getHabboInfo().getId(), room.getId());
+        }
+    }
+
+    private void deleteNonPersistentVariableValues(int userId, int roomId) {
+        try (Connection connection = Emulator.getDatabase().getDataSource().getConnection();
+             PreparedStatement stmt = connection.prepareStatement(
+                     "DELETE wuv FROM wired_user_variable_values wuv " +
+                     "JOIN wired_variable_definitions wvd ON wuv.room_id = wvd.room_id AND wuv.variable_name = wvd.variable_name " +
+                     "WHERE wuv.user_id = ? AND wuv.room_id = ? AND wvd.is_persistent = 0")) {
+            stmt.setInt(1, userId);
+            stmt.setInt(2, roomId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to delete non-persistent variable values for user {} in room {}", userId, roomId, e);
         }
     }
 
